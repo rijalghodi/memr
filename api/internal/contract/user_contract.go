@@ -25,5 +25,3 @@ type UserUseCase interface {
 	DeleteUser(ctx context.Context, id uint) error
 	Login(ctx context.Context, req *domain.LoginRequest) (*domain.LoginResponse, error)
 }
-
-

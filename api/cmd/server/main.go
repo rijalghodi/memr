@@ -162,4 +162,3 @@ func customErrorHandler(c *fiber.Ctx, err error) error {
 		"error":   err.Error(),
 	})
 }
-
