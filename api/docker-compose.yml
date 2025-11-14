@@ -1,56 +1,58 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: memr_postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+  adminer:
+    image: adminer
+    restart: always
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - 8080:8080
     networks:
-      - memr_network
+      - go-network
 
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: memr_api
-    environment:
-      PORT: 8080
-      ENV: development
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: postgres
-      DB_SSLMODE: disable
-      JWT_SECRET: your-secret-key-change-this-in-production
-      JWT_EXPIRY: 24h
+  postgresdb:
+    image: postgres:alpine
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      timeout: 20s
+      retries: 10
     ports:
-      - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
+      - ${DB_PORT}:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ./src/database/init:/docker-entrypoint-initdb.d
     networks:
-      - memr_network
-    restart: unless-stopped
+      - go-network
+
+  go-app:
+    build: .
+    image: go-app
+    ports:
+      - ${APP_PORT}:3000
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/go-app
+    restart: on-failure
+    env_file:
+      - .env
+    networks:
+      - go-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "${APP_URL}/v1/health-check"]
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
 
 volumes:
-  postgres_data:
-    driver: local
+  dbdata:
 
 networks:
-  memr_network:
+  go-network:
     driver: bridge
-
-

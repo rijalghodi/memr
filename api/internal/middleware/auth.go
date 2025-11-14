@@ -1,55 +1,39 @@
 package middleware
 
 import (
+	"app/internal/config"
+	"app/internal/pkg/user/service"
+	"app/internal/utils"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/rijalghodi/memr/api/internal/pkg"
 )
 
-// JWTAuth returns a middleware that validates JWT tokens
-func JWTAuth(secret string) fiber.Handler {
+func Auth(userService service.UserService, requiredRights ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Get authorization header
 		authHeader := c.Get("Authorization")
-		if authHeader == "" {
-			return pkg.SendUnauthorized(c, "Missing authorization header")
+		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+
+		if token == "" {
+			return fiber.NewError(fiber.StatusUnauthorized, "Please authenticate")
 		}
 
-		// Extract token from "Bearer <token>"
-		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			return pkg.SendUnauthorized(c, "Invalid authorization header format")
-		}
-
-		tokenString := parts[1]
-
-		// Parse and validate token
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			// Validate signing method
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid signing method")
-			}
-			return []byte(secret), nil
-		})
-
+		userID, err := utils.VerifyToken(token, config.JWTSecret, config.TokenTypeAccess)
 		if err != nil {
-			return pkg.SendUnauthorized(c, "Invalid or expired token")
+			return fiber.NewError(fiber.StatusUnauthorized, "Please authenticate")
 		}
 
-		if !token.Valid {
-			return pkg.SendUnauthorized(c, "Invalid token")
+		user, err := userService.GetUserByID(c, userID)
+		if err != nil || user == nil {
+			return fiber.NewError(fiber.StatusUnauthorized, "Please authenticate")
 		}
 
-		// Extract claims
-		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			// Store user ID in context for use in handlers
-			if userID, exists := claims["user_id"]; exists {
-				c.Locals("user_id", userID)
-			}
-			if email, exists := claims["email"]; exists {
-				c.Locals("email", email)
+		c.Locals("user", user)
+
+		if len(requiredRights) > 0 {
+			userRights, hasRights := config.RoleRights[user.Role]
+			if (!hasRights || !hasAllRights(userRights, requiredRights)) && c.Params("userId") != userID {
+				return fiber.NewError(fiber.StatusForbidden, "You don't have permission to access this resource")
 			}
 		}
 
@@ -57,24 +41,16 @@ func JWTAuth(secret string) fiber.Handler {
 	}
 }
 
-// GetUserIDFromContext retrieves the user ID from the context
-func GetUserIDFromContext(c *fiber.Ctx) (float64, bool) {
-	userID := c.Locals("user_id")
-	if userID == nil {
-		return 0, false
+func hasAllRights(userRights, requiredRights []string) bool {
+	rightSet := make(map[string]struct{}, len(userRights))
+	for _, right := range userRights {
+		rightSet[right] = struct{}{}
 	}
-	id, ok := userID.(float64)
-	return id, ok
-}
 
-// GetEmailFromContext retrieves the email from the context
-func GetEmailFromContext(c *fiber.Ctx) (string, bool) {
-	email := c.Locals("email")
-	if email == nil {
-		return "", false
+	for _, right := range requiredRights {
+		if _, exists := rightSet[right]; !exists {
+			return false
+		}
 	}
-	emailStr, ok := email.(string)
-	return emailStr, ok
+	return true
 }
-
-

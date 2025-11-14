@@ -1,46 +1,18 @@
-# Build stage
-FROM golang:1.22-alpine AS builder
+FROM golang:1.22 AS build
 
-# Install build dependencies
-RUN apk add --no-cache git make
-
-# Set working directory
 WORKDIR /app
-
-# Copy go mod files
-COPY go.mod go.sum ./
-COPY go.work ./
-
-# Copy library modules
-COPY libs/ ./libs/
-
-# Download dependencies
-RUN go mod download
-
-# Copy source code
 COPY . .
+RUN go clean --modcache
+RUN go mod tidy
+RUN CGO_ENABLED=0 GOOS=linux go build src/main.go
 
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/server
-
-# Runtime stage
 FROM alpine:latest
 
-# Install ca-certificates for HTTPS
-RUN apk --no-cache add ca-certificates
+RUN apk add --no-cache curl
 
-# Set working directory
-WORKDIR /root/
+WORKDIR /root
+COPY --from=build /app/main .
+COPY --from=build /app/.env .
 
-# Copy binary from builder
-COPY --from=builder /app/main .
-
-# Copy .env file (optional, can use environment variables from docker-compose)
-COPY --from=builder /app/.env* ./
-
-# Expose port
-EXPOSE 8080
-
-# Run the application
+EXPOSE 3000
 CMD ["./main"]
-
