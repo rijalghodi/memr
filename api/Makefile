@@ -2,32 +2,27 @@ include .env
 export $(shell sed 's/=.*//' .env)
 
 start:
-	@go run src/main.go
+	@go run main.go http
 lint:
 	@golangci-lint run
-tests:
-	@go test -v ./test/...
-tests-%:
-	@go test -v ./test/... -run=$(shell echo $* | sed 's/_/./g')
-testsum:
-	@cd test && gotestsum --format testname
 swagger:
-	@cd src && swag init
+	@swag init --dir ./cmd,./internal --output ./docs
 migration-%:
-	@migrate create -ext sql -dir src/database/migrations create-table-$(subst :,_,$*)
+	@if [ ! -d "internal/database/migrations" ]; then mkdir -p internal/database/migrations; fi; \
+	NEXT_NUM=$$(ls -1 internal/database/migrations/*.sql 2>/dev/null | sed -n 's/.*\/\([0-9]*\)_.*/\1/p' | sort -n | tail -1); \
+	if [ -z "$$NEXT_NUM" ]; then NEXT_NUM=0; fi; \
+	NEXT_NUM=$$((NEXT_NUM + 1)); \
+	MIGRATION_FILE="internal/database/migrations/$${NEXT_NUM}_$(subst :,_,$*).sql"; \
+	echo "-- +migrate Up" > "$$MIGRATION_FILE"; \
+	echo "" >> "$$MIGRATION_FILE"; \
+	echo "-- +migrate Down" >> "$$MIGRATION_FILE"; \
+	echo "Created migration: $$MIGRATION_FILE"
 migrate-up:
-	@migrate -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable" -path src/database/migrations up
+	@go run main.go migrate up $(word 2,$(MAKECMDGOALS))
 migrate-down:
-	@migrate -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable" -path src/database/migrations down
-migrate-docker-up:
-	@docker run -v ./src/database/migrations:/migrations --network go-fiber-boilerplate_go-network migrate/migrate -path=/migrations/ -database postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable up
-migrate-docker-down:
-	@docker run -v ./src/database/migrations:/migrations --network go-fiber-boilerplate_go-network migrate/migrate -path=/migrations/ -database postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable down -all
+	@go run main.go migrate down $(word 2,$(MAKECMDGOALS))
 docker:
-	@chmod -R 755 ./src/database/init
 	@docker-compose up --build
-docker-test:
-	@docker-compose up -d && make tests
 docker-down:
 	@docker-compose down --rmi all --volumes --remove-orphans
 docker-cache:

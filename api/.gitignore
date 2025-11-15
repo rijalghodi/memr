@@ -7,3 +7,8 @@ tmp/
 
 lint.txt
 main
+
+.vscode/
+
+_debug/
+__debug_bin*

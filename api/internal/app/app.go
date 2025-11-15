@@ -1,12 +1,13 @@
 package app
 
 import (
-	database "app/db"
 	"app/internal/config"
 	"app/internal/middleware"
-	"app/internal/utils"
+	"app/pkg/logger"
+	"app/pkg/postgres"
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,11 +16,21 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
+	"github.com/gofiber/swagger"
 	"gorm.io/gorm"
 )
 
 // Run starts the application server
 func Run() error {
+	logger.Init(logger.Config{
+		Level: config.Env.App.LogLevel,
+	})
+
+	// Initialize Firebase
+	if err := config.InitFirebase(); err != nil {
+		log.Fatalf("Failed to initialize Firebase: %v", err)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -28,7 +39,7 @@ func Run() error {
 	defer closeDatabase(db)
 	setupRoutes(app, db)
 
-	address := fmt.Sprintf("%s:%d", config.AppHost, config.AppPort)
+	address := fmt.Sprintf("%s:%d", config.Env.App.Host, config.Env.App.Port)
 
 	// Start server and handle graceful shutdown
 	serverErrors := make(chan error, 1)
@@ -53,14 +64,33 @@ func setupFiberApp() *fiber.App {
 }
 
 func setupDatabase() *gorm.DB {
-	db := database.Connect(config.DBHost, config.DBName)
-	// Add any additional database setup if needed
-	return db
+	db, err := postgres.NewPostgres(postgres.PostgresConfig{
+		MigrationDirectory: config.Env.Postgres.MigrationDirectory,
+		MigrationDialect:   config.Env.Postgres.MigrationDialect,
+		Host:               config.Env.Postgres.Host,
+		User:               config.Env.Postgres.User,
+		Password:           config.Env.Postgres.Password,
+		Port:               config.Env.Postgres.Port,
+		DBName:             config.Env.Postgres.DBName,
+		SSLMode:            config.Env.Postgres.SSLMode,
+		MaxOpenConns:       config.Env.Postgres.MaxOpenConns,
+		MaxIdleConns:       config.Env.Postgres.MaxIdleConns,
+		ConnMaxLifetime:    config.Env.Postgres.ConnMaxLifetime,
+		ConnMaxIdleTime:    config.Env.Postgres.ConnMaxIdleTime,
+	})
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	return db.DB
 }
 
 func setupRoutes(app *fiber.App, db *gorm.DB) {
-	Routes(app, db)
-	app.Use(utils.NotFoundHandler)
+
+	docs := app.Group("/docs")
+
+	docs.Get("/*", swagger.HandlerDefault)
+
+	InjectHTTPHandlers(app, db)
 }
 
 func startServer(app *fiber.App, address string, errs chan<- error) {
@@ -72,14 +102,14 @@ func startServer(app *fiber.App, address string, errs chan<- error) {
 func closeDatabase(db *gorm.DB) {
 	sqlDB, errDB := db.DB()
 	if errDB != nil {
-		utils.Log.Errorf("Error getting database instance: %v", errDB)
+		log.Fatalf("Error getting database instance: %v", errDB)
 		return
 	}
 
 	if err := sqlDB.Close(); err != nil {
-		utils.Log.Errorf("Error closing database connection: %v", err)
+		log.Fatalf("Error closing database connection: %v", err)
 	} else {
-		utils.Log.Info("Database connection closed successfully")
+		log.Println("Database connection closed successfully")
 	}
 }
 
@@ -89,15 +119,15 @@ func handleGracefulShutdown(ctx context.Context, app *fiber.App, serverErrors <-
 
 	select {
 	case err := <-serverErrors:
-		utils.Log.Fatalf("Server error: %v", err)
+		log.Fatalf("Server error: %v", err)
 	case <-quit:
-		utils.Log.Info("Shutting down server...")
+		log.Println("Shutting down server...")
 		if err := app.Shutdown(); err != nil {
-			utils.Log.Fatalf("Error during server shutdown: %v", err)
+			log.Fatalf("Error during server shutdown: %v", err)
 		}
 	case <-ctx.Done():
-		utils.Log.Info("Server exiting due to context cancellation")
+		log.Println("Server exiting due to context cancellation")
 	}
 
-	utils.Log.Info("Server exited")
+	log.Println("Server exited")
 }

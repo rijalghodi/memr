@@ -1,4 +1,4 @@
-package lib
+package postgres
 
 import (
 	"database/sql"
@@ -61,7 +61,7 @@ func (pg *Postgres) connect() error {
 
 	// Open GORM connection
 	db, err := gorm.Open(postgres.Open(postgresDsn), &gorm.Config{
-		Logger:                 logger.Default.LogMode(logger.Info),
+		Logger:                 logger.Default.LogMode(logger.Warn),
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
 		TranslateError:         true,

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"app/internal/utils"
+	"app/pkg/util"
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
@@ -9,11 +9,10 @@ import (
 
 func FiberConfig() fiber.Config {
 	return fiber.Config{
-		Prefork:       !Env.App.Debug, // Prefork in production (when debug is false)
 		CaseSensitive: true,
-		ServerHeader:  "Fiber",
-		AppName:       "Fiber API",
-		ErrorHandler:  utils.ErrorHandler,
+		ServerHeader:  "Memr",
+		AppName:       "Memr API",
+		ErrorHandler:  util.ErrorHandler,
 		JSONEncoder:   sonic.Marshal,
 		JSONDecoder:   sonic.Unmarshal,
 	}

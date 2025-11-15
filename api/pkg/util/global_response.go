@@ -1,4 +1,4 @@
-package utils
+package util
 
 type BaseResponse struct {
 	Status  bool   `json:"status"`
@@ -29,18 +29,21 @@ type PaginatedResponse struct {
 	Data    PaginatedData `json:"data"`
 }
 
-func ToPaginatedResponse(items any, page, pageSize int, total int64) PaginatedResponse {
+func ToPaginatedData(items any, page, pageSize int, total int64) PaginatedData {
 	totalPages := int((total + int64(pageSize) - 1) / int64(pageSize))
 
+	return PaginatedData{
+		Page:       page,
+		PageSize:   pageSize,
+		Total:      total,
+		TotalPages: totalPages,
+	}
+}
+
+func ToPaginatedResponse(items any, page, pageSize int, total int64) PaginatedResponse {
 	return PaginatedResponse{
 		Status:  true,
 		Message: "success",
-		Data: PaginatedData{
-			Page:       page,
-			PageSize:   pageSize,
-			Total:      total,
-			TotalPages: totalPages,
-			Items:      items,
-		},
+		Data:    ToPaginatedData(items, page, pageSize, total),
 	}
 }

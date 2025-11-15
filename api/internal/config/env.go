@@ -15,12 +15,14 @@ type Environment struct {
 	Redis       Redis
 	GPT         GPT
 	GoogleOAuth GoogleOAuth
+	Firebase    Firebase
 }
 
 type App struct {
 	Debug       bool   `env:"APP_DEBUG"`
+	LogLevel    string `env:"APP_LOG_LEVEL"`
 	Host        string `env:"APP_HOST"`
-	Port        string `env:"APP_PORT"`
+	Port        int    `env:"APP_PORT"`
 	URL         string `env:"APP_URL"`
 	FrontendURL string `env:"APP_FRONTEND_URL"`
 	Password    string `env:"APP_PASSWORD"`
@@ -44,8 +46,7 @@ type Postgres struct {
 
 type JWT struct {
 	Secret                  string `env:"JWT_SECRET"`
-	AccessExpMinutes        int    `env:"JWT_ACCESS_EXP_MINUTES"`
-	RefreshExpDays          int    `env:"JWT_REFRESH_EXP_DAYS"`
+	AccessExpMinutes        int    `env:"JWT_ACCESS_EXP_HOURS"`
 	ResetPasswordExpMinutes int    `env:"JWT_RESET_PASSWORD_EXP_MINUTES"`
 	VerifyEmailExpMinutes   int    `env:"JWT_VERIFY_EMAIL_EXP_MINUTES"`
 }
@@ -73,6 +74,10 @@ type GoogleOAuth struct {
 	RedirectURL  string `env:"GOOGLE_OAUTH_REDIRECT_URL"`
 	ClientID     string `env:"GOOGLE_OAUTH_CLIENT_ID"`
 	ClientSecret string `env:"GOOGLE_OAUTH_CLIENT_SECRET"`
+}
+
+type Firebase struct {
+	ServiceAccountKeyPath string `env:"FIREBASE_SERVICE_ACCOUNT_KEY_PATH"`
 }
 
 var Env Environment

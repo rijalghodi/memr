@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"app/internal/utils"
+	"app/pkg/util"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,7 +14,7 @@ func LimiterConfig() fiber.Handler {
 		Expiration: 15 * time.Minute,
 		LimitReached: func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusTooManyRequests).
-				JSON(utils.ToErrorResponse("Too many requests, please try again later", nil))
+				JSON(util.ToErrorResponse("Too many requests, please try again later", nil))
 		},
 		SkipSuccessfulRequests: true,
 	})
