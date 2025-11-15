@@ -46,7 +46,7 @@ type Postgres struct {
 
 type JWT struct {
 	Secret                  string `env:"JWT_SECRET"`
-	AccessExpMinutes        int    `env:"JWT_ACCESS_EXP_HOURS"`
+	AccessExpMinutes        int    `env:"JWT_ACCESS_EXP_MINUTES"`
 	ResetPasswordExpMinutes int    `env:"JWT_RESET_PASSWORD_EXP_MINUTES"`
 	VerifyEmailExpMinutes   int    `env:"JWT_VERIFY_EMAIL_EXP_MINUTES"`
 }
