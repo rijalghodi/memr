@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"app/config"
-	libraries "app/util/lib"
+	"app/internal/config"
+	"app/pkg/postgres"
 	"bufio"
 	"errors"
-	"log"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -30,13 +30,13 @@ func RunMigrate() error {
 func startMigration(direction migrate.MigrationDirection, version int) {
 	// Check confirmation for down migrations
 	if direction == migrate.Down && !confirmMigrateDown(version) {
-		log.Println("Migration aborted.")
+		fmt.Println("Migration aborted.")
 		return
 	}
 
 	// Connect to database
-	log.Println("Connecting to postgres...")
-	pg, err := libraries.NewPostgres(libraries.PostgresConfig{
+	fmt.Println("Connecting to postgres...")
+	pg, err := postgres.NewPostgres(postgres.PostgresConfig{
 		MigrationDirectory: config.Env.Postgres.MigrationDirectory,
 		MigrationDialect:   config.Env.Postgres.MigrationDialect,
 		Host:               config.Env.Postgres.Host,
@@ -51,17 +51,18 @@ func startMigration(direction migrate.MigrationDirection, version int) {
 		ConnMaxIdleTime:    config.Env.Postgres.ConnMaxIdleTime,
 	})
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		fmt.Printf("Failed to connect to database: %v\n", err)
 	}
 	defer pg.Close()
-	log.Println("Connected to postgres!")
+	fmt.Println("Connected to postgres")
 
 	// Run migration
-	log.Println("Migrating...")
+	fmt.Println("Migrating...")
 	if err := pg.Migrate(direction, version); err != nil {
-		log.Fatalf("Could not migrate, err: %s", err.Error())
+		fmt.Printf("Could not migrate, err: %s\n", err.Error())
+		return
 	}
-	log.Println("Migrated!")
+	fmt.Println("Migrated!")
 }
 
 func validateMigrateArguments(args []string) (direction migrate.MigrationDirection, version int, err error) {
@@ -91,12 +92,12 @@ func validateMigrateArguments(args []string) (direction migrate.MigrationDirecti
 func confirmMigrateDown(version int) bool {
 	reader := bufio.NewReader(os.Stdin)
 
-	log.Printf("[WARNING] You are about to migrate down to version %d. This action cannot be undone!\n", version)
-	log.Print("Type 'yes' to confirm: ")
+	fmt.Printf("[WARNING] You are about to migrate down to version %d. This action cannot be undone!\n", version)
+	fmt.Print("Type 'yes' to confirm: ")
 
 	response, err := reader.ReadString('\n')
 	if err != nil {
-		log.Printf("Error reading input: %v\n", err)
+		fmt.Printf("Error reading input: %v\n", err)
 		return false
 	}
 

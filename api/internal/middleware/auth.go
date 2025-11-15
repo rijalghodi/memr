@@ -2,55 +2,47 @@ package middleware
 
 import (
 	"app/internal/config"
-	"app/internal/pkg/user/service"
-	"app/internal/utils"
+	"app/pkg/util"
+	"slices"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func Auth(userService service.UserService, requiredRights ...string) fiber.Handler {
+func AuthGuard(roles ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		authHeader := c.Get("Authorization")
-		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
-
+		// Extract token from Authorization header
+		token := extractToken(c)
 		if token == "" {
 			return fiber.NewError(fiber.StatusUnauthorized, "Please authenticate")
 		}
 
-		userID, err := utils.VerifyToken(token, config.JWTSecret, config.TokenTypeAccess)
+		// Verify and parse token
+		claims, err := util.VerifyToken(token, config.Env.JWT.Secret)
 		if err != nil {
 			return fiber.NewError(fiber.StatusUnauthorized, "Please authenticate")
 		}
 
-		user, err := userService.GetUserByID(c, userID)
-		if err != nil || user == nil {
-			return fiber.NewError(fiber.StatusUnauthorized, "Please authenticate")
+		// Check role permissions if roles are specified
+		if len(roles) > 0 && !slices.Contains(roles, claims.Role) {
+			return fiber.NewError(fiber.StatusForbidden, "You are not authorized to access this resource")
 		}
 
-		c.Locals("user", user)
-
-		if len(requiredRights) > 0 {
-			userRights, hasRights := config.RoleRights[user.Role]
-			if (!hasRights || !hasAllRights(userRights, requiredRights)) && c.Params("userId") != userID {
-				return fiber.NewError(fiber.StatusForbidden, "You don't have permission to access this resource")
-			}
-		}
-
+		c.Locals("user", claims)
 		return c.Next()
 	}
 }
 
-func hasAllRights(userRights, requiredRights []string) bool {
-	rightSet := make(map[string]struct{}, len(userRights))
-	for _, right := range userRights {
-		rightSet[right] = struct{}{}
-	}
+func extractToken(c *fiber.Ctx) string {
+	authHeader := c.Get("Authorization")
+	return strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+}
 
-	for _, right := range requiredRights {
-		if _, exists := rightSet[right]; !exists {
-			return false
-		}
+// GetAuthClaims retrieves authenticated user claims from context
+func GetAuthClaims(c *fiber.Ctx) util.JWTClaims {
+	claims, ok := c.Locals("user").(util.JWTClaims)
+	if !ok {
+		return util.JWTClaims{}
 	}
-	return true
+	return claims
 }
