@@ -24,7 +24,6 @@ cp .env-example .env
 
 - [Features](#features)
 - [Commands](#commands)
-- [Environment Variables](#environment-variables)
 - [Project Structure](#project-structure)
 - [Error Handling](#error-handling)
 - [Validation](#validation)
@@ -36,10 +35,10 @@ cp .env-example .env
 - **SQL database**: [PostgreSQL](https://www.postgresql.org) with [Gorm](https://gorm.io)
 - **Database migrations**: with [golang-migrate](https://github.com/golang-migrate/migrate)
 - **Validation**: request data validation using [Package validator](https://github.com/go-playground/validator)
-- **Logging**: using custom logger and [Fiber-Logger](https://docs.gofiber.io/api/middleware/logger)
+- **Logging**: using custom [Zap](https://github.com/uber-go/zap)
 - **Error handling**: centralized error handling mechanism
 - **Sending email**: SMTP email support with Google Mail
-- **Environment variables**: using [Viper](https://github.com/spf13/viper)
+- **Environment variables**: using [Viper](https://github.com/joho/godotenv)
 - **Authentication**: Firebase Authentication and JWT
 - **Security**: HTTP headers, CORS, rate limiting
 - **Docker support**
@@ -50,6 +49,12 @@ Running locally:
 
 ```bash
 make start
+```
+
+Watch:
+
+```bash
+air
 ```
 
 > [!NOTE]
@@ -67,13 +72,6 @@ make docker-down
 
 # clean docker cache
 make docker-cache
-```
-
-Linting:
-
-```bash
-# run lint
-make lint
 ```
 
 Swagger:
@@ -174,11 +172,3 @@ These routes require a valid JWT access token in the Authorization request heade
 
 - Access token is valid for 30 minutes (configurable via `JWT_ACCESS_EXP_MINUTES`)
 - Refresh token is valid for 30 days (configurable via `JWT_REFRESH_EXP_DAYS`)
-
-## Authorization
-
-The `Auth` middleware can also be used to require certain rights/permissions to access a route.
-
-The permissions are role-based. You can view the permissions/rights of each role in the `internal/config/roles.go` file.
-
-If the user making the request does not have the required permissions to access this route, a Forbidden (403) error is thrown.
