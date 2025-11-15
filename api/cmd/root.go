@@ -8,7 +8,7 @@ import (
 // Execute is the entry point for all commands
 func Execute() error {
 	if len(os.Args) < 2 {
-		return fmt.Errorf("no command specified. Available commands: http")
+		return fmt.Errorf("no command specified. Available commands: http, migrate")
 	}
 
 	command := os.Args[1]
@@ -16,7 +16,9 @@ func Execute() error {
 	switch command {
 	case "http":
 		return RunHTTP()
+	case "migrate":
+		return RunMigrate()
 	default:
-		return fmt.Errorf("unknown command: %s. Available commands: http", command)
+		return fmt.Errorf("unknown command: %s. Available commands: http, migrate", command)
 	}
 }

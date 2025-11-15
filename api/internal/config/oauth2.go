@@ -13,9 +13,9 @@ var AppConfig Config
 
 func GoogleConfig() oauth2.Config {
 	AppConfig.GoogleLoginConfig = oauth2.Config{
-		RedirectURL:  RedirectURL,
-		ClientID:     GoogleClientID,
-		ClientSecret: GoogleClientSecret,
+		RedirectURL:  Env.GoogleOAuth.RedirectURL,
+		ClientID:     Env.GoogleOAuth.ClientID,
+		ClientSecret: Env.GoogleOAuth.ClientSecret,
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",

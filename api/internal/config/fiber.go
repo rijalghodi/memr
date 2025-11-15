@@ -9,7 +9,7 @@ import (
 
 func FiberConfig() fiber.Config {
 	return fiber.Config{
-		Prefork:       IsProd,
+		Prefork:       !Env.App.Debug, // Prefork in production (when debug is false)
 		CaseSensitive: true,
 		ServerHeader:  "Fiber",
 		AppName:       "Fiber API",
