@@ -4,7 +4,6 @@ type UserRes struct {
 	ID         string `json:"id"`
 	Email      string `json:"email"`
 	Name       string `json:"name"`
-	Role       string `json:"role"`
 	IsVerified bool   `json:"isVerified"`
 	CreatedAt  string `json:"createdAt"`
 	UpdatedAt  string `json:"updatedAt"`
