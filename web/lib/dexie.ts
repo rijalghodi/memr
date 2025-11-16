@@ -21,6 +21,7 @@ export type Project = {
   color?: string;
   createdAt: string;
   updatedAt: string;
+  viewedAt?: string;
   deletedAt?: string;
 };
 
@@ -31,6 +32,7 @@ export type Note = {
   content?: string;
   createdAt: string;
   updatedAt: string;
+  viewedAt?: string;
   deletedAt?: string;
 };
 
@@ -42,6 +44,7 @@ export type Collection = {
   color?: string;
   createdAt: string;
   updatedAt: string;
+  viewedAt?: string;
   deletedAt?: string;
 };
 

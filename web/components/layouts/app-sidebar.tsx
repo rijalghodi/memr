@@ -19,7 +19,18 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-import { ChevronDown, LogOutIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  Edit2,
+  LogOutIcon,
+  PlusIcon,
+  Square,
+  SquareCheck,
+  SquareCheckBig,
+  SquarePen,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -34,6 +45,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   Button,
+  DropdownMenuLabel,
 } from "../ui";
 
 type Menu = {
@@ -92,10 +104,10 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="mb-2 mt-3 px-4 py-3">
+      <SidebarHeader className="px-4 py-3 flex flex-col gap-0">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton className="py-5">
+            <SidebarMenuButton size="lg" className="mb-2">
               <Avatar className="size-6">
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
@@ -103,22 +115,41 @@ export function AppSidebar() {
               <span>John Doe</span>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
+          <DropdownMenuContent className="w-56 rounded-lg">
+            <DropdownMenuLabel className="flex items-center gap-2">
+              <Avatar className="size-6">
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <span>John Doe</span>
+            </DropdownMenuLabel>
             <DropdownMenuItem className="cursor-pointer" variant="destructive">
               <LogOutIcon />
               <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <SidebarMenuButton asChild size="default">
+          <Link href="/">
+            <SquarePen />
+            Add Note
+          </Link>
+        </SidebarMenuButton>
+        <SidebarMenuButton asChild size="default">
+          <Link href="/">
+            <SquareCheckBig />
+            Todo
+          </Link>
+        </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent className="px-4">
         <SidebarMenu className="gap-5">
           {items.map((item) =>
             item.submenu ? (
-              <Collapsible asChild>
+              <Collapsible asChild key={`${item.title}-collapsible`}>
                 <SidebarMenuItem key={item.title}>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="py-3 rounded-full group text-xs font-semibold gap-1">
+                    <SidebarMenuButton size="sm" className="font-semibold">
                       <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transform transition-transform duration-200 ease-in-out" />
                       {item.title}
                     </SidebarMenuButton>
@@ -138,10 +169,13 @@ export function AppSidebar() {
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton
                             size="sm"
-                            className="w-fit"
+                            className="font-medium"
                             asChild
                           >
-                            <Link href={item.seeAllHref}>See All</Link>
+                            <Link href={item.seeAllHref}>
+                              See All
+                              <ArrowRight />
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       )}
