@@ -456,7 +456,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
     <ul
       data-slot="sidebar-menu"
       data-sidebar="menu"
-      className={cn("flex w-full min-w-0 flex-col gap-1", className)}
+      className={cn("flex w-full min-w-0 flex-col", className)}
       {...props}
     />
   );
@@ -483,9 +483,9 @@ const sidebarMenuButtonVariants = cva(
           "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
       size: {
-        default: "h-8 text-sm",
-        sm: "h-7 text-xs",
-        lg: "h-12 text-sm group-data-[collapsible=icon]:p-0!",
+        default: "h-10 text-sm [svg]:size-3.5 px-4",
+        sm: "h-8 text-xs [svg]:size-3",
+        lg: "h-12 text-sm [svg]:size-5 group-data-[collapsible=icon]:p-0! px-4",
       },
     },
     defaultVariants: {
@@ -643,7 +643,7 @@ function SidebarMenuSub({ className, ...props }: React.ComponentProps<"ul">) {
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(
-        "border-sidebar-border flex min-w-0 translate-x-1 flex-col gap-1 border-l py-0.5",
+        "border-sidebar-border flex min-w-0 translate-x-1 flex-col border-l py-0.5",
         "group-data-[collapsible=icon]:hidden",
         className
       )}
@@ -688,8 +688,8 @@ function SidebarMenuSubButton({
       className={cn(
         "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-full px-3 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
         "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
-        size === "sm" && "text-xs",
-        size === "md" && "text-sm",
+        size === "sm" && "text-xs h-8 [&>svg]:size-3",
+        size === "md" && "text-sm h-10 [&>svg]:size-4",
         "group-data-[collapsible=icon]:hidden",
         className
       )}

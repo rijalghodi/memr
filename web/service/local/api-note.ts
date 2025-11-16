@@ -33,11 +33,31 @@ const noteApi = {
     return note;
   },
 
-  getAll: async (collectionId?: string): Promise<NoteRes[]> => {
+  getAll: async (
+    collectionId?: string,
+    sortBy?: "updatedAt" | "createdAt" | "viewedAt"
+  ): Promise<NoteRes[]> => {
     let notes = await db.notes.filter((note) => !note.deletedAt).toArray();
     if (collectionId) {
       notes = notes.filter((note) => note.collectionId === collectionId);
     }
+
+    // Sort by specified field (always DESC)
+    if (sortBy) {
+      notes.sort((a, b) => {
+        const aValue = a[sortBy];
+        const bValue = b[sortBy];
+
+        // Handle undefined values - put them at the end
+        if (!aValue && !bValue) return 0;
+        if (!aValue) return 1;
+        if (!bValue) return -1;
+
+        // Compare dates (DESC order - newest first)
+        return new Date(bValue).getTime() - new Date(aValue).getTime();
+      });
+    }
+
     return notes;
   },
 
@@ -108,10 +128,13 @@ export const useCreateNote = ({
   return { mutate, isLoading };
 };
 
-export const useGetNotes = (collectionId?: string) => {
+export const useGetNotes = (
+  collectionId?: string,
+  sortBy?: "updatedAt" | "createdAt" | "viewedAt"
+) => {
   const notes = useLiveQuery(async () => {
-    return await noteApi.getAll(collectionId);
-  }, [collectionId]);
+    return await noteApi.getAll(collectionId, sortBy);
+  }, [collectionId, sortBy]);
 
   return {
     data: notes ?? [],
