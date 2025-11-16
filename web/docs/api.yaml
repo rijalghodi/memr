@@ -35,14 +35,14 @@ definitions:
       updatedAt:
         type: string
     required:
-    - id
+      - id
     type: object
   contract.GoogleOAuthReq:
     properties:
       idToken:
         type: string
     required:
-    - idToken
+      - idToken
     type: object
   contract.GoogleOAuthRes:
     properties:
@@ -72,7 +72,7 @@ definitions:
       refreshToken:
         type: string
     required:
-    - refreshToken
+      - refreshToken
     type: object
   contract.RefreshTokenRes:
     properties:
@@ -101,7 +101,7 @@ definitions:
     properties:
       changes:
         items:
-          $ref: '#/definitions/contract.Change'
+          $ref: "#/definitions/contract.Change"
         type: array
       lastSyncTime:
         type: string
@@ -110,7 +110,7 @@ definitions:
     properties:
       changes:
         items:
-          $ref: '#/definitions/contract.Change'
+          $ref: "#/definitions/contract.Change"
         type: array
       lastSyncTime:
         type: string
@@ -144,7 +144,8 @@ info:
   contact:
     email: rijalghodi.dev@gmail.com
     name: Rijal Ghodi
-  description: Second brain that understand you. Manage project, todo, and resources
+  description:
+    Second brain that understand you. Manage project, todo, and resources
     in single app.
   license:
     name: MIT
@@ -154,129 +155,129 @@ paths:
   /v1/auth/google:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Google OAuth authentication
       parameters:
-      - description: Google OAuth request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/contract.GoogleOAuthReq'
+        - description: Google OAuth request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/contract.GoogleOAuthReq"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/util.BaseResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/contract.GoogleOAuthRes'
-              type: object
+              - $ref: "#/definitions/util.BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/contract.GoogleOAuthRes"
+                type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/util.BaseResponse'
+            $ref: "#/definitions/util.BaseResponse"
       summary: Google OAuth
       tags:
-      - Auth
+        - Auth
   /v1/auth/me:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Get current user information
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/util.BaseResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/contract.UserRes'
-              type: object
+              - $ref: "#/definitions/util.BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/contract.UserRes"
+                type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/util.BaseResponse'
+            $ref: "#/definitions/util.BaseResponse"
       summary: Get current user
       tags:
-      - Auth
+        - Auth
   /v1/auth/refresh-token:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Refresh access token using refresh token
       parameters:
-      - description: Refresh token request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/contract.RefreshTokenReq'
+        - description: Refresh token request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/contract.RefreshTokenReq"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/util.BaseResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/contract.RefreshTokenRes'
-              type: object
+              - $ref: "#/definitions/util.BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/contract.RefreshTokenRes"
+                type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/util.BaseResponse'
+            $ref: "#/definitions/util.BaseResponse"
       summary: Refresh token
       tags:
-      - Auth
+        - Auth
   /v1/sync:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Sync data between client and server
       parameters:
-      - description: Sync request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/contract.SyncReq'
+        - description: Sync request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/contract.SyncReq"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/util.BaseResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/contract.SyncRes'
-              type: object
+              - $ref: "#/definitions/util.BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/contract.SyncRes"
+                type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/util.BaseResponse'
+            $ref: "#/definitions/util.BaseResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/util.BaseResponse'
+            $ref: "#/definitions/util.BaseResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Sync data
       tags:
-      - Sync
+        - Sync
 securityDefinitions:
   BearerAuth:
-    description: 'Example Value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    description: "Example Value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
     in: header
     name: Authorization
     type: apiKey

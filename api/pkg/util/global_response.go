@@ -17,9 +17,9 @@ func ToErrorResponse(msg string, details any) BaseResponse {
 
 type PaginatedData struct {
 	Page       int   `json:"page"`
-	PageSize   int   `json:"page_size"`
+	PageSize   int   `json:"pageSize"`
 	Total      int64 `json:"total"`
-	TotalPages int   `json:"total_pages"`
+	TotalPages int   `json:"totalPages"`
 	Items      any   `json:"items"`
 }
 
