@@ -8,25 +8,23 @@ import (
 )
 
 type Environment struct {
-	App         App
-	Postgres    Postgres
-	JWT         JWT
-	SMTPGoogle  SMTPGoogle
-	Redis       Redis
-	GPT         GPT
-	GoogleOAuth GoogleOAuth
-	Firebase    Firebase
+	App        App
+	Logger     Logger
+	Postgres   Postgres
+	JWT        JWT
+	SMTPGoogle SMTPGoogle
+	Firebase   Firebase
 }
 
 type App struct {
-	Debug       bool   `env:"APP_DEBUG"`
-	LogLevel    string `env:"APP_LOG_LEVEL"`
-	Host        string `env:"APP_HOST"`
-	Port        int    `env:"APP_PORT"`
-	URL         string `env:"APP_URL"`
-	FrontendURL string `env:"APP_FRONTEND_URL"`
-	Password    string `env:"APP_PASSWORD"`
-	OTP         string `env:"APP_OTP"`
+	Host string `env:"APP_HOST"`
+	Port int    `env:"APP_PORT"`
+}
+
+type Logger struct {
+	Level        string `env:"LOGGER_LEVEL"`
+	Format       string `env:"LOGGER_FORMAT"`
+	EnableCaller bool   `env:"LOGGER_ENABLE_CALLER"`
 }
 
 type Postgres struct {
@@ -47,6 +45,7 @@ type Postgres struct {
 type JWT struct {
 	Secret                  string `env:"JWT_SECRET"`
 	AccessExpMinutes        int    `env:"JWT_ACCESS_EXP_MINUTES"`
+	RefreshExpDays          int    `env:"JWT_REFRESH_EXP_DAYS"`
 	ResetPasswordExpMinutes int    `env:"JWT_RESET_PASSWORD_EXP_MINUTES"`
 	VerifyEmailExpMinutes   int    `env:"JWT_VERIFY_EMAIL_EXP_MINUTES"`
 }
@@ -57,23 +56,6 @@ type SMTPGoogle struct {
 	Sender   string `env:"SMTP_GOOGLE_SENDER_NAME"`
 	Email    string `env:"SMTP_GOOGLE_EMAIL"`
 	Password string `env:"SMTP_GOOGLE_PASSWORD"`
-}
-
-type Redis struct {
-	Host     string `env:"REDIS_HOST"`
-	User     string `env:"REDIS_USER"`
-	Password string `env:"REDIS_PASSWORD"`
-	DB       int    `env:"REDIS_DB_NUMBER"`
-}
-
-type GPT struct {
-	APIKey string `env:"GPT_API_KEY"`
-}
-
-type GoogleOAuth struct {
-	RedirectURL  string `env:"GOOGLE_OAUTH_REDIRECT_URL"`
-	ClientID     string `env:"GOOGLE_OAUTH_CLIENT_ID"`
-	ClientSecret string `env:"GOOGLE_OAUTH_CLIENT_SECRET"`
 }
 
 type Firebase struct {
