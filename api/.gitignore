@@ -12,3 +12,5 @@ main
 
 _debug/
 __debug_bin*
+
+firebase.json
