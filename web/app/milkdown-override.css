@@ -34,6 +34,7 @@
 
   /* Override typography */
   --crepe-font-default: var(--font-inter) !important;
+  --crepe-font-title: var(--font-inter) !important;
 
   /* Small Shadow */
   --crepe-shadow-1: var(--shadow-lg);
