@@ -3,8 +3,8 @@ import localFont from "next/font/local";
 import { metadata as brandMetadata } from "@/lib/brand";
 import "./globals.css";
 import "@milkdown/crepe/theme/common/style.css";
-// import "@milkdown/crepe/theme/frame.css";
-import "@milkdown/kit/prose/view/style/prosemirror.css";
+import "@milkdown/crepe/theme/frame.css";
+// import "@milkdown/kit/prose/view/style/prosemirror.css";
 import "./milkdown-override.css";
 import { Providers } from "@/components/providers";
 
