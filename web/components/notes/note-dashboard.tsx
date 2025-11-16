@@ -1,12 +1,14 @@
 "use client";
 
-import { ArrowUpDown, Filter, Plus, SortAsc } from "lucide-react";
+import { ArrowDownUp, Filter, Plus } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { NoteItem } from "./note-item";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { DropdownFilter } from "../ui/drropdown-filter";
-import { useGetNotes } from "@/service/local/api-note";
+import { noteApiHook, useGetNotes } from "@/service/local/api-note";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/lib/routes";
 
 type Props = {};
 
@@ -14,11 +16,25 @@ type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
 export function NoteDashboard({}: Props) {
   const [sortBy, setSortBy] = useState<SortByValue>("updatedAt");
-
+  const router = useRouter();
   const { data: notes, isLoading } = useGetNotes(undefined, sortBy as any);
 
   const handleSortChange = (value: string) => {
     setSortBy(value as SortByValue);
+  };
+
+  // add noote
+  const { mutate: createNote } = noteApiHook.useCreateNote({
+    onSuccess: (data) => {
+      router.push(ROUTES.NOTE(data.id));
+    },
+  });
+
+  const handleAddNote = () => {
+    createNote({
+      title: "",
+      content: "",
+    });
   };
 
   return (
@@ -28,7 +44,7 @@ export function NoteDashboard({}: Props) {
         <div className="flex items-center justify-between px-6 pt-6 pb-3">
           <h1 className="text-2xl font-semibold">Notes</h1>
           <div className="flex items-center gap-0">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" onClick={handleAddNote}>
               <Plus />
             </Button>
             <CollapsibleTrigger asChild>
@@ -45,7 +61,7 @@ export function NoteDashboard({}: Props) {
               className="rounded-full px-4"
               value={sortBy}
               onValueChange={handleSortChange}
-              icon={<ArrowUpDown />}
+              icon={<ArrowDownUp />}
               options={[
                 {
                   label: "Last Updated",

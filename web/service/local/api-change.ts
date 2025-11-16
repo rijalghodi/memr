@@ -37,7 +37,7 @@ export type UpdateChangeReq = {
 
 export type ChangeRes = Change;
 
-const changeApi = {
+export const changeApi = {
   create: async (data: CreateChangeReq): Promise<ChangeRes> => {
     const change: Change = {
       id: crypto.randomUUID(),
@@ -76,6 +76,21 @@ const changeApi = {
       return change;
     }
     return undefined;
+  },
+
+  getByEntityIdAndType: async (
+    entityId: string,
+    type: Change["type"]
+  ): Promise<ChangeRes | undefined> => {
+    const change = await db.changes
+      .filter(
+        (change) =>
+          change.entityId === entityId &&
+          change.type === type &&
+          !change.deletedAt
+      )
+      .first();
+    return change;
   },
 
   update: async (data: UpdateChangeReq): Promise<ChangeRes> => {
