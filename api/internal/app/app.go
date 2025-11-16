@@ -1,6 +1,7 @@
 package app
 
 import (
+	_ "app/docs"
 	"app/internal/config"
 	"app/internal/middleware"
 	"app/pkg/logger"

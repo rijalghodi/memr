@@ -3,6 +3,7 @@ package middleware
 import (
 	"app/internal/config"
 	"app/pkg/util"
+	"errors"
 	"slices"
 	"strings"
 
@@ -39,10 +40,10 @@ func extractToken(c *fiber.Ctx) string {
 }
 
 // GetAuthClaims retrieves authenticated user claims from context
-func GetAuthClaims(c *fiber.Ctx) util.JWTClaims {
+func GetAuthClaims(c *fiber.Ctx) (claims util.JWTClaims, err error) {
 	claims, ok := c.Locals("user").(util.JWTClaims)
 	if !ok {
-		return util.JWTClaims{}
+		return claims, errors.New("user not found")
 	}
-	return claims
+	return claims, nil
 }

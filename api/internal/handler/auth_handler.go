@@ -86,7 +86,12 @@ func (h *AuthHandler) RefreshToken(c *fiber.Ctx) error {
 // @Failure 401 {object} util.BaseResponse
 // @Router /v1/auth/me [get]
 func (h *AuthHandler) GetCurrentUser(c *fiber.Ctx) error {
-	claims := middleware.GetAuthClaims(c)
+	claims, err := middleware.GetAuthClaims(c)
+	if err != nil {
+		logger.Log.Warn("Failed to get auth claims: %v", err)
+		return err
+	}
+
 	user, err := h.userUsecase.GetUserByID(c, claims.ID)
 	if err != nil {
 		logger.Log.Error("Failed to get user by ID: %v", err)
