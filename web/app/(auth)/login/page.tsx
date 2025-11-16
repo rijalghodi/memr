@@ -56,17 +56,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-sidebar">
       {/* Logo in top left corner */}
-      <div className="absolute top-6 left-6">
-        <Image src={logo} alt="Memr Logo" width={100} height={40} priority />
-      </div>
 
       {/* Centered content */}
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="w-full max-w-md space-y-8 text-center">
           {/* Heading */}
           <div className="space-y-2">
+            <div className="flex justify-center mb-4">
+              <Image
+                src={logo}
+                alt={BRAND.APP_NAME}
+                width={150}
+                height={60}
+                priority
+              />
+            </div>
             <h1 className="text-2xl font-semibold text-foreground">
               {BRAND.APP_TAGLINE}
             </h1>
@@ -77,7 +83,7 @@ export default function LoginPage() {
 
           {/* Google Login Button */}
           <Button
-            variant="outline"
+            variant="default"
             size="lg"
             className="px-8!"
             type="button"

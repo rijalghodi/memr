@@ -41,3 +41,7 @@
   /* Large Shadow */
   --crepe-shadow-2: var(--shadow-xl);
 }
+
+.milkdown .ProseMirror {
+  padding: 16px 120px !important;
+}

@@ -53,7 +53,7 @@ function SessionTabItem({
   return (
     <li
       className={cn(
-        "flex gap-1.5 items-center justify-center h-10 px-4 cursor-pointer hover:bg-muted text-xs font-medium [&>svg]:size-3.5 border-b border-transparent",
+        "flex gap-1.5 items-center justify-center h-10 px-4 cursor-pointer hover:bg-muted text-xs font-medium [&>svg]:size-3.5 border-b-2 border-transparent",
         "data-[active=true]:border-primary data-[active=true]:text-primary"
       )}
       data-active={active}
