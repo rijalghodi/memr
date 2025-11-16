@@ -1,17 +1,18 @@
 "use client";
 
-import { Editor, rootCtx } from "@milkdown/kit/core";
-import { commonmark } from "@milkdown/kit/preset/commonmark";
+import { Crepe } from "@milkdown/crepe";
 import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
 
-const MilkdownEditor: React.FC = () => {
-  const { get } = useEditor((root) =>
-    Editor.make()
-      .config((ctx) => {
-        ctx.set(rootCtx, root);
-      })
-      .use(commonmark)
-  );
+const CrepeEditor: React.FC = () => {
+  const { get } = useEditor((root) => {
+    return new Crepe({
+      root,
+      features: {
+        "image-block": false,
+        table: false,
+      },
+    });
+  });
 
   return <Milkdown />;
 };
@@ -19,7 +20,7 @@ const MilkdownEditor: React.FC = () => {
 export const RichTextEditor: React.FC = () => {
   return (
     <MilkdownProvider>
-      <MilkdownEditor />
+      <CrepeEditor />
     </MilkdownProvider>
   );
 };
