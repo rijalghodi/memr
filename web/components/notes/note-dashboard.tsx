@@ -12,7 +12,7 @@ type Props = {};
 
 type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
-export default function NoteDashboard({}: Props) {
+export function NoteDashboard({}: Props) {
   const [sortBy, setSortBy] = useState<SortByValue>("updatedAt");
 
   const { data: notes, isLoading } = useGetNotes(undefined, sortBy as any);
