@@ -1,0 +1,210 @@
+import { useLiveQuery } from "dexie-react-hooks";
+import { useCallback, useState } from "react";
+
+import { db, type Task } from "@/lib/dexie";
+
+export type CreateTaskReq = {
+  projectId?: string;
+  title?: string;
+  description?: string;
+  status?: number;
+  sortOrder?: string;
+  dueDate?: string;
+};
+
+export type UpdateTaskReq = {
+  id: string;
+  projectId?: string;
+  title?: string;
+  description?: string;
+  status?: number;
+  sortOrder?: string;
+  dueDate?: string;
+};
+
+export type TaskRes = Task;
+
+const taskApi = {
+  create: async (data: CreateTaskReq): Promise<TaskRes> => {
+    const now = new Date().toISOString();
+    const task: Task = {
+      id: crypto.randomUUID(),
+      projectId: data.projectId,
+      title: data.title,
+      description: data.description,
+      status: data.status ?? 0,
+      sortOrder: data.sortOrder,
+      dueDate: data.dueDate,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await db.tasks.add(task);
+    return task;
+  },
+
+  getAll: async (projectId?: string): Promise<TaskRes[]> => {
+    let tasks = await db.tasks.filter((task) => !task.deletedAt).toArray();
+    if (projectId) {
+      tasks = tasks.filter((task) => task.projectId === projectId);
+    }
+    return tasks;
+  },
+
+  getById: async (id: string): Promise<TaskRes | undefined> => {
+    const task = await db.tasks.get(id);
+    if (task && !task.deletedAt) {
+      return task;
+    }
+    return undefined;
+  },
+
+  update: async (data: UpdateTaskReq): Promise<TaskRes> => {
+    const existing = await db.tasks.get(data.id);
+    if (!existing || existing.deletedAt) {
+      throw new Error("Task not found");
+    }
+
+    const updated: Task = {
+      ...existing,
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
+    await db.tasks.update(data.id, updated);
+    return updated;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    const existing = await db.tasks.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error("Task not found");
+    }
+
+    await db.tasks.update(id, {
+      deletedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+  },
+};
+
+export const useCreateTask = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess?: (data: TaskRes) => void;
+  onError?: (error: string) => void;
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const mutate = useCallback(
+    async (data: CreateTaskReq) => {
+      setIsLoading(true);
+      try {
+        const result = await taskApi.create(data);
+        onSuccess?.(result);
+        return result;
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "An error occurred";
+        onError?.(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onSuccess, onError]
+  );
+
+  return { mutate, isLoading };
+};
+
+export const useGetTasks = (projectId?: string) => {
+  const tasks = useLiveQuery(async () => {
+    return await taskApi.getAll(projectId);
+  }, [projectId]);
+
+  return {
+    data: tasks ?? [],
+    isLoading: tasks === undefined,
+  };
+};
+
+export const useGetTask = (id: string | undefined) => {
+  const task = useLiveQuery(async () => {
+    if (!id) return undefined;
+    return await taskApi.getById(id);
+  }, [id]);
+
+  return {
+    data: task,
+    isLoading: task === undefined && id !== undefined,
+  };
+};
+
+export const useUpdateTask = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess?: (data: TaskRes) => void;
+  onError?: (error: string) => void;
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const mutate = useCallback(
+    async (data: UpdateTaskReq) => {
+      setIsLoading(true);
+      try {
+        const result = await taskApi.update(data);
+        onSuccess?.(result);
+        return result;
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "An error occurred";
+        onError?.(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onSuccess, onError]
+  );
+
+  return { mutate, isLoading };
+};
+
+export const useDeleteTask = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess?: () => void;
+  onError?: (error: string) => void;
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const mutate = useCallback(
+    async (id: string) => {
+      setIsLoading(true);
+      try {
+        await taskApi.delete(id);
+        onSuccess?.();
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "An error occurred";
+        onError?.(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onSuccess, onError]
+  );
+
+  return { mutate, isLoading };
+};
+
+export const taskApiHook = {
+  useCreateTask,
+  useGetTasks,
+  useGetTask,
+  useUpdateTask,
+  useDeleteTask,
+};

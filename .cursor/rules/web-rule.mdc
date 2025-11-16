@@ -11,7 +11,6 @@ Tech Stack: pnpm, NextJS, Tailwind, ShadCN, react-query, axios, react-hook-formm
 - Always use export NON-default react (except page.tsx, layout.tsx)
 - Always use commponent from "web/components/ui"
 - Always use ShadCN component. If not exisit, install it by `pnpm dlx shadn@latex add ...`
-- Always create component in "web/components/ui" and follow ShadCN rule
 - Always create feature component in "web/componennts/<feature-name>"
 - Always use axios and react-query when fetching data
 - Always use react-hook-form when handle form
