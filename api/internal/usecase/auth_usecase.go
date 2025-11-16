@@ -54,7 +54,7 @@ func (u *AuthUsecase) GoogleOAuth(c *fiber.Ctx, req *contract.GoogleOAuthReq) er
 			ID:         uuid.New().String(),
 			Name:       googleInfo.Name,
 			Email:      googleInfo.Email,
-			GoogleID:   googleInfo.Sub,
+			GoogleID:   util.ToPointer(googleInfo.Sub),
 			IsVerified: true,
 		}
 		if err := u.userRepo.CreateUser(newUser); err != nil {
@@ -62,8 +62,8 @@ func (u *AuthUsecase) GoogleOAuth(c *fiber.Ctx, req *contract.GoogleOAuthReq) er
 			return fiber.NewError(fiber.StatusInternalServerError)
 		}
 		user = newUser
-	} else if user.GoogleID == "" || user.GoogleID != googleInfo.Sub {
-		user.GoogleID = googleInfo.Sub
+	} else if util.ToValue(user.GoogleID) == "" || util.ToValue(user.GoogleID) != googleInfo.Sub {
+		user.GoogleID = util.ToPointer(googleInfo.Sub)
 		user.IsVerified = true
 		user.Name = googleInfo.Name
 
@@ -167,16 +167,6 @@ func (u *AuthUsecase) generateTokenPair(userID, role string) (*contract.TokenRes
 		RefreshToken:          refreshToken,
 		RefreshTokenExpiresAt: refreshExpiresAt.Format(time.RFC3339),
 	}, nil
-}
-
-func (u *AuthUsecase) generateVerificationToken(userID, role string) (string, error) {
-	expiresAt := time.Now().Add(time.Duration(config.Env.JWT.VerifyEmailExpMinutes) * time.Minute)
-	return util.GenerateToken(userID, role, config.TokenTypeVerifyEmail, config.Env.JWT.Secret, expiresAt)
-}
-
-func (u *AuthUsecase) generateResetPasswordToken(userID, role string) (string, error) {
-	expiresAt := time.Now().Add(time.Duration(config.Env.JWT.ResetPasswordExpMinutes) * time.Minute)
-	return util.GenerateToken(userID, role, config.TokenTypeResetPassword, config.Env.JWT.Secret, expiresAt)
 }
 
 func (u *AuthUsecase) buildUserRes(user *model.User) contract.UserRes {
