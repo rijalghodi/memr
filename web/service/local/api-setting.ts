@@ -8,7 +8,7 @@ export type CreateSettingReq = {
   value: string | number | boolean | object;
 };
 
-export type UpdateSettingReq = {
+export type UpsertSettingReq = {
   name: string;
   value: string | number | boolean | object;
 };
@@ -41,10 +41,10 @@ const settingApi = {
     return undefined;
   },
 
-  update: async (data: UpdateSettingReq): Promise<SettingRes> => {
+  upsert: async (data: UpsertSettingReq): Promise<SettingRes> => {
     const existing = await db.settings.get(data.name);
     if (!existing) {
-      throw new Error("Setting not found");
+      return await settingApi.create(data);
     }
 
     const updated: Settings = {
@@ -53,13 +53,14 @@ const settingApi = {
       updatedAt: new Date().toISOString(),
     };
     await db.settings.update(data.name, updated);
+    console.log("updated setting", updated);
     return updated;
   },
 
   delete: async (name: string): Promise<void> => {
     const existing = await db.settings.get(name);
     if (!existing) {
-      throw new Error("Setting not found");
+      return;
     }
 
     await db.settings.delete(name);
@@ -120,7 +121,7 @@ export const useGetSetting = (name: string | undefined) => {
   };
 };
 
-export const useUpdateSetting = ({
+export const useUpsertSetting = ({
   onSuccess,
   onError,
 }: {
@@ -130,10 +131,10 @@ export const useUpdateSetting = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const mutate = useCallback(
-    async (data: UpdateSettingReq) => {
+    async (data: UpsertSettingReq) => {
       setIsLoading(true);
       try {
-        const result = await settingApi.update(data);
+        const result = await settingApi.upsert(data);
         onSuccess?.(result);
         return result;
       } catch (error) {
@@ -185,6 +186,6 @@ export const settingApiHook = {
   useCreateSetting,
   useGetSettings,
   useGetSetting,
-  useUpdateSetting,
+  useUpdateSetting: useUpsertSetting,
   useDeleteSetting,
 };

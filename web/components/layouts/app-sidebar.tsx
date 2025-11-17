@@ -1,6 +1,21 @@
 "use client";
 
 import {
+  ArrowRight,
+  ChevronDown,
+  LogOutIcon,
+  SquareCheckBig,
+  SquarePen,
+} from "lucide-react";
+import Link from "next/link";
+import { format } from "date-fns";
+
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -13,40 +28,18 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { cn } from "@/lib/utils";
-import {
-  ArrowLeft,
-  ArrowRight,
-  ChevronDown,
-  Edit2,
-  LogOutIcon,
-  PlusIcon,
-  Square,
-  SquareCheck,
-  SquareCheckBig,
-  SquarePen,
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import Image from "next/image";
 
-import logo from "@/public/logo.png";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
   DropdownMenu,
-  DropdownMenuItem,
   DropdownMenuContent,
-  DropdownMenuTrigger,
-  Button,
+  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuTrigger,
 } from "../ui";
+import { useGetSetting } from "@/service/local/api-setting";
 
 type Menu = {
   title: string;
@@ -102,12 +95,18 @@ export function AppSidebar() {
     },
   ];
 
+  const { data: lastSyncTimeSetting } = useGetSetting("lastSyncTime");
+  const lastSyncTime = lastSyncTimeSetting?.value as string | undefined;
+
   return (
     <Sidebar>
       <SidebarHeader className="px-4 py-3 flex flex-col gap-0">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" className="mb-2">
+          <DropdownMenuTrigger
+            asChild
+            className="data-[state=open]:bg-sidebar-accent"
+          >
+            <SidebarMenuButton size="default" className="mb-2">
               <Avatar className="size-6">
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
@@ -115,18 +114,32 @@ export function AppSidebar() {
               <span>John Doe</span>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 rounded-lg">
+          <DropdownMenuContent
+            className="w-[240px] rounded-lg p-3"
+            align="start"
+          >
             <DropdownMenuLabel className="flex items-center gap-2">
               <Avatar className="size-6">
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
-              <span>John Doe</span>
+              <div className="space-y-0.5">
+                <div className="text-xs font-medium">John Doe</div>
+                <div className="text-xs text-muted-foreground">
+                  john.doe@example.com
+                </div>
+              </div>
             </DropdownMenuLabel>
             <DropdownMenuItem className="cursor-pointer" variant="destructive">
               <LogOutIcon />
-              <span>Logout</span>
+              Logout
             </DropdownMenuItem>
+            <DropdownMenuLabel className="text-xs font-normal">
+              Last synced at:{" "}
+              {lastSyncTime
+                ? format(new Date(lastSyncTime), "dd/MM/yyyy HH:mm")
+                : "Never"}
+            </DropdownMenuLabel>
           </DropdownMenuContent>
         </DropdownMenu>
         <SidebarMenuButton asChild size="default">

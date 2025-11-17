@@ -33,3 +33,15 @@ type RefreshTokenRes struct {
 	TokenRes
 	UserRes
 }
+
+type GoogleLoginReq struct {
+	Name          string `json:"name" validate:"required,max=50"`
+	Email         string `json:"email" validate:"required,email,max=50"`
+	VerifiedEmail bool   `json:"verified_email" validate:"required"`
+	Picture       string `json:"picture" validate:"omitempty,url"`
+}
+
+type GoogleLoginRes struct {
+	TokenRes
+	UserRes
+}

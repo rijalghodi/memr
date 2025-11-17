@@ -1,17 +1,23 @@
 "use client";
 
+import {
+  getRedirectResult,
+  GoogleAuthProvider,
+  signInWithRedirect,
+} from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+
+import { toast } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { IconGoogle } from "@/components/ui/icon-google";
-import { toast } from "@/components/ui";
-import { BRAND } from "@/lib/brand";
-import { ROUTES } from "@/lib/routes";
-import { auth } from "@/lib/firebase";
 import { setAuthCookie } from "@/lib/auth-cookie";
-import { useGoogleOAuth } from "@/service/api-auth";
+import { BRAND } from "@/lib/brand";
+import { auth } from "@/lib/firebase";
+import { ROUTES } from "@/lib/routes";
 import logo from "@/public/logo-long.png";
+import { useGoogleOAuth } from "@/service/api-auth";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -44,16 +50,23 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const idToken = await userCredential.user.getIdToken();
-
-      googleOAuth({ idToken });
+      signInWithRedirect(auth, provider);
     } catch (error: any) {
       if (error.code !== "auth/popup-closed-by-user") {
         toast.error(error.message || "Failed to sign in with Google");
       }
     }
   };
+
+  useEffect(() => {
+    const performGoogleOAuth = async () => {
+      const result = await getRedirectResult(auth);
+      if (!result) return;
+      const idToken = await result.user.getIdToken();
+      googleOAuth({ idToken });
+    };
+    performGoogleOAuth();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-sidebar">
@@ -83,11 +96,11 @@ export default function LoginPage() {
 
           {/* Google Login Button */}
           <Button
-            variant="default"
+            variant="outline-primary"
             size="lg"
-            className="px-8!"
+            className="px-10! rounded-full"
             type="button"
-            onClick={handleGoogleLogin}
+            onClick={loginWithGoogle}
             disabled={isPending}
           >
             <IconGoogle size={20} />
@@ -98,3 +111,16 @@ export default function LoginPage() {
     </div>
   );
 }
+
+export const loginWithGoogle = () => {
+  const params = new URLSearchParams({
+    client_id: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID!,
+    redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URI!,
+    response_type: "code",
+    scope: "openid email profile",
+    access_type: "offline", // get refresh token
+    prompt: "consent", // ensures refresh token in local dev
+  });
+
+  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+};

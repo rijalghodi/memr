@@ -33,6 +33,7 @@ export type UpsertTaskReq = {
   updatedAt?: string;
   createdAt?: string;
   deletedAt?: string;
+  syncedAt?: string;
 };
 
 export type TaskRes = Task;
@@ -55,8 +56,18 @@ export const taskApi = {
     return task;
   },
 
-  getAll: async (projectId?: string): Promise<TaskRes[]> => {
-    let tasks = await db.tasks.filter((task) => !task.deletedAt).toArray();
+  getAll: async (params?: {
+    projectId?: string;
+    unsynced?: boolean;
+  }): Promise<TaskRes[]> => {
+    const projectId = params?.projectId;
+    const unsynced = params?.unsynced;
+    let tasks = await db.tasks
+      .filter((task) => !task.deletedAt)
+      .filter(
+        (task) => !unsynced || !task.syncedAt || task.syncedAt < task.updatedAt
+      )
+      .toArray();
     if (projectId) {
       tasks = tasks.filter((task) => task.projectId === projectId);
     }
@@ -101,6 +112,7 @@ export const taskApi = {
         createdAt: data.createdAt ?? now,
         updatedAt: data.updatedAt ?? now,
         deletedAt: data.deletedAt,
+        syncedAt: data.syncedAt,
       };
       await db.tasks.add(task);
       return task;
@@ -162,7 +174,7 @@ export const useCreateTask = ({
 
 export const useGetTasks = (projectId?: string) => {
   const tasks = useLiveQuery(async () => {
-    return await taskApi.getAll(projectId);
+    return await taskApi.getAll({ projectId });
   }, [projectId]);
 
   return {

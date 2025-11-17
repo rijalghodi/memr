@@ -1,14 +1,14 @@
 "use client";
 
-import { Skeleton, toast } from "@/components/ui";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect } from "react";
-import Logo from "@/public/logo.png";
 
-import Image from "next/image";
-import { authApiHook } from "@/service/api-auth";
+import { Skeleton, toast } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
+import { cn } from "@/lib/utils";
+import Logo from "@/public/logo.png";
+import { authApiHook } from "@/service/api-auth";
 
 type AuthGuardContextType = {
   isAuthenticated: boolean;
@@ -18,7 +18,7 @@ type AuthGuardContextType = {
 };
 
 const AuthGuardContext = createContext<AuthGuardContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function useAuthGuard() {
@@ -51,7 +51,7 @@ export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
             width={100}
             height={100}
             className={cn(
-              "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32"
+              "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32",
             )}
           />
         </div>
@@ -80,11 +80,9 @@ export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
 export function AuthGuard({
   children,
   mustNotAuthenticated = false,
-  allowRoles,
 }: {
   children: React.ReactNode;
   mustNotAuthenticated?: boolean;
-  allowRoles?: string[];
 }) {
   const { isAuthenticated, isLoading, error } = useAuthGuard();
   const pathname = usePathname();
@@ -113,7 +111,7 @@ export function AuthGuard({
       router.push(ROUTES.LOGIN);
       return;
     }
-  }, [error, isLoading, mustNotAuthenticated, allowRoles]);
+  }, [error, isLoading, mustNotAuthenticated]);
 
   if (isLoading)
     return (
@@ -125,7 +123,6 @@ export function AuthGuard({
               isAuthenticated,
               error: (error as any)?.message,
               pathname,
-              allowRoles,
               mustNotAuthenticated,
             }}
             position="right-top"
@@ -151,7 +148,6 @@ export function AuthGuard({
             isAuthenticated,
             error: (error as any)?.message,
             pathname,
-            allowRoles,
             mustNotAuthenticated,
           }}
           position="right-top"
@@ -176,7 +172,7 @@ function DebugInfo({
         position === "left-top" && "left-4 top-4",
         position === "right-top" && "right-4 top-4",
         position === "left-bottom" && "left-4 bottom-4",
-        position === "right-bottom" && "right-4 bottom-4"
+        position === "right-bottom" && "right-4 bottom-4",
       )}
     >
       {JSON.stringify(data, null, 2)}

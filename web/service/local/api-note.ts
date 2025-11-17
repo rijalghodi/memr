@@ -24,6 +24,7 @@ export type UpsertNoteReq = {
   updatedAt?: string;
   createdAt?: string;
   deletedAt?: string;
+  syncedAt?: string;
 };
 
 export type NoteRes = Note;
@@ -43,11 +44,18 @@ export const noteApi = {
     return note;
   },
 
-  getAll: async (
-    collectionId?: string,
-    sortBy?: "updatedAt" | "createdAt" | "viewedAt"
-  ): Promise<NoteRes[]> => {
-    let notes = await db.notes.filter((note) => !note.deletedAt).toArray();
+  getAll: async (params?: {
+    collectionId?: string;
+    sortBy?: "updatedAt" | "createdAt" | "viewedAt";
+    unsynced?: boolean;
+  }): Promise<NoteRes[]> => {
+    const { collectionId, sortBy, unsynced } = params ?? {};
+    let notes = await db.notes
+      .filter((note) => !note.deletedAt)
+      .filter(
+        (note) => !unsynced || !note.syncedAt || note.syncedAt < note.updatedAt
+      )
+      .toArray();
     if (collectionId) {
       notes = notes.filter((note) => note.collectionId === collectionId);
     }
@@ -106,6 +114,7 @@ export const noteApi = {
         createdAt: data.createdAt ?? now,
         updatedAt: data.updatedAt ?? now,
         deletedAt: data.deletedAt,
+        syncedAt: data.syncedAt,
       };
       await db.notes.add(note);
       return note;
@@ -170,7 +179,7 @@ export const useGetNotes = (
   sortBy?: "updatedAt" | "createdAt" | "viewedAt"
 ) => {
   const notes = useLiveQuery(async () => {
-    return await noteApi.getAll(collectionId, sortBy);
+    return await noteApi.getAll({ collectionId, sortBy });
   }, [collectionId, sortBy]);
 
   return {

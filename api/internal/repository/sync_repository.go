@@ -288,17 +288,23 @@ func (r *SyncRepository) syncProject(tx *gorm.DB, userID string, change *contrac
 	return nil
 }
 
-func (r *SyncRepository) syncNote(tx *gorm.DB, userID string, change *contract.Change) error {
+func (r *SyncRepository) syncNote(tx *gorm.DB, userID string, change *contract.Change) (err error) {
 	var embedding *pgvector.Vector
+	var embeddingText string
+	title := util.ToValue(change.Title)
+	content := util.ToValue(change.Content)
+	if title != "" {
+		embeddingText = "Title: " + title
+	}
+	if title != "" && content != "" {
+		embeddingText += "\n\n"
+	}
+	if content != "" {
+		embeddingText += "Content: " + content
+	}
 
-	if change.Content != nil {
+	if embeddingText != "" {
 		ctx := context.Background()
-		embeddingText := *change.Content
-
-		if title := util.ToValue(change.Title); title != "" {
-			embeddingText = "Title: " + title + "\n\n" + "Content: " + *change.Content
-		}
-
 		emb, err := r.openaiUsecase.GenerateEmbedding(ctx, embeddingText)
 		if err != nil {
 			logger.Log.Error("Failed to generate embedding for note", zap.Error(err), zap.String("noteID", change.EntityID))

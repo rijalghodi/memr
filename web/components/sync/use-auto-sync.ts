@@ -1,82 +1,92 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useSync } from "@/service/api-sync";
-import type { Change, Change as SyncChange } from "@/service/api-sync";
-import { useGetSetting, useUpdateSetting } from "@/service/local/api-setting";
-import { taskApi } from "@/service/local/api-task";
-import { projectApi } from "@/service/local/api-project";
-import { noteApi } from "@/service/local/api-note";
-import { collectionApi } from "@/service/local/api-collection";
-import { db } from "@/lib/dexie";
 
-const SYNC_INTERVAL = 5 * 1000; // 5 seconds
+import type { Change } from "@/service/api-sync";
+import { useSync } from "@/service/api-sync";
+import { collectionApi } from "@/service/local/api-collection";
+import { noteApi } from "@/service/local/api-note";
+import { projectApi } from "@/service/local/api-project";
+import { useGetSetting, useUpsertSetting } from "@/service/local/api-setting";
+import { taskApi } from "@/service/local/api-task";
+import { SYNC_INTERVAL } from "@/lib/constant";
 
 export function useAutoSync() {
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const { data: lastSyncTimeSetting } = useGetSetting("lastSyncTime");
-  const { mutate: updateSetting } = useUpdateSetting({});
+  const { mutate: updateSetting } = useUpsertSetting({});
   const lastSyncTime = lastSyncTimeSetting?.value as string | undefined;
 
-  const { mutate: syncChanges, isPending: isSyncPending } = useSync({
+  const { mutate: pushChanges, isPending: isSyncPending } = useSync({
     onSuccess: async (response) => {
-      // Insert all changes to Dexie
-      for (const change of response.data?.changes ?? []) {
-        // Handle upsert
-        if (change.type === "task") {
-          await taskApi.upsert({
-            id: change.entityId,
-            projectId: change.projectId,
-            title: change.title,
-            description: change.description,
-            status: change.status,
-            sortOrder: change.sortOrder,
-            dueDate: change.dueDate,
-            updatedAt: change.updatedAt,
-            createdAt: change.createdAt,
-            deletedAt: change.deletedAt,
-          });
-        } else if (change.type === "project") {
-          await projectApi.upsert({
-            id: change.entityId,
-            title: change.title,
-            description: change.description,
-            color: change.color,
-            updatedAt: change.updatedAt,
-            createdAt: change.createdAt,
-            deletedAt: change.deletedAt,
-          });
-        } else if (change.type === "note") {
-          await noteApi.upsert({
-            id: change.entityId,
-            collectionId: change.collectionId,
-            title: change.title,
-            content: change.content,
-            updatedAt: change.updatedAt,
-            createdAt: change.createdAt,
-            deletedAt: change.deletedAt,
-          });
-        } else if (change.type === "collection") {
-          await collectionApi.upsert({
-            id: change.entityId,
-            title: change.title,
-            description: change.description,
-            color: change.color,
-            updatedAt: change.updatedAt,
-            createdAt: change.createdAt,
-            deletedAt: change.deletedAt,
-          });
+      try {
+        console.log("pushChanges onSuccess", response.data);
+        // Insert all changes to Dexie
+        for (const change of response.data?.changes ?? []) {
+          // Handle upsert
+          if (change.type === "task") {
+            await taskApi.upsert({
+              id: change.entityId,
+              projectId: change.projectId,
+              title: change.title,
+              description: change.description,
+              status: change.status,
+              sortOrder: change.sortOrder,
+              dueDate: change.dueDate,
+              updatedAt: change.updatedAt,
+              createdAt: change.createdAt,
+              deletedAt: change.deletedAt,
+              syncedAt: response.data?.lastSyncTime,
+            });
+          } else if (change.type === "project") {
+            await projectApi.upsert({
+              id: change.entityId,
+              title: change.title,
+              description: change.description,
+              color: change.color,
+              updatedAt: change.updatedAt,
+              createdAt: change.createdAt,
+              deletedAt: change.deletedAt,
+              syncedAt: response.data?.lastSyncTime,
+            });
+          } else if (change.type === "note") {
+            await noteApi.upsert({
+              id: change.entityId,
+              collectionId: change.collectionId,
+              title: change.title,
+              content: change.content,
+              updatedAt: change.updatedAt,
+              createdAt: change.createdAt,
+              deletedAt: change.deletedAt,
+              syncedAt: response.data?.lastSyncTime,
+            });
+          } else if (change.type === "collection") {
+            await collectionApi.upsert({
+              id: change.entityId,
+              title: change.title,
+              description: change.description,
+              color: change.color,
+              updatedAt: change.updatedAt,
+              createdAt: change.createdAt,
+              deletedAt: change.deletedAt,
+              syncedAt: response.data?.lastSyncTime,
+            });
+          }
         }
+
+        console.log("upserted lastSyncTime", response.data?.lastSyncTime);
+
+        // Update lastSyncTime
+        await updateSetting({
+          name: "lastSyncTime",
+          value: response.data?.lastSyncTime ?? new Date(0).toISOString(),
+        });
+      } catch (error) {
+        console.error("Error during sync:", error);
+      } finally {
+        setIsLoading(false);
       }
-
-      // Update lastSyncTime
-      await updateSetting({
-        name: "lastSyncTime",
-        value: response.data?.lastSyncTime ?? new Date(0).toISOString(),
-      });
-
-      setIsLoading(false);
     },
     onError: (error) => {
       // Log error but don't delete changes - they'll be retried next sync
@@ -89,11 +99,12 @@ export function useAutoSync() {
     const performSync = async () => {
       console.log("useAutoSync useEffect");
       try {
+        setIsLoading(true);
         // Fetch all entities from Dexie
-        const allProjects = await projectApi.getAll();
-        const allTasks = await taskApi.getAll();
-        const allCollections = await collectionApi.getAll();
-        const allNotes = await noteApi.getAll();
+        const allProjects = await projectApi.getAll({ unsynced: true });
+        const allTasks = await taskApi.getAll({ unsynced: true });
+        const allCollections = await collectionApi.getAll({ unsynced: true });
+        const allNotes = await noteApi.getAll({ unsynced: true });
 
         const allChanges: Change[] = [];
 
@@ -152,7 +163,7 @@ export function useAutoSync() {
         }
 
         if (allChanges.length === 0) {
-          syncChanges({
+          pushChanges({
             changes: [],
             lastSyncTime: lastSyncTime ?? new Date(0).toISOString(),
           });
@@ -169,17 +180,13 @@ export function useAutoSync() {
 
         // Send all changes to server
         if (allChanges.length > 0) {
-          setIsLoading(true);
-          syncChanges({
+          pushChanges({
             changes: allChanges,
             lastSyncTime: lastSyncTime ?? new Date(0).toISOString(),
           });
         }
       } catch (error) {
         console.error("Error during sync:", error);
-        setIsLoading(false);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -191,11 +198,11 @@ export function useAutoSync() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [syncChanges]);
+  }, [pushChanges]);
 
   return {
     isLoading: isLoading || isSyncPending,
-    sync: syncChanges,
+    sync: pushChanges,
     lastSyncTime,
   };
 }

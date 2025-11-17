@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { RichTextEditor } from "../ui/rich-text/rich-text-editor";
-import { useGetNote, useUpdateNote } from "@/service/local/api-note";
+import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+
 import { debounce } from "@/lib/utils";
+import { useGetNote, useUpdateNote } from "@/service/local/api-note";
+
+import { RichTextEditor } from "../ui/rich-text/rich-text-editor";
 
 type Props = {
   noteId?: string;
@@ -35,7 +37,7 @@ export function NoteWorkspace({ noteId }: Props) {
   const debouncedUpdate = useRef(
     debounce((values: { id: string; title: string; content: string }) => {
       updateNote(values);
-    }, DEBOUNCE_TIME)
+    }, DEBOUNCE_TIME),
   ).current;
 
   useEffect(() => {

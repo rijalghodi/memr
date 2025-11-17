@@ -17,12 +17,14 @@ import (
 type AuthUsecase struct {
 	userRepo        *repository.UserRepository
 	firebaseUsecase *FirebaseUsecase
+	tokenUsecase    *TokenUsecase
 }
 
-func NewAuthUsecase(userRepo *repository.UserRepository, firebaseUsecase *FirebaseUsecase) *AuthUsecase {
+func NewAuthUsecase(userRepo *repository.UserRepository, firebaseUsecase *FirebaseUsecase, tokenUsecase *TokenUsecase) *AuthUsecase {
 	return &AuthUsecase{
 		userRepo:        userRepo,
 		firebaseUsecase: firebaseUsecase,
+		tokenUsecase:    tokenUsecase,
 	}
 }
 
@@ -73,7 +75,7 @@ func (u *AuthUsecase) GoogleOAuth(c *fiber.Ctx, req *contract.GoogleOAuthReq) er
 		}
 	}
 
-	tokens, err := u.generateTokenPair(user.ID, "")
+	tokens, err := u.tokenUsecase.GenerateTokenPair(user.ID)
 	if err != nil {
 		logger.Log.Error("Failed to generate token pair", zap.Error(err), zap.String("userID", user.ID))
 		return fiber.NewError(fiber.StatusInternalServerError)
@@ -125,7 +127,7 @@ func (u *AuthUsecase) RefreshToken(c *fiber.Ctx, req *contract.RefreshTokenReq) 
 		return fiber.NewError(fiber.StatusNotFound, "User not found")
 	}
 
-	tokens, err := u.generateTokenPair(user.ID, "")
+	tokens, err := u.tokenUsecase.GenerateTokenPair(user.ID)
 	if err != nil {
 		logger.Log.Error("Failed to generate token pair", zap.Error(err), zap.String("userID", user.ID))
 		return fiber.NewError(fiber.StatusInternalServerError)
@@ -139,6 +141,54 @@ func (u *AuthUsecase) RefreshToken(c *fiber.Ctx, req *contract.RefreshTokenReq) 
 	return c.Status(fiber.StatusOK).JSON(util.ToSuccessResponse(res))
 }
 
+func (u *AuthUsecase) LoginGoogleUser(c *fiber.Ctx, req *contract.GoogleLoginReq) (*contract.GoogleLoginRes, error) {
+	userFromDB, err := u.userRepo.GetUserByEmail(req.Email)
+	if err != nil {
+		if err.Error() == "User not found" {
+			user := &model.User{
+				Name:       req.Name,
+				Email:      req.Email,
+				IsVerified: req.VerifiedEmail,
+			}
+
+			if err := u.userRepo.CreateUser(user); err != nil {
+				logger.Log.Errorf("Failed to create user: %+v", err)
+				return nil, err
+			}
+
+			tokens, err := u.tokenUsecase.GenerateTokenPair(user.ID)
+			if err != nil {
+				logger.Log.Error("Failed to generate token pair", zap.Error(err), zap.String("userID", user.ID))
+				return nil, err
+			}
+
+			return &contract.GoogleLoginRes{
+				TokenRes: *tokens,
+				UserRes:  u.buildUserRes(user),
+			}, nil
+		}
+
+		return nil, err
+	}
+
+	userFromDB.IsVerified = req.VerifiedEmail
+	if err := u.userRepo.UpdateUser(userFromDB); err != nil {
+		logger.Log.Errorf("Failed to update user: %+v", err)
+		return nil, err
+	}
+
+	tokens, err := u.tokenUsecase.GenerateTokenPair(userFromDB.ID)
+	if err != nil {
+		logger.Log.Error("Failed to generate token pair", zap.Error(err), zap.String("userID", userFromDB.ID))
+		return nil, err
+	}
+
+	return &contract.GoogleLoginRes{
+		TokenRes: *tokens,
+		UserRes:  u.buildUserRes(userFromDB),
+	}, nil
+}
+
 func (u *AuthUsecase) GetUserByID(id string) (*model.User, error) {
 	user, err := u.userRepo.GetUserByID(id)
 	if err != nil {
@@ -146,27 +196,6 @@ func (u *AuthUsecase) GetUserByID(id string) (*model.User, error) {
 		return nil, fiber.NewError(fiber.StatusInternalServerError)
 	}
 	return user, nil
-}
-
-func (u *AuthUsecase) generateTokenPair(userID, role string) (*contract.TokenRes, error) {
-	accessExpiresAt := time.Now().Add(time.Duration(config.Env.JWT.AccessExpMinutes) * time.Minute)
-	accessToken, err := util.GenerateToken(userID, role, config.TokenTypeAccess, config.Env.JWT.Secret, accessExpiresAt)
-	if err != nil {
-		return nil, err
-	}
-
-	refreshExpiresAt := time.Now().Add(time.Duration(config.Env.JWT.RefreshExpDays) * 24 * time.Hour)
-	refreshToken, err := util.GenerateToken(userID, role, config.TokenTypeRefresh, config.Env.JWT.Secret, refreshExpiresAt)
-	if err != nil {
-		return nil, err
-	}
-
-	return &contract.TokenRes{
-		AccessToken:           accessToken,
-		AccessTokenExpiresAt:  accessExpiresAt.Format(time.RFC3339),
-		RefreshToken:          refreshToken,
-		RefreshTokenExpiresAt: refreshExpiresAt.Format(time.RFC3339),
-	}, nil
 }
 
 func (u *AuthUsecase) buildUserRes(user *model.User) contract.UserRes {
