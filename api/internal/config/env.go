@@ -14,6 +14,7 @@ type Environment struct {
 	JWT        JWT
 	SMTPGoogle SMTPGoogle
 	Firebase   Firebase
+	OpenAI     OpenAI
 }
 
 type App struct {
@@ -60,6 +61,10 @@ type SMTPGoogle struct {
 
 type Firebase struct {
 	ServiceAccountKeyPath string `env:"FIREBASE_SERVICE_ACCOUNT_KEY_PATH"`
+}
+
+type OpenAI struct {
+	APIKey string `env:"OPENAI_API_KEY"`
 }
 
 var Env Environment
