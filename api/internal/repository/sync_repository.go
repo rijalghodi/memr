@@ -4,6 +4,7 @@ import (
 	"app/internal/contract"
 	"app/internal/model"
 	"app/pkg/logger"
+	"app/pkg/openai"
 	"app/pkg/util"
 	"context"
 	"sort"
@@ -15,18 +16,14 @@ import (
 )
 
 type SyncRepository struct {
-	db            *gorm.DB
-	openaiUsecase OpenAIUsecase
+	db           *gorm.DB
+	openaiClient *openai.OpenAIClient
 }
 
-type OpenAIUsecase interface {
-	GenerateEmbedding(ctx context.Context, text string) ([]float32, error)
-}
-
-func NewSyncRepository(db *gorm.DB, openaiUsecase OpenAIUsecase) *SyncRepository {
+func NewSyncRepository(db *gorm.DB, openaiClient *openai.OpenAIClient) *SyncRepository {
 	return &SyncRepository{
-		db:            db,
-		openaiUsecase: openaiUsecase,
+		db:           db,
+		openaiClient: openaiClient,
 	}
 }
 
@@ -305,7 +302,7 @@ func (r *SyncRepository) syncNote(tx *gorm.DB, userID string, change *contract.C
 
 	if embeddingText != "" {
 		ctx := context.Background()
-		emb, err := r.openaiUsecase.GenerateEmbedding(ctx, embeddingText)
+		emb, err := r.openaiClient.GenerateEmbedding(ctx, embeddingText)
 		if err != nil {
 			logger.Log.Error("Failed to generate embedding for note", zap.Error(err), zap.String("noteID", change.EntityID))
 			embedding = nil

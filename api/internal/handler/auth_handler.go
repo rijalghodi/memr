@@ -29,35 +29,9 @@ func NewAuthHandler(authUsecase *usecase.AuthUsecase, userUsecase *usecase.UserU
 }
 
 func (h *AuthHandler) RegisterRoutes(app *fiber.App) {
-	app.Post("/v1/auth/google", h.GoogleOAuth)
 	app.Get("/v1/auth/me", middleware.AuthGuard(), h.GetCurrentUser)
 	app.Post("/v1/auth/refresh-token", h.RefreshToken)
 	app.Get("/v1/auth/google/callback", h.GoogleCallback)
-}
-
-// @Tags Auth
-// @Summary Google OAuth
-// @Description Google OAuth authentication
-// @Accept json
-// @Produce json
-// @Param request body contract.GoogleOAuthReq true "Google OAuth request"
-// @Success 200 {object} util.BaseResponse{data=contract.GoogleOAuthRes}
-// @Failure 400 {object} util.BaseResponse
-// @Router /v1/auth/google [post]
-func (h *AuthHandler) GoogleOAuth(c *fiber.Ctx) error {
-	var req contract.GoogleOAuthReq
-	if err := c.BodyParser(&req); err != nil {
-		logger.Log.Warn("Failed to parse request body: %v", err)
-		return err
-	}
-
-	// Validate request
-	if err := util.ValidateStruct(&req); err != nil {
-		logger.Log.Warn("Validation error: %v", err)
-		return err
-	}
-
-	return h.authUsecase.GoogleOAuth(c, &req)
 }
 
 // @Tags Auth
