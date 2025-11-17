@@ -44,8 +44,11 @@ export const projectApi = {
     return project;
   },
 
-  getAll: async (params?: { unsynced?: boolean }): Promise<ProjectRes[]> => {
-    const unsynced = params?.unsynced;
+  getAll: async (params?: {
+    sortBy?: "updatedAt" | "createdAt" | "viewedAt";
+    unsynced?: boolean;
+  }): Promise<ProjectRes[]> => {
+    const { sortBy, unsynced } = params ?? {};
     const projects = await db.projects
       .filter((project) => !project.deletedAt)
       .filter(
@@ -56,6 +59,14 @@ export const projectApi = {
             new Date(project.updatedAt).getTime()
       )
       .toArray();
+    if (sortBy) {
+      projects.sort((a, b) => {
+        return (
+          new Date(b[sortBy] ?? new Date(0)).getTime() -
+          new Date(a[sortBy] ?? new Date(0)).getTime()
+        );
+      });
+    }
     return projects;
   },
 
@@ -154,9 +165,13 @@ export const useCreateProject = ({
   return { mutate, isLoading };
 };
 
-export const useGetProjects = () => {
+export const useGetProjects = (params?: {
+  sortBy?: "updatedAt" | "createdAt" | "viewedAt";
+  unsynced?: boolean;
+}) => {
+  const { sortBy, unsynced } = params ?? {};
   const projects = useLiveQuery(async () => {
-    return await projectApi.getAll();
+    return await projectApi.getAll({ sortBy, unsynced });
   }, []);
 
   return {
