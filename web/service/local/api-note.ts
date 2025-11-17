@@ -67,16 +67,10 @@ export const noteApi = {
     // Sort by specified field (always DESC)
     if (sortBy) {
       notes.sort((a, b) => {
-        const aValue = a[sortBy];
-        const bValue = b[sortBy];
-
-        // Handle undefined values - put them at the end
-        if (!aValue && !bValue) return 0;
-        if (!aValue) return 1;
-        if (!bValue) return -1;
-
-        // Compare dates (DESC order - newest first)
-        return new Date(bValue).getTime() - new Date(aValue).getTime();
+        return (
+          new Date(b[sortBy] ?? new Date(0)).getTime() -
+          new Date(a[sortBy] ?? new Date(0)).getTime()
+        );
       });
     }
 
@@ -178,13 +172,14 @@ export const useCreateNote = ({
   return { mutate, isLoading };
 };
 
-export const useGetNotes = (
-  collectionId?: string,
-  sortBy?: "updatedAt" | "createdAt" | "viewedAt"
-) => {
+export const useGetNotes = (params?: {
+  collectionId?: string;
+  sortBy?: "updatedAt" | "createdAt" | "viewedAt";
+  unsynced?: boolean;
+}) => {
   const notes = useLiveQuery(async () => {
-    return await noteApi.getAll({ collectionId, sortBy });
-  }, [collectionId, sortBy]);
+    return await noteApi.getAll(params);
+  }, [params]);
 
   return {
     data: notes ?? [],
