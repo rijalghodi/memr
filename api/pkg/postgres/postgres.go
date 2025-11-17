@@ -50,7 +50,7 @@ func NewPostgres(config PostgresConfig) (*Postgres, error) {
 func (pg *Postgres) connect() error {
 	// Build DSN
 	postgresDsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=UTC",
 		pg.config.Host,
 		pg.config.User,
 		pg.config.Password,

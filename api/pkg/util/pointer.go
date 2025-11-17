@@ -14,10 +14,21 @@ func ToValue[T any](v *T) T {
 	return *v
 }
 
-func ToPointerTimeString(v *time.Time) *string {
+func StringPtrToTimePtr(v *string, layout string) *time.Time {
 	if v == nil {
 		return nil
 	}
-	timeString := v.Format(time.RFC3339)
+	time, err := time.Parse(layout, *v)
+	if err != nil {
+		return nil
+	}
+	return ToPointer(time)
+}
+
+func TimePtrToStringPtr(v *time.Time, layout string) *string {
+	if v == nil {
+		return nil
+	}
+	timeString := v.UTC().Format(layout)
 	return ToPointer(timeString)
 }

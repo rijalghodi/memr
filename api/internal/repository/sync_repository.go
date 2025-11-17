@@ -64,15 +64,15 @@ func (r *SyncRepository) GetChanges(userID string, from string) (changes []contr
 		changes = append(changes, contract.Change{
 			Type:        "task",
 			ID:          task.ID,
-			Title:       util.ToPointer(task.Title),
-			Description: util.ToPointer(task.Description),
+			Title:       task.Title,
+			Description: task.Description,
 			ProjectID:   task.ProjectID,
 			SortOrder:   task.SortOrder,
-			DueDate:     util.ToPointerTimeString(task.DueDate),
+			DueDate:     util.TimePtrToStringPtr(task.DueDate, time.RFC3339),
 			Status:      util.ToPointer(task.Status),
-			UpdatedAt:   task.UpdatedAt.Format(time.RFC3339),
-			CreatedAt:   task.CreatedAt.Format(time.RFC3339),
-			DeletedAt:   util.ToPointerTimeString(task.DeletedAt),
+			UpdatedAt:   task.UpdatedAt.UTC().Format(time.RFC3339),
+			CreatedAt:   task.CreatedAt.UTC().Format(time.RFC3339),
+			DeletedAt:   util.TimePtrToStringPtr(task.DeletedAt, time.RFC3339),
 		})
 	}
 
@@ -80,12 +80,12 @@ func (r *SyncRepository) GetChanges(userID string, from string) (changes []contr
 		changes = append(changes, contract.Change{
 			Type:        "project",
 			ID:          project.ID,
-			Title:       util.ToPointer(project.Title),
-			Description: util.ToPointer(project.Description),
+			Title:       project.Title,
+			Description: project.Description,
 			Color:       project.Color,
-			UpdatedAt:   project.UpdatedAt.Format(time.RFC3339),
-			CreatedAt:   project.CreatedAt.Format(time.RFC3339),
-			DeletedAt:   util.ToPointerTimeString(project.DeletedAt),
+			UpdatedAt:   project.UpdatedAt.UTC().Format(time.RFC3339),
+			CreatedAt:   project.CreatedAt.UTC().Format(time.RFC3339),
+			DeletedAt:   util.TimePtrToStringPtr(project.DeletedAt, time.RFC3339),
 		})
 	}
 
@@ -94,11 +94,11 @@ func (r *SyncRepository) GetChanges(userID string, from string) (changes []contr
 			Type:         "note",
 			ID:           note.ID,
 			CollectionID: note.CollectionID,
-			Title:        util.ToPointer(note.Title),
-			Content:      util.ToPointer(note.Content),
-			UpdatedAt:    note.UpdatedAt.Format(time.RFC3339),
-			CreatedAt:    note.CreatedAt.Format(time.RFC3339),
-			DeletedAt:    util.ToPointerTimeString(note.DeletedAt),
+			Title:        note.Title,
+			Content:      note.Content,
+			UpdatedAt:    note.UpdatedAt.UTC().Format(time.RFC3339),
+			CreatedAt:    note.CreatedAt.UTC().Format(time.RFC3339),
+			DeletedAt:    util.TimePtrToStringPtr(note.DeletedAt, time.RFC3339),
 		})
 	}
 
@@ -109,9 +109,9 @@ func (r *SyncRepository) GetChanges(userID string, from string) (changes []contr
 			Title:       util.ToPointer(collection.Title),
 			Description: util.ToPointer(collection.Description),
 			Color:       collection.Color,
-			UpdatedAt:   collection.UpdatedAt.Format(time.RFC3339),
-			CreatedAt:   collection.CreatedAt.Format(time.RFC3339),
-			DeletedAt:   util.ToPointerTimeString(collection.DeletedAt),
+			UpdatedAt:   collection.UpdatedAt.UTC().Format(time.RFC3339),
+			CreatedAt:   collection.CreatedAt.UTC().Format(time.RFC3339),
+			DeletedAt:   util.TimePtrToStringPtr(collection.DeletedAt, time.RFC3339),
 		})
 	}
 
@@ -187,83 +187,222 @@ func (r *SyncRepository) Sync(userID string, req *contract.SyncReq) (lastSyncTim
 func (r *SyncRepository) syncTask(tx *gorm.DB, userID string, change *contract.Change) error {
 	var dueDate *time.Time
 	if change.DueDate != nil {
-		dueDateTime, err := time.Parse(time.RFC3339, util.ToValue(change.DueDate))
-		if err != nil {
-			logger.Log.Warn("Failed to parse due date", zap.Error(err), zap.String("dueDate", util.ToValue(change.DueDate)))
-			return err
-		}
-		dueDate = util.ToPointer(dueDateTime)
+		dueDate = util.StringPtrToTimePtr(change.DueDate, time.RFC3339)
 	}
 
-	var status int
+	// Prepare only non-falsy updates
+	updates := map[string]any{}
+
+	if change.ProjectID != nil {
+		updates["project_id"] = change.ProjectID
+	}
+	if change.Title != nil {
+		updates["title"] = change.Title
+	}
+	if change.Description != nil {
+		updates["description"] = change.Description
+	}
 	if change.Status != nil {
-		status = *change.Status
+		updates["status"] = *change.Status
+	}
+	if change.SortOrder != nil {
+		updates["sort_order"] = change.SortOrder
+	}
+	if dueDate != nil {
+		updates["due_date"] = dueDate
+	}
+	if change.DeletedAt != nil {
+		updates["deleted_at"] = change.DeletedAt
 	}
 
-	task := &model.Task{
-		ID:          change.ID,
-		ProjectID:   change.ProjectID,
-		UserID:      userID,
-		Title:       util.ToValue(change.Title),
-		Description: util.ToValue(change.Description),
-		Status:      status,
-		SortOrder:   change.SortOrder,
-		DueDate:     dueDate,
+	// Try update first
+	res := tx.Model(&model.Task{}).
+		Where("id = ? AND user_id = ?", change.ID, userID).
+		Updates(updates)
+
+	if res.Error != nil {
+		return res.Error
 	}
-	return tx.Save(task).Error
+
+	// If nothing updated → create
+	if res.RowsAffected == 0 {
+		var status int
+		if change.Status != nil {
+			status = *change.Status
+		}
+		task := &model.Task{
+			ID:          change.ID,
+			ProjectID:   change.ProjectID,
+			UserID:      userID,
+			Title:       change.Title,
+			Description: change.Description,
+			Status:      status,
+			SortOrder:   change.SortOrder,
+			DueDate:     dueDate,
+		}
+		return tx.Create(task).Error
+	}
+
+	return nil
 }
 
 func (r *SyncRepository) syncProject(tx *gorm.DB, userID string, change *contract.Change) error {
-	project := &model.Project{
-		ID:          change.ID,
-		UserID:      userID,
-		Title:       util.ToValue(change.Title),
-		Description: util.ToValue(change.Description),
-		Color:       change.Color,
+
+	// Prepare only non-falsy updates
+	updates := map[string]any{}
+
+	if change.Title != nil {
+		updates["title"] = change.Title
 	}
-	return tx.Save(project).Error
+	if change.Description != nil {
+		updates["description"] = change.Description
+	}
+	if change.Color != nil {
+		updates["color"] = change.Color
+	}
+	if change.DeletedAt != nil {
+		updates["deleted_at"] = change.DeletedAt
+	}
+
+	// Try update first
+	res := tx.Model(&model.Project{}).
+		Where("id = ? AND user_id = ?", change.ID, userID).
+		Updates(updates)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	// If nothing updated → create
+	if res.RowsAffected == 0 {
+		project := &model.Project{
+			ID:          change.ID,
+			UserID:      userID,
+			Title:       change.Title,
+			Description: change.Description,
+			Color:       change.Color,
+		}
+		return tx.Create(project).Error
+	}
+
+	return nil
 }
 
 func (r *SyncRepository) syncNote(tx *gorm.DB, userID string, change *contract.Change) error {
-	content := util.ToValue(change.Content)
 	var embedding *pgvector.Vector
 
-	// Generate embedding if content is not empty
-	if content != "" {
+	if change.Content != nil {
 		ctx := context.Background()
-		embeddingText := content
+		embeddingText := *change.Content
+
 		if title := util.ToValue(change.Title); title != "" {
-			embeddingText = "Title: " + title + "\n\n" + "Content: " + content
+			embeddingText = "Title: " + title + "\n\n" + "Content: " + *change.Content
 		}
 
-		embeddingFloat32, err := r.openaiUsecase.GenerateEmbedding(ctx, embeddingText)
+		emb, err := r.openaiUsecase.GenerateEmbedding(ctx, embeddingText)
 		if err != nil {
 			logger.Log.Error("Failed to generate embedding for note", zap.Error(err), zap.String("noteID", change.ID))
-			// Continue without embedding rather than failing the sync
 			embedding = nil
 		} else {
-			embedding = util.ToPointer(pgvector.NewVector(embeddingFloat32))
+			embedding = util.ToPointer(pgvector.NewVector(emb))
 		}
 	}
 
-	note := &model.Note{
-		ID:           change.ID,
-		UserID:       userID,
-		CollectionID: change.CollectionID,
-		Title:        util.ToValue(change.Title),
-		Content:      content,
-		Embedding:    embedding,
+	// Prepare only non-falsy updates
+	updates := map[string]any{}
+
+	if change.CollectionID != nil {
+		updates["collection_id"] = change.CollectionID
 	}
-	return tx.Save(note).Error
+	if change.Title != nil {
+		updates["title"] = *change.Title
+	}
+	if change.Content != nil {
+		updates["content"] = *change.Content
+	}
+	if embedding != nil {
+		updates["embedding"] = embedding
+	}
+
+	if change.DeletedAt != nil {
+		updates["deleted_at"] = change.DeletedAt
+	}
+
+	// TODO: Later, not now. Handle if user want to restore deleted note.
+
+	// Try update first
+	res := tx.Model(&model.Note{}).
+		Where("id = ? AND user_id = ?", change.ID, userID).
+		Updates(updates)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	// If nothing updated → create
+	if res.RowsAffected == 0 {
+		note := &model.Note{
+			ID:           change.ID,
+			UserID:       userID,
+			CollectionID: change.CollectionID,
+			Title:        change.Title,
+			Content:      change.Content,
+			Embedding:    embedding,
+		}
+		return tx.Create(note).Error
+	}
+
+	return nil
 }
 
 func (r *SyncRepository) syncCollection(tx *gorm.DB, userID string, change *contract.Change) error {
-	collection := &model.Collection{
-		ID:          change.ID,
-		UserID:      userID,
-		Title:       util.ToValue(change.Title),
-		Description: util.ToValue(change.Description),
-		Color:       change.Color,
+	var deletedAt *time.Time
+	if change.DeletedAt != nil {
+		deletedDateTime, err := time.Parse(time.RFC3339, util.ToValue(change.DeletedAt))
+		if err != nil {
+			logger.Log.Warn("Failed to parse deleted at", zap.Error(err), zap.String("deletedAt", util.ToValue(change.DeletedAt)))
+			return err
+		}
+		deletedAt = util.ToPointer(deletedDateTime)
 	}
-	return tx.Save(collection).Error
+
+	// Prepare only non-falsy updates
+	updates := map[string]any{}
+
+	if change.Title != nil {
+		updates["title"] = util.ToValue(change.Title)
+	}
+	if change.Description != nil {
+		updates["description"] = util.ToValue(change.Description)
+	}
+	if change.Color != nil {
+		updates["color"] = change.Color
+	}
+	if deletedAt != nil {
+		updates["deleted_at"] = deletedAt
+	}
+
+	// Try update first
+	res := tx.Model(&model.Collection{}).
+		Where("id = ? AND user_id = ?", change.ID, userID).
+		Updates(updates)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	// If nothing updated → create
+	if res.RowsAffected == 0 {
+		collection := &model.Collection{
+			ID:          change.ID,
+			UserID:      userID,
+			Title:       util.ToValue(change.Title),
+			Description: util.ToValue(change.Description),
+			Color:       change.Color,
+			DeletedAt:   deletedAt,
+		}
+		return tx.Create(collection).Error
+	}
+
+	return nil
 }
