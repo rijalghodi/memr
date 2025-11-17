@@ -13,12 +13,12 @@ import { SYNC_INTERVAL } from "@/lib/constant";
 
 export function useAutoSync() {
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const { data: lastSyncTimeSetting } = useGetSetting("lastSyncTime");
   const { mutate: updateSetting } = useUpsertSetting({});
   const lastSyncTime = lastSyncTimeSetting?.value as string | undefined;
 
-  const { mutate: pushChanges, isPending: isSyncPending } = useSync({
+  const { mutate: pushChanges } = useSync({
     onSuccess: async (response) => {
       try {
         console.log("pushChanges onSuccess", response.data);
@@ -85,113 +85,112 @@ export function useAutoSync() {
       } catch (error) {
         console.error("Error during sync:", error);
       } finally {
-        setIsLoading(false);
+        setIsSyncing(false);
       }
     },
     onError: (error) => {
       // Log error but don't delete changes - they'll be retried next sync
       console.error("Sync failed:", error);
-      setIsLoading(false);
+      setIsSyncing(false);
     },
   });
 
-  useEffect(() => {
-    const performSync = async () => {
-      console.log("useAutoSync useEffect");
-      try {
-        setIsLoading(true);
-        // Fetch all entities from Dexie
-        const allProjects = await projectApi.getAll({ unsynced: true });
-        const allTasks = await taskApi.getAll({ unsynced: true });
-        const allCollections = await collectionApi.getAll({ unsynced: true });
-        const allNotes = await noteApi.getAll({ unsynced: true });
+  const performSync = async () => {
+    console.log("useAutoSync useEffect");
+    try {
+      setIsSyncing(true);
+      // Fetch all entities from Dexie
+      const allProjects = await projectApi.getAll({ unsynced: true });
+      const allTasks = await taskApi.getAll({ unsynced: true });
+      const allCollections = await collectionApi.getAll({ unsynced: true });
+      const allNotes = await noteApi.getAll({ unsynced: true });
 
-        const allChanges: Change[] = [];
+      const allChanges: Change[] = [];
 
-        for (const task of allTasks) {
-          allChanges.push({
-            entityId: task.id,
-            type: "task",
-            title: task.title,
-            description: task.description,
-            status: task.status,
-            sortOrder: task.sortOrder,
-            dueDate: task.dueDate,
-            updatedAt: task.updatedAt,
-            createdAt: task.createdAt,
-            deletedAt: task.deletedAt,
-          });
-        }
-
-        for (const project of allProjects) {
-          allChanges.push({
-            entityId: project.id,
-            type: "project",
-            title: project.title,
-            description: project.description,
-            color: project.color,
-            updatedAt: project.updatedAt,
-            createdAt: project.createdAt,
-            deletedAt: project.deletedAt,
-          });
-        }
-
-        for (const collection of allCollections) {
-          allChanges.push({
-            entityId: collection.id,
-            type: "collection",
-            title: collection.title,
-            description: collection.description,
-            color: collection.color,
-            updatedAt: collection.updatedAt,
-            createdAt: collection.createdAt,
-            deletedAt: collection.deletedAt,
-          });
-        }
-
-        for (const note of allNotes) {
-          allChanges.push({
-            entityId: note.id,
-            type: "note",
-            title: note.title,
-            content: note.content,
-            collectionId: note.collectionId,
-            updatedAt: note.updatedAt,
-            createdAt: note.createdAt,
-            deletedAt: note.deletedAt,
-          });
-        }
-
-        if (allChanges.length === 0) {
-          pushChanges({
-            changes: [],
-            lastSyncTime: lastSyncTime ?? new Date(0).toISOString(),
-          });
-          return; // No changes to sync
-        }
-
-        // sort by updatedAt
-        allChanges.sort((a, b) => {
-          return (
-            new Date(b.updatedAt ?? new Date(0).toISOString()).getTime() -
-            new Date(a.updatedAt ?? new Date(0).toISOString()).getTime()
-          );
+      for (const task of allTasks) {
+        allChanges.push({
+          entityId: task.id,
+          type: "task",
+          title: task.title,
+          description: task.description,
+          status: task.status,
+          sortOrder: task.sortOrder,
+          dueDate: task.dueDate,
+          updatedAt: task.updatedAt,
+          createdAt: task.createdAt,
+          deletedAt: task.deletedAt,
         });
-
-        // Send all changes to server
-        if (allChanges.length > 0) {
-          pushChanges({
-            changes: allChanges,
-            lastSyncTime: lastSyncTime ?? new Date(0).toISOString(),
-          });
-        }
-      } catch (error) {
-        console.error("Error during sync:", error);
       }
-    };
 
+      for (const project of allProjects) {
+        allChanges.push({
+          entityId: project.id,
+          type: "project",
+          title: project.title,
+          description: project.description,
+          color: project.color,
+          updatedAt: project.updatedAt,
+          createdAt: project.createdAt,
+          deletedAt: project.deletedAt,
+        });
+      }
+
+      for (const collection of allCollections) {
+        allChanges.push({
+          entityId: collection.id,
+          type: "collection",
+          title: collection.title,
+          description: collection.description,
+          color: collection.color,
+          updatedAt: collection.updatedAt,
+          createdAt: collection.createdAt,
+          deletedAt: collection.deletedAt,
+        });
+      }
+
+      for (const note of allNotes) {
+        allChanges.push({
+          entityId: note.id,
+          type: "note",
+          title: note.title,
+          content: note.content,
+          collectionId: note.collectionId,
+          updatedAt: note.updatedAt,
+          createdAt: note.createdAt,
+          deletedAt: note.deletedAt,
+        });
+      }
+
+      if (allChanges.length === 0) {
+        pushChanges({
+          changes: [],
+          lastSyncTime: lastSyncTime ?? new Date(0).toISOString(),
+        });
+        return; // No changes to sync
+      }
+
+      // sort by updatedAt
+      allChanges.sort((a, b) => {
+        return (
+          new Date(b.updatedAt ?? new Date(0).toISOString()).getTime() -
+          new Date(a.updatedAt ?? new Date(0).toISOString()).getTime()
+        );
+      });
+
+      // Send all changes to server
+      if (allChanges.length > 0) {
+        pushChanges({
+          changes: allChanges,
+          lastSyncTime: lastSyncTime ?? new Date(0).toISOString(),
+        });
+      }
+    } catch (error) {
+      console.error("Error during sync:", error);
+    }
+  };
+
+  useEffect(() => {
     intervalRef.current = setInterval(performSync, SYNC_INTERVAL);
-
     // Cleanup interval on unmount
     return () => {
       if (intervalRef.current) {
@@ -201,8 +200,8 @@ export function useAutoSync() {
   }, [pushChanges]);
 
   return {
-    isLoading: isLoading || isSyncPending,
-    sync: pushChanges,
+    isSyncing,
+    sync: performSync,
     lastSyncTime,
   };
 }

@@ -15,7 +15,6 @@ type Props = {
 
 export function NoteWorkspace({ noteId }: Props) {
   const { data: note, isLoading } = useGetNote(noteId);
-  // const { mutate: updateNote } = useUpdateNote({});
 
   const form = useForm({
     defaultValues: {
@@ -33,17 +32,15 @@ export function NoteWorkspace({ noteId }: Props) {
   );
 
   useEffect(() => {
-    if (note) {
-      form.reset({
-        title: note.title,
-        content: note.content,
-      });
-    }
+    form.reset({
+      title: note?.title ?? "",
+      content: note?.content ?? "",
+    });
   }, [note]);
 
   useEffect(() => {
     console.log("debounced update values", values);
-    if (values) {
+    if (!isLoading && noteId) {
       noteApi.update({
         id: noteId,
         title: values.title,
@@ -62,14 +59,14 @@ export function NoteWorkspace({ noteId }: Props) {
 
   return (
     <div className="flex flex-col max-h-[calc(100vh-100px)] overflow-y-auto">
-      <div className="pt-6 pb-0 w-full px-[120px]">
+      {/* <div className="pt-6 pb-0 w-full px-[120px]">
         <input
           type="text"
           placeholder="Untitled"
           {...form.register("title")}
-          className="w-fit tex-2xl p-2 md:text-3xl lg:text-5xl font-bold focus:outline-none border-none focus:ring-0 focus:bg-accent rounded-lg"
+          className="w-fit tex-2xl p-2 md:text-3xl lg:text-5xl font-semibold focus:outline-none border-none focus:ring-0 focus:bg-accent rounded-lg"
         />
-      </div>
+      </div> */}
       <div className="w-full">
         <RichTextEditor
           value={form.watch("content")}
