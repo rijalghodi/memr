@@ -31,7 +31,7 @@ func CustomErrorMessages(err error) map[string]string {
 func generateErrorMessages(validationErrors validator.ValidationErrors) map[string]string {
 	errorsMap := make(map[string]string)
 	for _, err := range validationErrors {
-		fieldName := err.Field()
+		fieldName := err.StructNamespace()
 		tag := err.Tag()
 
 		customMessage := customMessages[tag]

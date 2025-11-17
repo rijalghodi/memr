@@ -12,10 +12,10 @@ import (
 )
 
 type SyncHandler struct {
-	syncUsecase usecase.SyncUsecase
+	syncUsecase *usecase.SyncUsecase
 }
 
-func NewSyncHandler(syncUsecase usecase.SyncUsecase) *SyncHandler {
+func NewSyncHandler(syncUsecase *usecase.SyncUsecase) *SyncHandler {
 	return &SyncHandler{syncUsecase: syncUsecase}
 }
 

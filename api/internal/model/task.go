@@ -3,8 +3,9 @@ package model
 import "time"
 
 type Task struct {
-	ID          string     `json:"id"`
+	ID          string     `json:"id" gorm:"primaryKey"`
 	ProjectID   *string    `json:"project_id"`
+	UserID      string     `json:"user_id"`
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
 	Status      int        `json:"status"`
@@ -15,4 +16,5 @@ type Task struct {
 	DeletedAt   *time.Time `gorm:"index"`
 
 	Project *Project `gorm:"foreignKey:ProjectID"`
+	User    *User    `gorm:"foreignKey:UserID"`
 }
