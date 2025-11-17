@@ -3,7 +3,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RichTextEditor } from "../ui/rich-text/rich-text-editor";
 import { useGetNote, useUpdateNote } from "@/service/local/api-note";
-import { changeApi } from "@/service/local/api-change";
+import {
+  changeApi,
+  useUpdateChange,
+  useUpsertChange,
+} from "@/service/local/api-change";
 import { useForm } from "react-hook-form";
 import { debounce } from "@/lib/utils";
 
@@ -16,6 +20,7 @@ const DEBOUNCE_TIME = 5000;
 export function NoteWorkspace({ noteId }: Props) {
   const { data: note, isLoading } = useGetNote(noteId);
   const { mutate: updateNote } = useUpdateNote({});
+  const { mutate: upsertChange } = useUpsertChange({});
 
   const form = useForm({
     defaultValues: {
@@ -36,6 +41,12 @@ export function NoteWorkspace({ noteId }: Props) {
   const debouncedUpdate = useRef(
     debounce((values: { id: string; title: string; content: string }) => {
       updateNote(values);
+      upsertChange({
+        entityId: values.id,
+        type: "note",
+        title: values.title ?? "",
+        content: values.content ?? "",
+      });
     }, DEBOUNCE_TIME)
   ).current;
 

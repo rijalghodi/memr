@@ -22,7 +22,7 @@ export type Change = {
 
 export type SyncReq = {
   changes: Change[];
-  lastSyncTime?: string;
+  lastSyncTime: string;
 };
 
 export type SyncRes = {
