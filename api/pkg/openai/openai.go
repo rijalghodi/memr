@@ -1,21 +1,19 @@
-package usecase
+package openai
 
 import (
-	"app/pkg/logger"
 	"context"
 	"fmt"
 
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/packages/param"
-	"go.uber.org/zap"
 )
 
-type OpenAIUsecase struct {
+type OpenAIClient struct {
 	client openai.Client
 }
 
-func NewOpenAIUsecase(apiKey string) (*OpenAIUsecase, error) {
+func NewOpenAIClient(apiKey string) (*OpenAIClient, error) {
 	if apiKey == "" {
 		return nil, fmt.Errorf("OpenAI API key is required")
 	}
@@ -24,13 +22,13 @@ func NewOpenAIUsecase(apiKey string) (*OpenAIUsecase, error) {
 		option.WithAPIKey(apiKey),
 	)
 
-	return &OpenAIUsecase{
+	return &OpenAIClient{
 		client: client,
 	}, nil
 }
 
 // GenerateEmbedding generates an embedding for the given text using text-embedding-3-small model
-func (u *OpenAIUsecase) GenerateEmbedding(ctx context.Context, text string) ([]float32, error) {
+func (u *OpenAIClient) GenerateEmbedding(ctx context.Context, text string) ([]float32, error) {
 	if text == "" {
 		return []float32{}, nil
 	}
@@ -44,12 +42,10 @@ func (u *OpenAIUsecase) GenerateEmbedding(ctx context.Context, text string) ([]f
 		Input: input,
 	})
 	if err != nil {
-		logger.Log.Error("Failed to create embedding", zap.Error(err), zap.String("text", text))
 		return nil, fmt.Errorf("failed to create embedding: %w", err)
 	}
 
 	if len(response.Data) == 0 {
-		logger.Log.Warn("No embeddings returned from OpenAI")
 		return nil, fmt.Errorf("no embeddings returned")
 	}
 
