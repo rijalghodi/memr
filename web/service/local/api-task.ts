@@ -22,9 +22,22 @@ export type UpdateTaskReq = {
   dueDate?: string;
 };
 
+export type UpsertTaskReq = {
+  id: string;
+  projectId?: string;
+  title?: string;
+  description?: string;
+  status?: number;
+  sortOrder?: string;
+  dueDate?: string;
+  updatedAt?: string;
+  createdAt?: string;
+  deletedAt?: string;
+};
+
 export type TaskRes = Task;
 
-const taskApi = {
+export const taskApi = {
   create: async (data: CreateTaskReq): Promise<TaskRes> => {
     const now = new Date().toISOString();
     const task: Task = {
@@ -68,6 +81,36 @@ const taskApi = {
       ...existing,
       ...data,
       updatedAt: new Date().toISOString(),
+    };
+    await db.tasks.update(data.id, updated);
+    return updated;
+  },
+
+  upsert: async (data: UpsertTaskReq): Promise<TaskRes> => {
+    const existing = await db.tasks.get(data.id);
+    if (!existing || existing.deletedAt) {
+      const now = new Date().toISOString();
+      const task: Task = {
+        id: data.id ?? crypto.randomUUID(),
+        projectId: data.projectId,
+        title: data.title,
+        description: data.description,
+        status: data.status ?? 0,
+        sortOrder: data.sortOrder,
+        dueDate: data.dueDate,
+        createdAt: data.createdAt ?? now,
+        updatedAt: data.updatedAt ?? now,
+        deletedAt: data.deletedAt,
+      };
+      await db.tasks.add(task);
+      return task;
+    }
+
+    const updated: Task = {
+      ...existing,
+      ...data,
+      updatedAt: data.updatedAt ?? new Date().toISOString(),
+      deletedAt: data.deletedAt,
     };
     await db.tasks.update(data.id, updated);
     return updated;

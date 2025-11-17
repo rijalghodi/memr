@@ -15,6 +15,8 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/openai/openai-go/v3 v3.8.1
+	github.com/pgvector/pgvector-go v0.3.0
 	github.com/rubenv/sql-migrate v1.8.0
 	github.com/swaggo/swag v1.16.6
 	go.uber.org/zap v1.27.0
@@ -78,8 +80,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
-	github.com/openai/openai-go/v3 v3.8.1 // indirect
-	github.com/pgvector/pgvector-go v0.3.0 // indirect
 	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
