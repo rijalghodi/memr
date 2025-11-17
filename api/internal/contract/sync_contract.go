@@ -2,7 +2,7 @@ package contract
 
 type SyncReq struct {
 	Changes      []Change `json:"changes" validate:"dive"`
-	LastSyncTime string   `json:"lastSyncTime"`
+	LastSyncTime string   `json:"lastSyncTime" validate:"required"`
 }
 
 type SyncRes struct {

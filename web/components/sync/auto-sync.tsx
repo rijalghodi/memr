@@ -6,6 +6,8 @@ import { useSync } from "@/service/api-sync";
 import type { Change as SyncChange } from "@/service/api-sync";
 import type { Change as DexieChange } from "@/lib/dexie";
 
+const SYNC_INTERVAL = 5 * 1000; // 5 seconds
+
 export function AutoSync() {
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const { mutate: syncChanges } = useSync({
@@ -134,6 +136,7 @@ export function AutoSync() {
         if (mergedChanges.length > 0) {
           syncChanges({
             changes: mergedChanges,
+            lastSyncTime: new Date().toISOString(),
           });
         }
       } catch (error) {
@@ -142,7 +145,7 @@ export function AutoSync() {
     };
 
     // Perform initial sync after 5 minutes
-    intervalRef.current = setInterval(performSync, 5 * 60 * 1000); // 5 minutes
+    intervalRef.current = setInterval(performSync, SYNC_INTERVAL); // 5 minutes
 
     // Cleanup interval on unmount
     return () => {
