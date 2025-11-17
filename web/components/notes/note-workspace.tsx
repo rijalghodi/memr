@@ -3,20 +3,19 @@
 import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 
-import { debounce } from "@/lib/utils";
-import { useGetNote, useUpdateNote } from "@/service/local/api-note";
+import { noteApi, useGetNote, useUpdateNote } from "@/service/local/api-note";
 
 import { RichTextEditor } from "../ui/rich-text/rich-text-editor";
+import { AUTOSAVE_INTERVAL } from "@/lib/constant";
+import { useDebounce } from "@/hooks/use-debounce";
 
 type Props = {
-  noteId?: string;
+  noteId: string;
 };
-
-const DEBOUNCE_TIME = 5000;
 
 export function NoteWorkspace({ noteId }: Props) {
   const { data: note, isLoading } = useGetNote(noteId);
-  const { mutate: updateNote } = useUpdateNote({});
+  // const { mutate: updateNote } = useUpdateNote({});
 
   const form = useForm({
     defaultValues: {
@@ -24,6 +23,14 @@ export function NoteWorkspace({ noteId }: Props) {
       content: "",
     },
   });
+
+  const values = useDebounce(
+    {
+      title: form.watch("title"),
+      content: form.watch("content"),
+    },
+    AUTOSAVE_INTERVAL
+  );
 
   useEffect(() => {
     if (note) {
@@ -34,27 +41,16 @@ export function NoteWorkspace({ noteId }: Props) {
     }
   }, [note]);
 
-  const debouncedUpdate = useRef(
-    debounce((values: { id: string; title: string; content: string }) => {
-      updateNote(values);
-    }, DEBOUNCE_TIME),
-  ).current;
-
   useEffect(() => {
-    if (!noteId) return;
-    const subscription = form.watch((values) => {
-      // Whenever title or content changes, trigger debounced update.
-      if (form.formState.isDirty) {
-        debouncedUpdate({
-          id: noteId,
-          title: values.title ?? "",
-          content: values.content ?? "",
-        });
-      }
-    });
-    return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [noteId]);
+    console.log("debounced update values", values);
+    if (values) {
+      noteApi.update({
+        id: noteId,
+        title: values.title,
+        content: values.content,
+      });
+    }
+  }, [JSON.stringify(values)]);
 
   if (isLoading && noteId) {
     return (

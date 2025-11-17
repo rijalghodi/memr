@@ -27,6 +27,6 @@ func (u *SyncUsecase) Sync(c *fiber.Ctx, userID string, req *contract.SyncReq) (
 	}
 	return &contract.SyncRes{
 		Changes:      changes,
-		LastSyncTime: lastSyncTime.Format(time.RFC3339),
+		LastSyncTime: lastSyncTime.UTC().Format(time.RFC3339),
 	}, nil
 }

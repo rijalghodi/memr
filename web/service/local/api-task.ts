@@ -65,7 +65,11 @@ export const taskApi = {
     let tasks = await db.tasks
       .filter((task) => !task.deletedAt)
       .filter(
-        (task) => !unsynced || !task.syncedAt || task.syncedAt < task.updatedAt
+        (task) =>
+          !unsynced ||
+          !task.syncedAt ||
+          new Date(task.syncedAt ?? new Date(0)).getTime() <
+            new Date(task.updatedAt).getTime()
       )
       .toArray();
     if (projectId) {

@@ -50,7 +50,10 @@ export const projectApi = {
       .filter((project) => !project.deletedAt)
       .filter(
         (project) =>
-          !unsynced || !project.syncedAt || project.syncedAt < project.updatedAt
+          !unsynced ||
+          !project.syncedAt ||
+          new Date(project.syncedAt ?? new Date(0)).getTime() <
+            new Date(project.updatedAt).getTime()
       )
       .toArray();
     return projects;
