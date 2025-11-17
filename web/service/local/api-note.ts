@@ -16,9 +16,19 @@ export type UpdateNoteReq = {
   content?: string;
 };
 
+export type UpsertNoteReq = {
+  id: string;
+  collectionId?: string;
+  title?: string;
+  content?: string;
+  updatedAt?: string;
+  createdAt?: string;
+  deletedAt?: string;
+};
+
 export type NoteRes = Note;
 
-const noteApi = {
+export const noteApi = {
   create: async (data: CreateNoteReq): Promise<NoteRes> => {
     const now = new Date().toISOString();
     const note: Note = {
@@ -79,6 +89,33 @@ const noteApi = {
       ...existing,
       ...data,
       updatedAt: new Date().toISOString(),
+    };
+    await db.notes.update(data.id, updated);
+    return updated;
+  },
+
+  upsert: async (data: UpsertNoteReq): Promise<NoteRes> => {
+    const existing = await db.notes.get(data.id);
+    if (!existing || existing.deletedAt) {
+      const now = new Date().toISOString();
+      const note: Note = {
+        id: data.id,
+        collectionId: data.collectionId,
+        title: data.title,
+        content: data.content,
+        createdAt: data.createdAt ?? now,
+        updatedAt: data.updatedAt ?? now,
+        deletedAt: data.deletedAt,
+      };
+      await db.notes.add(note);
+      return note;
+    }
+
+    const updated: Note = {
+      ...existing,
+      ...data,
+      updatedAt: data.updatedAt ?? new Date().toISOString(),
+      deletedAt: data.deletedAt,
     };
     await db.notes.update(data.id, updated);
     return updated;

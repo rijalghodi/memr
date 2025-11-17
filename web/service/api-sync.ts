@@ -4,6 +4,7 @@ import { apiClient } from "./api-client";
 import type { GErrorResponse, GResponse } from "./type";
 
 export type Change = {
+  entityId: string;
   collectionId?: string; // Note-only
   color?: string; // Project and collection-only
   content?: string;
@@ -11,7 +12,6 @@ export type Change = {
   deletedAt?: string;
   description?: string;
   dueDate?: string;
-  id: string;
   projectId?: string; // Task-only
   sortOrder?: string;
   status?: number;

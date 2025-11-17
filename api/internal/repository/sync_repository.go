@@ -63,7 +63,7 @@ func (r *SyncRepository) GetChanges(userID string, from string) (changes []contr
 	for _, task := range tasks {
 		changes = append(changes, contract.Change{
 			Type:        "task",
-			ID:          task.ID,
+			EntityID:    task.ID,
 			Title:       task.Title,
 			Description: task.Description,
 			ProjectID:   task.ProjectID,
@@ -79,7 +79,7 @@ func (r *SyncRepository) GetChanges(userID string, from string) (changes []contr
 	for _, project := range projects {
 		changes = append(changes, contract.Change{
 			Type:        "project",
-			ID:          project.ID,
+			EntityID:    project.ID,
 			Title:       project.Title,
 			Description: project.Description,
 			Color:       project.Color,
@@ -92,7 +92,7 @@ func (r *SyncRepository) GetChanges(userID string, from string) (changes []contr
 	for _, note := range notes {
 		changes = append(changes, contract.Change{
 			Type:         "note",
-			ID:           note.ID,
+			EntityID:     note.ID,
 			CollectionID: note.CollectionID,
 			Title:        note.Title,
 			Content:      note.Content,
@@ -105,7 +105,7 @@ func (r *SyncRepository) GetChanges(userID string, from string) (changes []contr
 	for _, collection := range collections {
 		changes = append(changes, contract.Change{
 			Type:        "collection",
-			ID:          collection.ID,
+			EntityID:    collection.ID,
 			Title:       util.ToPointer(collection.Title),
 			Description: util.ToPointer(collection.Description),
 			Color:       collection.Color,
@@ -217,7 +217,7 @@ func (r *SyncRepository) syncTask(tx *gorm.DB, userID string, change *contract.C
 
 	// Try update first
 	res := tx.Model(&model.Task{}).
-		Where("id = ? AND user_id = ?", change.ID, userID).
+		Where("id = ? AND user_id = ?", change.EntityID, userID).
 		Updates(updates)
 
 	if res.Error != nil {
@@ -231,7 +231,7 @@ func (r *SyncRepository) syncTask(tx *gorm.DB, userID string, change *contract.C
 			status = *change.Status
 		}
 		task := &model.Task{
-			ID:          change.ID,
+			ID:          change.EntityID,
 			ProjectID:   change.ProjectID,
 			UserID:      userID,
 			Title:       change.Title,
@@ -266,7 +266,7 @@ func (r *SyncRepository) syncProject(tx *gorm.DB, userID string, change *contrac
 
 	// Try update first
 	res := tx.Model(&model.Project{}).
-		Where("id = ? AND user_id = ?", change.ID, userID).
+		Where("id = ? AND user_id = ?", change.EntityID, userID).
 		Updates(updates)
 
 	if res.Error != nil {
@@ -276,7 +276,7 @@ func (r *SyncRepository) syncProject(tx *gorm.DB, userID string, change *contrac
 	// If nothing updated → create
 	if res.RowsAffected == 0 {
 		project := &model.Project{
-			ID:          change.ID,
+			ID:          change.EntityID,
 			UserID:      userID,
 			Title:       change.Title,
 			Description: change.Description,
@@ -301,7 +301,7 @@ func (r *SyncRepository) syncNote(tx *gorm.DB, userID string, change *contract.C
 
 		emb, err := r.openaiUsecase.GenerateEmbedding(ctx, embeddingText)
 		if err != nil {
-			logger.Log.Error("Failed to generate embedding for note", zap.Error(err), zap.String("noteID", change.ID))
+			logger.Log.Error("Failed to generate embedding for note", zap.Error(err), zap.String("noteID", change.EntityID))
 			embedding = nil
 		} else {
 			embedding = util.ToPointer(pgvector.NewVector(emb))
@@ -332,7 +332,7 @@ func (r *SyncRepository) syncNote(tx *gorm.DB, userID string, change *contract.C
 
 	// Try update first
 	res := tx.Model(&model.Note{}).
-		Where("id = ? AND user_id = ?", change.ID, userID).
+		Where("id = ? AND user_id = ?", change.EntityID, userID).
 		Updates(updates)
 
 	if res.Error != nil {
@@ -342,7 +342,7 @@ func (r *SyncRepository) syncNote(tx *gorm.DB, userID string, change *contract.C
 	// If nothing updated → create
 	if res.RowsAffected == 0 {
 		note := &model.Note{
-			ID:           change.ID,
+			ID:           change.EntityID,
 			UserID:       userID,
 			CollectionID: change.CollectionID,
 			Title:        change.Title,
@@ -384,7 +384,7 @@ func (r *SyncRepository) syncCollection(tx *gorm.DB, userID string, change *cont
 
 	// Try update first
 	res := tx.Model(&model.Collection{}).
-		Where("id = ? AND user_id = ?", change.ID, userID).
+		Where("id = ? AND user_id = ?", change.EntityID, userID).
 		Updates(updates)
 
 	if res.Error != nil {
@@ -394,7 +394,7 @@ func (r *SyncRepository) syncCollection(tx *gorm.DB, userID string, change *cont
 	// If nothing updated → create
 	if res.RowsAffected == 0 {
 		collection := &model.Collection{
-			ID:          change.ID,
+			ID:          change.EntityID,
 			UserID:      userID,
 			Title:       util.ToValue(change.Title),
 			Description: util.ToValue(change.Description),

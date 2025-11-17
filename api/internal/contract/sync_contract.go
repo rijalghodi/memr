@@ -12,7 +12,8 @@ type SyncRes struct {
 
 type Change struct {
 	Type        string  `json:"type" validate:"required,oneof=task project note collection"`
-	ID          string  `json:"id" validate:"required,uuid"`
+	EntityID    string  `json:"entityId" validate:"required,uuid"`
+	Action      string  `json:"action" validate:"required,oneof=create update delete"`
 	Title       *string `json:"title,omitempty"`
 	Description *string `json:"description,omitempty"`
 

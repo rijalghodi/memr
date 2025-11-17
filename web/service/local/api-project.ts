@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { db, type Project } from "@/lib/dexie";
 
 export type CreateProjectReq = {
-  userId: string;
   title?: string;
   description?: string;
   color?: string;
@@ -17,14 +16,23 @@ export type UpdateProjectReq = {
   color?: string;
 };
 
+export type UpsertProjectReq = {
+  id: string;
+  title?: string;
+  description?: string;
+  color?: string;
+  updatedAt?: string;
+  createdAt?: string;
+  deletedAt?: string;
+};
+
 export type ProjectRes = Project;
 
-const projectApi = {
+export const projectApi = {
   create: async (data: CreateProjectReq): Promise<ProjectRes> => {
     const now = new Date().toISOString();
     const project: Project = {
       id: crypto.randomUUID(),
-      userId: data.userId,
       title: data.title,
       description: data.description,
       color: data.color,
@@ -35,13 +43,10 @@ const projectApi = {
     return project;
   },
 
-  getAll: async (userId?: string): Promise<ProjectRes[]> => {
+  getAll: async (): Promise<ProjectRes[]> => {
     let projects = await db.projects
       .filter((project) => !project.deletedAt)
       .toArray();
-    if (userId) {
-      projects = projects.filter((project) => project.userId === userId);
-    }
     return projects;
   },
 
@@ -63,6 +68,33 @@ const projectApi = {
       ...existing,
       ...data,
       updatedAt: new Date().toISOString(),
+    };
+    await db.projects.update(data.id, updated);
+    return updated;
+  },
+
+  upsert: async (data: UpsertProjectReq): Promise<ProjectRes> => {
+    const existing = await db.projects.get(data.id);
+    if (!existing || existing.deletedAt) {
+      const now = new Date().toISOString();
+      const project: Project = {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        color: data.color,
+        createdAt: data.createdAt ?? now,
+        updatedAt: data.updatedAt ?? now,
+        deletedAt: data.deletedAt,
+      };
+      await db.projects.add(project);
+      return project;
+    }
+
+    const updated: Project = {
+      ...existing,
+      ...data,
+      updatedAt: data.updatedAt ?? new Date().toISOString(),
+      deletedAt: data.deletedAt,
     };
     await db.projects.update(data.id, updated);
     return updated;
@@ -112,10 +144,10 @@ export const useCreateProject = ({
   return { mutate, isLoading };
 };
 
-export const useGetProjects = (userId?: string) => {
+export const useGetProjects = () => {
   const projects = useLiveQuery(async () => {
-    return await projectApi.getAll(userId);
-  }, [userId]);
+    return await projectApi.getAll();
+  }, []);
 
   return {
     data: projects ?? [],

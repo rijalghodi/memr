@@ -11,11 +11,11 @@ export type Task = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
+  syncedAt?: string;
 };
 
 export type Project = {
   id: string;
-  userId: string;
   title?: string;
   description?: string;
   color?: string;
@@ -23,6 +23,7 @@ export type Project = {
   updatedAt: string;
   viewedAt?: string;
   deletedAt?: string;
+  syncedAt?: string;
 };
 
 export type Note = {
@@ -34,11 +35,11 @@ export type Note = {
   updatedAt: string;
   viewedAt?: string;
   deletedAt?: string;
+  syncedAt?: string;
 };
 
 export type Collection = {
   id: string;
-  userId: string;
   title?: string;
   description?: string;
   color?: string;
@@ -46,24 +47,32 @@ export type Collection = {
   updatedAt: string;
   viewedAt?: string;
   deletedAt?: string;
+  syncedAt?: string;
 };
 
-export type Change = {
-  id: string; // Change record ID (primary key)
-  entityId: string; // ID of the entity being changed (matches sync_contract.go ID field)
-  type: "task" | "project" | "note" | "collection";
-  title?: string;
-  description?: string;
-  projectId?: string;
-  sortOrder?: string;
-  dueDate?: string;
-  status?: number;
-  content?: string;
-  color?: string;
-  collectionId?: string;
-  updatedAt: string;
+// export type Change = {
+//   id: string; // Change record ID (primary key)
+//   entityId: string; // ID of the entity being changed (matches sync_contract.go ID field)
+//   type: "task" | "project" | "note" | "collection";
+//   title?: string;
+//   description?: string;
+//   projectId?: string;
+//   sortOrder?: string;
+//   dueDate?: string;
+//   status?: number;
+//   content?: string;
+//   color?: string;
+//   collectionId?: string;
+//   updatedAt: string;
+//   createdAt: string;
+//   deletedAt?: string;
+// };
+
+export type Settings = {
+  name: string;
+  value: string | number | boolean | object;
   createdAt: string;
-  deletedAt?: string;
+  updatedAt: string;
 };
 
 class MemrDatabase extends Dexie {
@@ -71,16 +80,18 @@ class MemrDatabase extends Dexie {
   projects!: Table<Project>;
   notes!: Table<Note>;
   collections!: Table<Collection>;
-  changes!: Table<Change>;
+  // changes!: Table<Change>;
+  settings!: Table<Settings>;
 
   constructor() {
     super("memr");
     this.version(1).stores({
       tasks: "id, projectId, deletedAt",
-      projects: "id, userId, deletedAt",
+      projects: "id, deletedAt",
       notes: "id, collectionId, deletedAt",
-      collections: "id, userId, deletedAt",
-      changes: "id, entityId, type, deletedAt",
+      collections: "id, deletedAt",
+      // changes: "id, entityId, type, deletedAt",
+      settings: "name, createdAt",
     });
   }
 }

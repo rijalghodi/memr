@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { db, type Collection } from "@/lib/dexie";
 
 export type CreateCollectionReq = {
-  userId: string;
   title?: string;
   description?: string;
   color?: string;
@@ -17,14 +16,23 @@ export type UpdateCollectionReq = {
   color?: string;
 };
 
+export type UpsertCollectionReq = {
+  id: string;
+  title?: string;
+  description?: string;
+  color?: string;
+  updatedAt?: string;
+  createdAt?: string;
+  deletedAt?: string;
+};
+
 export type CollectionRes = Collection;
 
-const collectionApi = {
+export const collectionApi = {
   create: async (data: CreateCollectionReq): Promise<CollectionRes> => {
     const now = new Date().toISOString();
     const collection: Collection = {
       id: crypto.randomUUID(),
-      userId: data.userId,
       title: data.title,
       description: data.description,
       color: data.color,
@@ -35,15 +43,10 @@ const collectionApi = {
     return collection;
   },
 
-  getAll: async (userId?: string): Promise<CollectionRes[]> => {
+  getAll: async (): Promise<CollectionRes[]> => {
     let collections = await db.collections
       .filter((collection) => !collection.deletedAt)
       .toArray();
-    if (userId) {
-      collections = collections.filter(
-        (collection) => collection.userId === userId
-      );
-    }
     return collections;
   },
 
@@ -65,6 +68,33 @@ const collectionApi = {
       ...existing,
       ...data,
       updatedAt: new Date().toISOString(),
+    };
+    await db.collections.update(data.id, updated);
+    return updated;
+  },
+
+  upsert: async (data: UpsertCollectionReq): Promise<CollectionRes> => {
+    const existing = await db.collections.get(data.id);
+    if (!existing || existing.deletedAt) {
+      const now = new Date().toISOString();
+      const collection: Collection = {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        color: data.color,
+        createdAt: data.createdAt ?? now,
+        updatedAt: data.updatedAt ?? now,
+        deletedAt: data.deletedAt,
+      };
+      await db.collections.add(collection);
+      return collection;
+    }
+
+    const updated: Collection = {
+      ...existing,
+      ...data,
+      updatedAt: data.updatedAt ?? new Date().toISOString(),
+      deletedAt: data.deletedAt,
     };
     await db.collections.update(data.id, updated);
     return updated;
@@ -114,10 +144,10 @@ export const useCreateCollection = ({
   return { mutate, isLoading };
 };
 
-export const useGetCollections = (userId?: string) => {
+export const useGetCollections = () => {
   const collections = useLiveQuery(async () => {
-    return await collectionApi.getAll(userId);
-  }, [userId]);
+    return await collectionApi.getAll();
+  }, []);
 
   return {
     data: collections ?? [],
