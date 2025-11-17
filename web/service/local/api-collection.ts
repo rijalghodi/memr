@@ -52,7 +52,8 @@ export const collectionApi = {
         (collection) =>
           !unsynced ||
           !collection.syncedAt ||
-          collection.syncedAt < collection.updatedAt
+          new Date(collection.syncedAt ?? new Date(0)).getTime() <
+            new Date(collection.updatedAt).getTime()
       )
       .toArray();
     return collections;

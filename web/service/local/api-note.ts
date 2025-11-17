@@ -53,7 +53,11 @@ export const noteApi = {
     let notes = await db.notes
       .filter((note) => !note.deletedAt)
       .filter(
-        (note) => !unsynced || !note.syncedAt || note.syncedAt < note.updatedAt
+        (note) =>
+          !unsynced ||
+          !note.syncedAt ||
+          new Date(note.syncedAt ?? new Date(0)).getTime() <
+            new Date(note.updatedAt).getTime()
       )
       .toArray();
     if (collectionId) {
