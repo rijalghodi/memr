@@ -1,16 +1,18 @@
 "use client";
 
+import { FileText, MoreHorizontal, Trash } from "lucide-react";
 import React from "react";
+
+import { useDeleteNote } from "@/service/local/api-note";
+
 import { Button } from "../ui/button";
+import { useConfirmation } from "../ui/confirmation-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { FileText, MoreHorizontal, Trash } from "lucide-react";
-import { useDeleteNote } from "@/service/local/api-note";
-import { useConfirmation } from "../ui/confirmation-dialog";
 
 type Props = {
   id: string;

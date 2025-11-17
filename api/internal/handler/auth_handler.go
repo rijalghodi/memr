@@ -1,11 +1,17 @@
 package handler
 
 import (
+	"app/internal/config"
 	"app/internal/contract"
 	"app/internal/middleware"
 	"app/internal/usecase"
 	"app/pkg/logger"
 	"app/pkg/util"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -26,6 +32,7 @@ func (h *AuthHandler) RegisterRoutes(app *fiber.App) {
 	app.Post("/v1/auth/google", h.GoogleOAuth)
 	app.Get("/v1/auth/me", middleware.AuthGuard(), h.GetCurrentUser)
 	app.Post("/v1/auth/refresh-token", h.RefreshToken)
+	app.Get("/v1/auth/google/callback", h.GoogleCallback)
 }
 
 // @Tags Auth
@@ -104,4 +111,56 @@ func (h *AuthHandler) GetCurrentUser(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(util.ToSuccessResponse(user))
+}
+
+func (h *AuthHandler) GoogleCallback(c *fiber.Ctx) error {
+	state := c.Query("state")
+	storedState := c.Cookies("oauth_state")
+
+	if state != storedState {
+		return fiber.NewError(fiber.StatusUnauthorized, "States don't Match!")
+	}
+
+	code := c.Query("code")
+	googlecon := config.GoogleConfig()
+
+	token, err := googlecon.Exchange(context.Background(), code)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(
+		c.Context(), http.MethodGet,
+		"https://www.googleapis.com/oauth2/v2/userinfo?access_token="+token.AccessToken,
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	userData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	googleUser := new(contract.GoogleLoginReq)
+	if errJSON := json.Unmarshal(userData, googleUser); errJSON != nil {
+		return errJSON
+	}
+
+	res, err := h.authUsecase.LoginGoogleUser(c, googleUser)
+	if err != nil {
+		return err
+	}
+
+	googleLoginURL := fmt.Sprintf("%s?accessToken=%s&refreshToken=%s",
+		config.Env.GoogleOAuth.ClientCallbackURI, res.TokenRes.AccessToken, res.TokenRes.RefreshToken)
+
+	return c.Status(fiber.StatusSeeOther).Redirect(googleLoginURL)
 }

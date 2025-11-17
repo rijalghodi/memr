@@ -29,7 +29,8 @@ func InjectHTTPHandlers(ctx context.Context, app *fiber.App, db *gorm.DB) {
 	}
 
 	userRepo := repository.NewUserRepository(db)
-	authUsecase := usecase.NewAuthUsecase(userRepo, firebaseUsecase)
+	tokenUsecase := usecase.NewTokenUsecase()
+	authUsecase := usecase.NewAuthUsecase(userRepo, firebaseUsecase, tokenUsecase)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	authHandler := handler.NewAuthHandler(authUsecase, userUsecase)
 	authHandler.RegisterRoutes(app)

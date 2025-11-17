@@ -101,7 +101,7 @@ export const useGoogleOAuth = ({
 };
 
 export const useGetCurrentUser = (
-  enabled: boolean = true
+  enabled: boolean = true,
 ): UseQueryResult<GetCurrentUserApiRes, GErrorResponse> => {
   return useQuery({
     queryKey: [GET_CURRENT_USER_KEY],

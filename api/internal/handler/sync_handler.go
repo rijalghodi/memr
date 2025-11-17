@@ -58,5 +58,5 @@ func (h *SyncHandler) Sync(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(res)
+	return c.Status(fiber.StatusOK).JSON(util.ToSuccessResponse(res))
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+
 import { NoteWorkspace } from "@/components/notes/note-workspace";
 
 export default function NoteEditorPage() {

@@ -24,6 +24,7 @@ export type UpsertProjectReq = {
   updatedAt?: string;
   createdAt?: string;
   deletedAt?: string;
+  syncedAt?: string;
 };
 
 export type ProjectRes = Project;
@@ -43,9 +44,14 @@ export const projectApi = {
     return project;
   },
 
-  getAll: async (): Promise<ProjectRes[]> => {
-    let projects = await db.projects
+  getAll: async (params?: { unsynced?: boolean }): Promise<ProjectRes[]> => {
+    const unsynced = params?.unsynced;
+    const projects = await db.projects
       .filter((project) => !project.deletedAt)
+      .filter(
+        (project) =>
+          !unsynced || !project.syncedAt || project.syncedAt < project.updatedAt
+      )
       .toArray();
     return projects;
   },
@@ -85,6 +91,7 @@ export const projectApi = {
         createdAt: data.createdAt ?? now,
         updatedAt: data.updatedAt ?? now,
         deletedAt: data.deletedAt,
+        syncedAt: data.syncedAt,
       };
       await db.projects.add(project);
       return project;

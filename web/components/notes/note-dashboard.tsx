@@ -1,14 +1,16 @@
 "use client";
 
 import { ArrowDownUp, Filter, Plus } from "lucide-react";
-import React, { useState } from "react";
-import { Button } from "../ui/button";
-import { NoteItem } from "./note-item";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
-import { DropdownFilter } from "../ui/drropdown-filter";
-import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+
 import { ROUTES } from "@/lib/routes";
+import { noteApiHook, useGetNotes } from "@/service/local/api-note";
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
+import { Button } from "../ui/button";
+import { DropdownFilter } from "../ui/drropdown-filter";
+import { NoteItem } from "./note-item";
 
 type Props = {};
 

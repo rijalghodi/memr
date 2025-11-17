@@ -1,10 +1,11 @@
 "use client";
 
-import { ConfirmationProvider } from "./ui/confirmation-dialog";
-import { Toaster } from "./ui/sonner";
 import * as React from "react";
+
 import { AuthGuardProvider } from "./layouts/auth-guard";
 import { QueryProvider } from "./query-provider";
+import { ConfirmationProvider } from "./ui/confirmation-dialog";
+import { Toaster } from "./ui/sonner";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

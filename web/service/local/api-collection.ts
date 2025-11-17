@@ -1,7 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 
-import { db, type Collection } from "@/lib/dexie";
+import { type Collection, db } from "@/lib/dexie";
 
 export type CreateCollectionReq = {
   title?: string;
@@ -24,6 +24,7 @@ export type UpsertCollectionReq = {
   updatedAt?: string;
   createdAt?: string;
   deletedAt?: string;
+  syncedAt?: string;
 };
 
 export type CollectionRes = Collection;
@@ -43,9 +44,16 @@ export const collectionApi = {
     return collection;
   },
 
-  getAll: async (): Promise<CollectionRes[]> => {
-    let collections = await db.collections
+  getAll: async (params?: { unsynced?: boolean }): Promise<CollectionRes[]> => {
+    const unsynced = params?.unsynced;
+    const collections = await db.collections
       .filter((collection) => !collection.deletedAt)
+      .filter(
+        (collection) =>
+          !unsynced ||
+          !collection.syncedAt ||
+          collection.syncedAt < collection.updatedAt
+      )
       .toArray();
     return collections;
   },
@@ -85,6 +93,7 @@ export const collectionApi = {
         createdAt: data.createdAt ?? now,
         updatedAt: data.updatedAt ?? now,
         deletedAt: data.deletedAt,
+        syncedAt: data.syncedAt,
       };
       await db.collections.add(collection);
       return collection;

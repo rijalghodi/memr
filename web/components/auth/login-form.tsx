@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from "react";
+
 import { auth } from "@/lib/firebase";
 
 type Props = {};
@@ -22,7 +23,7 @@ export function LoginForm({}: Props) {
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
       const token = await userCredential.user.getIdToken();
       setIdToken(token);

@@ -1,6 +1,9 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
+
 import { useIsMobile } from "@/hooks/use-mobile";
+
 import {
   Button,
   DropdownMenu,
@@ -9,7 +12,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "./";
-import { ChevronDown } from "lucide-react";
 
 export type DropdownFilterProps<T extends string> = {
   value?: T;

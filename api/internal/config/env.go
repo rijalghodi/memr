@@ -8,13 +8,14 @@ import (
 )
 
 type Environment struct {
-	App        App
-	Logger     Logger
-	Postgres   Postgres
-	JWT        JWT
-	SMTPGoogle SMTPGoogle
-	Firebase   Firebase
-	OpenAI     OpenAI
+	App         App
+	Logger      Logger
+	Postgres    Postgres
+	JWT         JWT
+	SMTPGoogle  SMTPGoogle
+	Firebase    Firebase
+	OpenAI      OpenAI
+	GoogleOAuth GoogleOAuth
 }
 
 type App struct {
@@ -65,6 +66,13 @@ type Firebase struct {
 
 type OpenAI struct {
 	APIKey string `env:"OPENAI_API_KEY"`
+}
+
+type GoogleOAuth struct {
+	RedirectURI       string `env:"GOOGLE_OAUTH_REDIRECT_URI"`
+	ClientID          string `env:"GOOGLE_OAUTH_CLIENT_ID"`
+	ClientSecret      string `env:"GOOGLE_OAUTH_CLIENT_SECRET"`
+	ClientCallbackURI string `env:"GOOGLE_OAUTH_CLIENT_CALLBACK_URI"`
 }
 
 var Env Environment

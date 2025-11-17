@@ -1,7 +1,8 @@
 "use client";
 
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import React, { useState } from "react";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+
 import { auth } from "@/lib/firebase";
 
 type Props = {};

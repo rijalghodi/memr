@@ -57,22 +57,22 @@ export const chatApi = {
 
   listMessages: async (
     studentId: string,
-    params?: ListMessagesParams
+    params?: ListMessagesParams,
   ): Promise<ListMessagesRes> => {
     const response = await apiClient.get(
       `/students/${studentId}/chat/messages`,
-      { params }
+      { params },
     );
     return response.data;
   },
 
   sendMessage: async (
     studentId: string,
-    data: SendMessageReq
+    data: SendMessageReq,
   ): Promise<SendMessageRes> => {
     const response = await apiClient.post(
       `/students/${studentId}/chat/messages`,
-      data
+      data,
     );
     return response.data;
   },
@@ -107,7 +107,7 @@ export const LIST_MESSAGES_KEY = "list-messages";
 export const useListMessages = (
   studentId: string,
   params?: ListMessagesParams,
-  enabled: boolean = true
+  enabled: boolean = true,
 ): UseQueryResult<ListMessagesRes, GErrorResponse> => {
   return useQuery({
     queryKey: [LIST_MESSAGES_KEY, studentId, params],
