@@ -73,7 +73,7 @@ export function FloatingToolbar({ editor }: { editor: Editor | null }) {
                   {/* Rich formatting */}
                   <ColorHighlightToolbar />
                   <LinkToolbar />
-                  <ImagePlaceholderToolbar />
+                  {/* <ImagePlaceholderToolbar /> */}
                   <Separator orientation="vertical" className="h-6 mx-1" />
 
                   {/* Additional controls */}

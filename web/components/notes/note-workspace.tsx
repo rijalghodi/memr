@@ -5,10 +5,9 @@ import { useForm } from "react-hook-form";
 
 import { noteApi, useGetNote, useUpdateNote } from "@/service/local/api-note";
 
-import { RichTextEditor } from "../ui/rich-text/rich-text-editor";
 import { AUTOSAVE_INTERVAL } from "@/lib/constant";
 import { useDebounce } from "@/hooks/use-debounce";
-import { RichTextEditorDemo } from "../tiptap/rich-text-editor";
+import { RichTextEditor } from "../tiptap/rich-text-editor";
 
 type Props = {
   noteId: string;
@@ -69,7 +68,7 @@ export function NoteWorkspace({ noteId }: Props) {
         />
       </div> */}
       <div className="w-full">
-        <RichTextEditorDemo />
+        <RichTextEditor />
         {/* <RichTextEditor
           value={form.watch("content")}
           onChange={(value) => form.setValue("content", value)}
