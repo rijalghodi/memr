@@ -21,63 +21,22 @@ import { EditorToolbar } from "./toolbars/editor-toolbar";
 import Placeholder from "@tiptap/extension-placeholder";
 import { content } from "@/lib/content";
 import { FloatingMenuBasic } from "./extensions/floating-menu-basic";
+import { extensions } from "./extensions/extensions";
+import { useEffect } from "react";
+import { Markdown } from "@tiptap/markdown";
 
-const extensions = [
-  StarterKit.configure({
-    orderedList: {
-      HTMLAttributes: {
-        class: "list-decimal",
-      },
-    },
-    bulletList: {
-      HTMLAttributes: {
-        class: "list-disc",
-      },
-    },
-    heading: {
-      levels: [1, 2, 3, 4],
-    },
-  }),
-  Placeholder.configure({
-    emptyNodeClass: "is-editor-empty",
-    placeholder: ({ node }) => {
-      switch (node.type.name) {
-        case "heading":
-          return `Heading ${node.attrs.level}`;
-        case "detailsSummary":
-          return "Section title";
-        case "codeBlock":
-          // never show the placeholder when editing code
-          return "";
-        default:
-          return "Write, type '/' for commands";
-      }
-    },
-    includeChildren: false,
-  }),
-  TextAlign.configure({
-    types: ["heading", "paragraph"],
-  }),
-  TextStyle,
-  Subscript,
-  Superscript,
-  Underline,
-  Link,
-  Color,
-  Highlight.configure({
-    multicolor: true,
-  }),
-  ImageExtension,
-  ImagePlaceholder,
-  SearchAndReplace,
-  Typography,
-];
+type Props = {
+  value?: string;
+  onChange?: (value: string) => void;
+  className?: string;
+};
 
-export function RichTextEditorDemo({ className }: { className?: string }) {
+export function RichTextEditor({ value, onChange, className }: Props) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: extensions as Extension[],
-    content,
+    // contentType: "markdown",
+    // content: "# Hello World\n\nThis is **Markdown**!",
     editorProps: {
       attributes: {
         class: "max-w-full focus:outline-none",
@@ -88,9 +47,16 @@ export function RichTextEditorDemo({ className }: { className?: string }) {
       // Update stats
       // saving as text/json/hmtml
       // const text = editor.getHTML();
+      // const markdown = editor.getMarkdown();
       console.log(editor.getText());
     },
   });
+
+  useEffect(() => {
+    if (editor) {
+      // editor.setMarkdown(value ?? "");
+    }
+  }, [value, editor]);
 
   if (!editor) return null;
 

@@ -1,0 +1,66 @@
+"use client";
+import SearchAndReplace from "@/components/tiptap/extensions/search-and-replace";
+import { Color } from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
+import Link from "@tiptap/extension-link";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import TextAlign from "@tiptap/extension-text-align";
+import { TextStyle } from "@tiptap/extension-text-style";
+import Typography from "@tiptap/extension-typography";
+import Underline from "@tiptap/extension-underline";
+import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
+import { Markdown } from "@tiptap/markdown";
+
+export const extensions = [
+  StarterKit.configure({
+    orderedList: {
+      HTMLAttributes: {
+        class: "list-decimal",
+      },
+    },
+    bulletList: {
+      HTMLAttributes: {
+        class: "list-disc",
+      },
+    },
+    heading: {
+      levels: [1, 2, 3, 4],
+    },
+  }),
+  Placeholder.configure({
+    emptyNodeClass: "is-editor-empty",
+    placeholder: ({ node }) => {
+      switch (node.type.name) {
+        case "heading":
+          return `Heading ${node.attrs.level}`;
+        case "detailsSummary":
+          return "Section title";
+        case "codeBlock":
+          // never show the placeholder when editing code
+          return "";
+        default:
+          return "Write, type '/' for commands";
+      }
+    },
+    includeChildren: false,
+  }),
+  TextAlign.configure({
+    types: ["heading", "paragraph"],
+  }),
+  TextStyle,
+  Subscript,
+  Superscript,
+  Underline,
+  Link,
+  Color,
+  Highlight.configure({
+    multicolor: true,
+  }),
+  // ImageExtension,
+  // ImagePlaceholder,
+  SearchAndReplace,
+  Typography,
+  //   Markdown,
+];

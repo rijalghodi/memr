@@ -244,8 +244,12 @@
 }
 
 .ProseMirror li {
-  margin: var(--editor-spacing-2) 0;
+  margin: var(--editor-spacing-1) 0;
   padding-left: var(--editor-spacing-2);
+}
+
+.ProseMirror li > p {
+  margin: 0;
 }
 
 .ProseMirror ul {

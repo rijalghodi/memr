@@ -44,6 +44,7 @@
     "@tiptap/extension-text-style": "^2.11.3",
     "@tiptap/extension-typography": "^2.11.3",
     "@tiptap/extension-underline": "^2.11.3",
+    "@tiptap/markdown": "^3.10.7",
     "@tiptap/pm": "^2.11.3",
     "@tiptap/react": "^2.11.3",
     "@tiptap/starter-kit": "^2.11.3",
