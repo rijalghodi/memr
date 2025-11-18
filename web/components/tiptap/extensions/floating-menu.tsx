@@ -17,7 +17,7 @@ import {
   CodeSquare,
   TextQuote,
 } from "lucide-react";
-import { FloatingMenu } from "@tiptap/react/menus";
+import { FloatingMenu } from "@tiptap/react";
 import {
   Command,
   CommandEmpty,
@@ -312,6 +312,7 @@ export function TipTapFloatingMenu({ editor }: { editor: Editor }) {
   return (
     <FloatingMenu
       editor={editor}
+      // shouldShow={() => true}
       shouldShow={({ state }) => {
         if (!editor) return false;
 
@@ -338,9 +339,12 @@ export function TipTapFloatingMenu({ editor }: { editor: Editor }) {
         if (!isOpen) setIsOpen(true);
         return true;
       }}
-      appendTo={document.body}
-      options={{
+      tippyOptions={{
+        duration: 100,
         placement: "bottom-start",
+        offset: [0, 10],
+        appendTo: document.body,
+        interactive: true,
         onHide: () => {
           setIsOpen(false);
           setSelectedIndex(-1);

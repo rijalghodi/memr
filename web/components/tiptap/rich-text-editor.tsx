@@ -20,6 +20,7 @@ import { FloatingToolbar } from "@/components/tiptap/extensions/floating-toolbar
 import { EditorToolbar } from "./toolbars/editor-toolbar";
 import Placeholder from "@tiptap/extension-placeholder";
 import { content } from "@/lib/content";
+import { FloatingMenuBasic } from "./extensions/floating-menu-basic";
 
 const extensions = [
   StarterKit.configure({
@@ -100,12 +101,13 @@ export function RichTextEditorDemo({ className }: { className?: string }) {
         className
       )}
     >
-      <EditorToolbar editor={editor} />
+      {/* <EditorToolbar editor={editor} /> */}
       <FloatingToolbar editor={editor} />
       <TipTapFloatingMenu editor={editor} />
+
       <EditorContent
         editor={editor}
-        className=" min-h-[600px] w-full min-w-full cursor-text sm:p-6"
+        className=" min-h-[600px] w-full min-w-full cursor-text"
       />
     </div>
   );
