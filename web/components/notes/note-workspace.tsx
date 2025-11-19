@@ -34,11 +34,12 @@ export function NoteWorkspace({ noteId }: Props) {
 
   // Autosave debounced content
   useEffect(() => {
-    if (isLoading || !noteId || isInitialLoadRef.current) return;
+    // if (isLoading || !noteId || isInitialLoadRef.current) return;
 
-    // Don't save if content hasn't changed from the loaded note
-    if (debouncedContent === note?.content) return;
+    // // Don't save if content hasn't changed from the loaded note
+    // if (debouncedContent === note?.content) return;
 
+    console.log("debouncedContent", debouncedContent);
     noteApi.update({
       id: noteId,
       content: debouncedContent,

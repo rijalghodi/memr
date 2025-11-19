@@ -13,16 +13,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { markdownToText, truncateString } from "@/lib/string";
 
 type Props = {
   id: string;
-  title?: string;
   content?: string;
   createdAt: string;
   updatedAt: string;
 };
 
-export function NoteItem({ id, title, content, createdAt, updatedAt }: Props) {
+export function NoteItem({ id, content = "", createdAt, updatedAt }: Props) {
+  const displayContent = content ? markdownToText(content) : "";
+  const displayTitle = displayContent ? displayContent : "Untitled Note";
   const { mutate: deleteNote, isLoading: isDeleting } = useDeleteNote({
     onSuccess: () => {
       // Note deleted successfully
@@ -37,8 +39,8 @@ export function NoteItem({ id, title, content, createdAt, updatedAt }: Props) {
   const handleDelete = () => {
     confirm({
       title: "Delete Note",
-      message: `Are you sure you want to delete "${title || "this note"}"? This action cannot be undone.`,
-      itemName: title || "Note",
+      message: `Are you sure you want to delete "${truncateString(displayTitle, 20) || "this note"}"? This action cannot be undone.`,
+      itemName: truncateString(displayTitle, 20) || "Note",
       variant: "destructive",
       confirmLabel: "Delete",
       cancelLabel: "Cancel",
@@ -48,19 +50,18 @@ export function NoteItem({ id, title, content, createdAt, updatedAt }: Props) {
     });
   };
 
-  const displayTitle = title || "Untitled Note";
-  const displayContent = content || "";
-
   return (
     <div className="px-6 group hover:bg-muted cursor-pointer">
       <div className="flex justify-between items-center py-6 border-b group-last:border-b-0">
         <div className="grid grid-cols-[28px_1fr] gap-1 flex-1">
           <div className="flex items-center justify-start">
-            <FileText className="size-5 text-muted-foreground" />
+            <FileText className="size-4 text-muted-foreground" />
           </div>
-          <h3 className="text-xl font-semibold">{displayTitle}</h3>
-          {displayContent && (
-            <p className="text-sm text-muted-foreground col-start-2">
+          <h3 className="text-xl font-semibold line-clamp-1 text-ellipsis">
+            {displayTitle}
+          </h3>
+          {content && (
+            <p className="text-sm text-muted-foreground col-start-2 line-clamp-1 text-ellipsis">
               {displayContent}
             </p>
           )}
