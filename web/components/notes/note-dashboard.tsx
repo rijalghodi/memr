@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDownUp, Filter, Plus } from "lucide-react";
+import { ArrowDownUp, Filter, ListFilter, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -19,7 +19,7 @@ type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 export function NoteDashboard({}: Props) {
   const [sortBy, setSortBy] = useState<SortByValue>("updatedAt");
   const router = useRouter();
-  const { data: notes, isLoading } = useGetNotes(undefined, sortBy as any);
+  const { data: notes, isLoading } = useGetNotes({ sortBy });
 
   const handleSortChange = (value: string) => {
     setSortBy(value as SortByValue);
@@ -51,13 +51,13 @@ export function NoteDashboard({}: Props) {
             </Button>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="icon">
-                <Filter />
+                <ListFilter />
               </Button>
             </CollapsibleTrigger>
           </div>
         </div>
         <CollapsibleContent>
-          <div className="px-6 flex items-center">
+          <div className="px-6 flex items-center pb-3">
             <DropdownFilter
               variant="secondary"
               className="rounded-full px-4"
@@ -98,7 +98,6 @@ export function NoteDashboard({}: Props) {
               <NoteItem
                 key={note.id}
                 id={note.id}
-                title={note.title}
                 content={note.content}
                 createdAt={note.createdAt}
                 updatedAt={note.updatedAt}

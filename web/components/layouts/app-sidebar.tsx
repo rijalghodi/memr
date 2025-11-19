@@ -115,7 +115,7 @@ export function SidebarEntityMenus() {
           })) ?? [],
       },
     ],
-    [notes],
+    [notes]
   );
 
   return (
@@ -125,8 +125,8 @@ export function SidebarEntityMenus() {
           <Collapsible asChild key={`${idx}-entity-menu-collapsible`}>
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton size="sm" className="font-semibold">
-                  <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transform transition-transform duration-200 ease-in-out" />
+                <SidebarMenuButton size="sm" className="font-semibold group">
+                  <ChevronDown className="size-3 group-data-[state=open]:-rotate-180 transform transition-transform duration-200 ease-in-out" />
                   {item.title}
                 </SidebarMenuButton>
               </CollapsibleTrigger>
@@ -167,7 +167,7 @@ export function SidebarEntityMenus() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        ),
+        )
       )}
     </SidebarMenu>
   );
