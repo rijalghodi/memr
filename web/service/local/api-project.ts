@@ -56,7 +56,7 @@ export const projectApi = {
           !unsynced ||
           !project.syncedAt ||
           new Date(project.syncedAt ?? new Date(0)).getTime() <
-            new Date(project.updatedAt).getTime()
+            new Date(project.updatedAt).getTime(),
       )
       .toArray();
     if (sortBy) {
@@ -159,7 +159,7 @@ export const useCreateProject = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -217,7 +217,7 @@ export const useUpdateProject = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -247,7 +247,7 @@ export const useDeleteProject = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };

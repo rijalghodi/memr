@@ -8,8 +8,6 @@ import {
   Check,
   ChevronDown,
 } from "lucide-react";
-import { useMediaQuery } from "@/hooks/use-media-querry";
-import { MobileToolbarGroup, MobileToolbarItem } from "./mobile-toolbar-group";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +22,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useMediaQuery } from "@/hooks/use-media-querry";
+
+import { MobileToolbarGroup, MobileToolbarItem } from "./mobile-toolbar-group";
 import { useToolbar } from "./toolbar-provider";
 
 export const AlignmentTooolbar = () => {
@@ -82,8 +83,10 @@ export const AlignmentTooolbar = () => {
 
   if (isMobile) {
     return (
-      <MobileToolbarGroup 
-        label={alignmentOptions[findIndex(currentTextAlign())]?.name ?? "Left Align"}
+      <MobileToolbarGroup
+        label={
+          alignmentOptions[findIndex(currentTextAlign())]?.name ?? "Left Align"
+        }
       >
         {alignmentOptions.map((option, index) => (
           <MobileToolbarItem

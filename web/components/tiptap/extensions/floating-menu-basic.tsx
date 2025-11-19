@@ -1,5 +1,5 @@
-import { FloatingMenu } from "@tiptap/react";
 import type { Editor } from "@tiptap/core";
+import { FloatingMenu } from "@tiptap/react";
 import { useState } from "react";
 
 export function FloatingMenuBasic({ editor }: { editor: Editor }) {
@@ -21,7 +21,7 @@ export function FloatingMenuBasic({ editor }: { editor: Editor }) {
           0,
           $from.parentOffset,
           "\n",
-          " "
+          " ",
         );
 
         const isSlashCommand =

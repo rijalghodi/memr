@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { SYNC_INTERVAL } from "@/lib/constant";
 import type { Change } from "@/service/api-sync";
 import { useSync } from "@/service/api-sync";
 import { collectionApi } from "@/service/local/api-collection";
@@ -9,7 +10,6 @@ import { noteApi } from "@/service/local/api-note";
 import { projectApi } from "@/service/local/api-project";
 import { useGetSetting, useUpsertSetting } from "@/service/local/api-setting";
 import { taskApi } from "@/service/local/api-task";
-import { SYNC_INTERVAL } from "@/lib/constant";
 
 export function useAutoSync() {
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
