@@ -68,7 +68,7 @@
 
 /* Dark Mode Custom Properties */
 .dark {
-  --editor-text-default: var(--foreground);
+  --editor-text-default: var(--foreground) / 50;
   --editor-text-gray: var(--muted-foreground);
   --editor-text-brown: hsl(25 95% 53%);
   --editor-text-orange: hsl(24 95% 53%);
@@ -102,9 +102,9 @@
 .ProseMirror {
   caret-color: var(--editor-text-default);
   outline: none;
-  padding: var(--editor-spacing-8) var(--editor-spacing-8);
-  margin: 0 auto;
-  max-width: 90ch;
+  padding: var(--editor-spacing-8) var(--editor-spacing-12);
+  margin: 0 0;
+  max-width: 76ch;
   font-family: var(--editor-font-sans);
   position: relative;
   /* background-color: var(--editor-bg-default); */
