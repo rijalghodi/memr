@@ -1,26 +1,28 @@
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ToolbarProvider } from "./toolbar-provider";
 import { Editor } from "@tiptap/core";
-import { UndoToolbar } from "./undo";
-import { RedoToolbar } from "./redo";
-import { HeadingsToolbar } from "./headings";
-import { BlockquoteToolbar } from "./blockquote";
-import { CodeToolbar } from "./code";
-import { BoldToolbar } from "./bold";
-import { ItalicToolbar } from "./italic";
-import { UnderlineToolbar } from "./underline";
-import { StrikeThroughToolbar } from "./strikethrough";
-import { LinkToolbar } from "./link";
-import { BulletListToolbar } from "./bullet-list";
-import { OrderedListToolbar } from "./ordered-list";
-import { HorizontalRuleToolbar } from "./horizontal-rule";
+
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 import { AlignmentTooolbar } from "./alignment";
-import { ImagePlaceholderToolbar } from "./image-placeholder-toolbar";
-import { ColorHighlightToolbar } from "./color-and-highlight";
-import { SearchAndReplaceToolbar } from "./search-and-replace-toolbar";
+import { BlockquoteToolbar } from "./blockquote";
+import { BoldToolbar } from "./bold";
+import { BulletListToolbar } from "./bullet-list";
+import { CodeToolbar } from "./code";
 import { CodeBlockToolbar } from "./code-block";
+import { ColorHighlightToolbar } from "./color-and-highlight";
+import { HeadingsToolbar } from "./headings";
+import { HorizontalRuleToolbar } from "./horizontal-rule";
+import { ImagePlaceholderToolbar } from "./image-placeholder-toolbar";
+import { ItalicToolbar } from "./italic";
+import { LinkToolbar } from "./link";
+import { OrderedListToolbar } from "./ordered-list";
+import { RedoToolbar } from "./redo";
+import { SearchAndReplaceToolbar } from "./search-and-replace-toolbar";
+import { StrikeThroughToolbar } from "./strikethrough";
+import { ToolbarProvider } from "./toolbar-provider";
+import { UnderlineToolbar } from "./underline";
+import { UndoToolbar } from "./undo";
 
 export const EditorToolbar = ({ editor }: { editor: Editor }) => {
   return (
@@ -39,7 +41,7 @@ export const EditorToolbar = ({ editor }: { editor: Editor }) => {
                 <HeadingsToolbar />
                 <BlockquoteToolbar />
                 <CodeToolbar />
-                <CodeBlockToolbar/>
+                <CodeBlockToolbar />
                 <Separator orientation="vertical" className="mx-1 h-7" />
 
                 {/* Basic Formatting Group */}

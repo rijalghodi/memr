@@ -1,23 +1,24 @@
 "use client";
 
 import { BubbleMenu, type Editor } from "@tiptap/react";
-import { BoldToolbar } from "../toolbars/bold";
-import { ItalicToolbar } from "../toolbars/italic";
-import { UnderlineToolbar } from "../toolbars/underline";
-import { LinkToolbar } from "../toolbars/link";
-import { ColorHighlightToolbar } from "../toolbars/color-and-highlight";
-import { ToolbarProvider } from "../toolbars/toolbar-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { useMediaQuery } from "@/hooks/use-media-querry";
+import { useEffect } from "react";
+
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { HeadingsToolbar } from "../toolbars/headings";
-import { BulletListToolbar } from "../toolbars/bullet-list";
-import { OrderedListToolbar } from "../toolbars/ordered-list";
-import { ImagePlaceholderToolbar } from "../toolbars/image-placeholder-toolbar";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useMediaQuery } from "@/hooks/use-media-querry";
+
 import { AlignmentTooolbar } from "../toolbars/alignment";
 import { BlockquoteToolbar } from "../toolbars/blockquote";
-import { useEffect } from "react";
+import { BoldToolbar } from "../toolbars/bold";
+import { BulletListToolbar } from "../toolbars/bullet-list";
+import { ColorHighlightToolbar } from "../toolbars/color-and-highlight";
+import { HeadingsToolbar } from "../toolbars/headings";
+import { ItalicToolbar } from "../toolbars/italic";
+import { LinkToolbar } from "../toolbars/link";
+import { OrderedListToolbar } from "../toolbars/ordered-list";
+import { ToolbarProvider } from "../toolbars/toolbar-provider";
+import { UnderlineToolbar } from "../toolbars/underline";
 
 export function FloatingToolbar({ editor }: { editor: Editor | null }) {
   const isMobile = useMediaQuery("(max-width: 640px)");

@@ -3,11 +3,14 @@
 import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 
-import { noteApi, useGetNote, useUpdateNote } from "@/service/local/api-note";
-
-import { AUTOSAVE_INTERVAL } from "@/lib/constant";
 import { useDebounce } from "@/hooks/use-debounce";
-import { RichTextEditor } from "../tiptap/rich-text-editor";
+import { AUTOSAVE_INTERVAL } from "@/lib/constant";
+import { noteApi, useGetNote } from "@/service/local/api-note";
+
+import {
+  RichTextEditor,
+  RichTextEditorRef,
+} from "@/components/tiptap/rich-text-editor";
 
 type Props = {
   noteId: string;
@@ -15,6 +18,35 @@ type Props = {
 
 export function NoteWorkspace({ noteId }: Props) {
   const { data: note, isLoading } = useGetNote(noteId);
+
+  const editorRef = useRef<RichTextEditorRef>(null);
+
+  const parseMarkdown = (markdown: string) => {
+    const editor = editorRef.current?.editor;
+    if (!editor || !editor.markdown) {
+      console.error("Editor or MarkdownManager not available");
+      return;
+    }
+
+    try {
+      editor.commands.setContent(markdown, true, { contentType: "markdown" });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getEditorAsMarkdown = () => {
+    const editor = editorRef.current?.editor;
+    if (!editor) {
+      return "";
+    }
+
+    try {
+      return editor.getMarkdown();
+    } catch {
+      return editor.getText();
+    }
+  };
 
   const form = useForm({
     defaultValues: {
@@ -68,7 +100,7 @@ export function NoteWorkspace({ noteId }: Props) {
         />
       </div> */}
       <div className="w-full">
-        <RichTextEditor />
+        <RichTextEditor ref={editorRef} />
         {/* <RichTextEditor
           value={form.watch("content")}
           onChange={(value) => form.setValue("content", value)}

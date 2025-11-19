@@ -5,9 +5,9 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import logo from "@/public/logo-long.png";
 
-import { ExampleChat } from "./example-chat";
 import { useAutoSync } from "../sync/use-auto-sync";
 import { Button } from "../ui";
+import { ExampleChat } from "./example-chat";
 type Props = {
   children: React.ReactNode;
 };
@@ -72,7 +72,7 @@ function SessionTabItem({
     <li
       className={cn(
         "flex gap-1.5 items-center justify-center h-10 px-4 cursor-pointer hover:bg-muted text-xs font-medium [&>svg]:size-3.5 border-b-2 border-transparent",
-        "data-[active=true]:border-primary data-[active=true]:text-primary"
+        "data-[active=true]:border-primary data-[active=true]:text-primary",
       )}
       data-active={active}
     >

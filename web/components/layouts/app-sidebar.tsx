@@ -1,5 +1,6 @@
 "use client";
 
+import { format } from "date-fns";
 import {
   ArrowRight,
   ChevronDown,
@@ -8,7 +9,7 @@ import {
   SquarePen,
 } from "lucide-react";
 import Link from "next/link";
-import { format } from "date-fns";
+import { useMemo } from "react";
 
 import {
   Collapsible,
@@ -19,7 +20,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -28,6 +28,10 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { useGetCollections } from "@/service/local/api-collection";
+import { useGetNotes } from "@/service/local/api-note";
+import { useGetProjects } from "@/service/local/api-project";
+import { useGetSetting } from "@/service/local/api-setting";
 
 import {
   Avatar,
@@ -40,12 +44,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui";
-import { useGetSetting } from "@/service/local/api-setting";
-import { useGetNotes } from "@/service/local/api-note";
-import { useMemo } from "react";
-import { useGetProjects } from "@/service/local/api-project";
-import { useGetTasks } from "@/service/local/api-task";
-import { useGetCollections } from "@/service/local/api-collection";
 
 type Menu = {
   title: string;
@@ -117,7 +115,7 @@ export function SidebarEntityMenus() {
           })) ?? [],
       },
     ],
-    [notes]
+    [notes],
   );
 
   return (
@@ -169,7 +167,7 @@ export function SidebarEntityMenus() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        )
+        ),
       )}
     </SidebarMenu>
   );

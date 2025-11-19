@@ -56,7 +56,7 @@ export const collectionApi = {
           !unsynced ||
           !collection.syncedAt ||
           new Date(collection.syncedAt ?? new Date(0)).getTime() <
-            new Date(collection.updatedAt).getTime()
+            new Date(collection.updatedAt).getTime(),
       )
       .toArray();
     if (sortBy) {
@@ -159,7 +159,7 @@ export const useCreateCollection = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -217,7 +217,7 @@ export const useUpdateCollection = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -247,7 +247,7 @@ export const useDeleteCollection = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };

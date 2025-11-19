@@ -69,7 +69,7 @@ export const taskApi = {
           !unsynced ||
           !task.syncedAt ||
           new Date(task.syncedAt ?? new Date(0)).getTime() <
-            new Date(task.updatedAt).getTime()
+            new Date(task.updatedAt).getTime(),
       )
       .toArray();
     if (projectId) {
@@ -170,7 +170,7 @@ export const useCreateTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -224,7 +224,7 @@ export const useUpdateTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -254,7 +254,7 @@ export const useDeleteTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
