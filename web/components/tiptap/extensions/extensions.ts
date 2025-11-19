@@ -12,6 +12,9 @@ import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 
 import SearchAndReplace from "@/components/tiptap/extensions/search-and-replace";
+import { SlashCommandExtension } from "./slash-command";
+import { FloatingToolbarExtension } from "./floating-toolbar";
+import { Markdown } from "@tiptap/markdown";
 
 export const extensions = [
   StarterKit.configure({
@@ -26,7 +29,7 @@ export const extensions = [
       },
     },
     heading: {
-      levels: [1, 2, 3, 4],
+      levels: [1, 2, 3],
     },
   }),
   Placeholder.configure({
@@ -58,9 +61,9 @@ export const extensions = [
   Highlight.configure({
     multicolor: true,
   }),
-  // ImageExtension,
-  // ImagePlaceholder,
   SearchAndReplace,
   Typography,
-  //   Markdown,
+  SlashCommandExtension,
+  FloatingToolbarExtension,
+  Markdown,
 ];

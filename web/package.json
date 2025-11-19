@@ -10,6 +10,7 @@
     "lint:fix": "eslint --fix && prettier --write ."
   },
   "dependencies": {
+    "@floating-ui/react-dom": "^2.1.6",
     "@milkdown/crepe": "^7.17.1",
     "@milkdown/kit": "^7.17.1",
     "@milkdown/react": "^7.17.1",

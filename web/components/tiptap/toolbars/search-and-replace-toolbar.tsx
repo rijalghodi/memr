@@ -32,9 +32,9 @@ export function SearchAndReplaceToolbar() {
   const [replaceText, setReplaceText] = useState("");
   const [checked, setChecked] = useState(false);
 
-  const results = editor?.storage?.searchAndReplace
+  const results = (editor?.storage as any)?.searchAndReplace
     .results as SearchAndReplaceStorage["results"];
-  const selectedResult = editor?.storage?.searchAndReplace
+  const selectedResult = (editor?.storage as any)?.searchAndReplace
     .selectedResult as SearchAndReplaceStorage["selectedResult"];
 
   const replace = () => editor?.chain().replace().run();
@@ -76,7 +76,7 @@ export function SearchAndReplaceToolbar() {
               className={cn("h-8 w-max px-3 font-normal")}
             >
               <Repeat className="mr-2 h-4 w-4" />
-              <p>Search & Replace</p>
+              <p className="sr-only">Search & Replace</p>
             </Button>
           </PopoverTrigger>
         </TooltipTrigger>
