@@ -1,7 +1,7 @@
 "use client";
 
 import { FileText, MoreHorizontal, Trash } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 import { useDeleteNote } from "@/service/local/api-note";
 
@@ -14,6 +14,10 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { markdownToText, truncateString } from "@/lib/string";
+import { ROUTES } from "@/lib/routes";
+import { useRouter } from "next/navigation";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 type Props = {
   id: string;
@@ -23,8 +27,16 @@ type Props = {
 };
 
 export function NoteItem({ id, content = "", createdAt, updatedAt }: Props) {
-  const displayContent = content ? markdownToText(content) : "";
-  const displayTitle = displayContent ? displayContent : "Untitled Note";
+  const displayContent = content
+    ? markdownToText(content)
+    : "No additional content";
+
+  const displayTitle = content
+    ? truncateString(displayContent, 50)
+    : "Untitled Note";
+
+  const router = useRouter();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { mutate: deleteNote, isLoading: isDeleting } = useDeleteNote({
     onSuccess: () => {
       // Note deleted successfully
@@ -36,7 +48,8 @@ export function NoteItem({ id, content = "", createdAt, updatedAt }: Props) {
 
   const { confirm } = useConfirmation();
 
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation when clicking delete
     confirm({
       title: "Delete Note",
       message: `Are you sure you want to delete "${truncateString(displayTitle, 20) || "this note"}"? This action cannot be undone.`,
@@ -50,40 +63,79 @@ export function NoteItem({ id, content = "", createdAt, updatedAt }: Props) {
     });
   };
 
+  const handleClick = () => {
+    router.push(ROUTES.NOTE(id));
+  };
+
   return (
-    <div className="px-6 group hover:bg-muted cursor-pointer">
-      <div className="flex justify-between items-center py-6 border-b group-last:border-b-0">
-        <div className="grid grid-cols-[28px_1fr] gap-1 flex-1">
+    <div
+      className={cn(
+        "px-6 group hover:bg-muted cursor-pointer group/note-item transition-colors",
+        isDropdownOpen && "bg-muted"
+      )}
+      onClick={handleClick}
+    >
+      <div className="flex justify-between items-center py-4 border-b border-muted group-last:border-b-0">
+        <div className="grid grid-cols-[28px_1fr] gap-1 gap-y-0.5 flex-1">
           <div className="flex items-center justify-start">
             <FileText className="size-4 text-muted-foreground" />
           </div>
-          <h3 className="text-xl font-semibold line-clamp-1 text-ellipsis">
+          <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">
             {displayTitle}
           </h3>
-          {content && (
-            <p className="text-sm text-muted-foreground col-start-2 line-clamp-1 text-ellipsis">
-              {displayContent}
-            </p>
-          )}
+          <p className="text-sm text-muted-foreground col-start-2 line-clamp-1 text-ellipsis">
+            {displayContent}
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={isDeleting}>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isDeleting}
+          <div
+            className={cn(
+              "text-xs group-hover/note-item:hidden",
+              isDropdownOpen && "hidden"
+            )}
+          >
+            {format(new Date(updatedAt), "EEE dd/MM/yy")}
+          </div>
+          <div
+            className={cn(
+              "group-hover/note-item:block hidden",
+              isDropdownOpen && "block"
+            )}
+          >
+            <DropdownMenu
+              open={isDropdownOpen}
+              onOpenChange={setIsDropdownOpen}
+            >
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isDeleting}
+                  className="hover:bg-accent"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                onClick={(e) => e.stopPropagation()}
+                className={cn(
+                  "group-hover/note-item:block hidden w-[120px]",
+                  isDropdownOpen && "block"
+                )}
               >
-                <Trash className="size-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  <Trash className="size-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </div>
