@@ -5,12 +5,20 @@ import { useForm } from "react-hook-form";
 
 import { useDebounce } from "@/hooks/use-debounce";
 import { AUTOSAVE_INTERVAL } from "@/lib/constant";
+import { ROUTES } from "@/lib/routes";
+import {
+  extractFirstLineFromContent,
+  markdownToText,
+  truncateString,
+} from "@/lib/string";
 import { noteApi, useGetNote } from "@/service/local/api-note";
 
+import { useSessionTabs } from "@/components/session-tabs";
 import {
   RichTextEditor,
   RichTextEditorRef,
 } from "@/components/tiptap/rich-text-editor";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   noteId: string;
@@ -18,56 +26,70 @@ type Props = {
 
 export function NoteWorkspace({ noteId }: Props) {
   const { data: note, isLoading } = useGetNote(noteId);
+  const { updateTabTitle } = useSessionTabs();
 
   const [content, setContent] = useState("");
-  const isInitialLoadRef = useRef(true);
+  const contentLoaded = useRef(false);
 
   const debouncedContent = useDebounce(content, AUTOSAVE_INTERVAL);
 
-  // Load note content when it's available
+  // Load note content when it's available (only once per note)
   useEffect(() => {
-    if (note?.content && isInitialLoadRef.current) {
-      setContent(note.content);
-      isInitialLoadRef.current = false;
+    if (!isLoading && note && !contentLoaded.current) {
+      setContent(note.content || "");
+      contentLoaded.current = true;
     }
-  }, [note?.content]);
+  }, [note, isLoading]);
+
+  // Update tab title when note or content changes
+  useEffect(() => {
+    if (!contentLoaded.current || !noteId) return;
+
+    const currentContent = content || "";
+    const title = currentContent
+      ? extractFirstLineFromContent(currentContent, 80)
+      : "Untitled Note";
+
+    updateTabTitle(ROUTES.NOTE(noteId), title || "Untitled Note");
+  }, [content, noteId, updateTabTitle, contentLoaded]);
 
   // Autosave debounced content
   useEffect(() => {
-    // if (isLoading || !noteId || isInitialLoadRef.current) return;
+    if (!contentLoaded.current || !noteId) return;
 
-    // // Don't save if content hasn't changed from the loaded note
-    // if (debouncedContent === note?.content) return;
+    // Don't save if content hasn't changed from the loaded note
+    if (debouncedContent === note?.content) return;
 
-    console.log("debouncedContent", debouncedContent);
     noteApi.update({
       id: noteId,
       content: debouncedContent,
     });
-  }, [debouncedContent, noteId, isLoading, note?.content]);
+  }, [debouncedContent, noteId, note?.content]);
 
-  if (isLoading && noteId) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-muted-foreground">Loading...</div>
+        <Loader2 className="size-4 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!note) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-sm text-muted-foreground">Note not found</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col max-h-[calc(100vh-100px)] overflow-y-auto">
-      <div className="w-full">
+      <div
+        className="w-full transition-all duration-500 ease-in-out animate-in fade-in slide-in-from-bottom-3"
+        key={noteId}
+      >
         <RichTextEditor value={content} onChange={setContent} />
       </div>
     </div>
   );
 }
-
-// {/* <div className="pt-6 pb-0 w-full px-[120px]">
-//   <input
-//     type="text"
-//     placeholder="Untitled"
-//     {...form.register("title")}
-//     className="w-fit tex-2xl p-2 md:text-3xl lg:text-5xl font-semibold focus:outline-none border-none focus:ring-0 focus:bg-accent rounded-lg"
-//   />
-// </div> */}

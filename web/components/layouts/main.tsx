@@ -1,10 +1,13 @@
-import { Home, RefreshCcw } from "lucide-react";
+import { Home, RefreshCcw, X } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import logo from "@/public/logo-long.png";
 
+import { useSessionTabs } from "../session-tabs";
 import { useAutoSync } from "../sync/use-auto-sync";
 import { Button } from "../ui";
 import { ExampleChat } from "./example-chat";
@@ -48,15 +51,59 @@ export function Main({ children }: Props) {
 }
 
 export function SessionTabs() {
+  const router = useRouter();
+  const { sessionTabs, activeTab, pathname, setActiveTab, closeTab } =
+    useSessionTabs();
+  const isHomeActive = pathname === ROUTES.HOME;
+
+  const handleTabClick = (pathname: string) => {
+    router.push(pathname);
+  };
+
+  const handleHomeClick = () => {
+    router.push(ROUTES.HOME);
+  };
+
+  const handleCloseTab = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    const tabIndex = sessionTabs.findIndex((tab) => tab.id === id);
+    const isActive = activeTab?.id === id;
+
+    closeTab(id);
+
+    // If closing active tab, navigate to previous tab (or next if no previous)
+    if (isActive) {
+      if (tabIndex > 0) {
+        // Navigate to previous tab
+        router.push(sessionTabs[tabIndex - 1].pathname);
+      } else if (sessionTabs.length > 1) {
+        // Navigate to next tab (now at index 0)
+        router.push(sessionTabs[1].pathname);
+      } else {
+        // No more tabs, navigate to home
+        router.push(ROUTES.HOME);
+      }
+    }
+  };
+
   return (
     <ul className="flex items-center h-10 border-b rounded-t-2xl">
-      <SessionTabItem active>
+      <SessionTabItem active={isHomeActive} onClick={handleHomeClick}>
         <Home />
         Home
       </SessionTabItem>
-      <SessionTabItem>Tasks</SessionTabItem>
-      <SessionTabItem>Notes</SessionTabItem>
-      <SessionTabItem>Collections</SessionTabItem>
+      {sessionTabs.map((tab) => (
+        <SessionTabItem
+          key={tab.id}
+          active={activeTab?.id === tab.id}
+          onClick={() => handleTabClick(tab.pathname)}
+          onClose={(e) => handleCloseTab(e, tab.id)}
+        >
+          <span className="w-full overflow-hidden text-ellipsis whitespace-nowrap">
+            {tab.title}
+          </span>
+        </SessionTabItem>
+      ))}
     </ul>
   );
 }
@@ -64,19 +111,40 @@ export function SessionTabs() {
 function SessionTabItem({
   children,
   active,
+  onClick,
+  onClose,
 }: {
   children: React.ReactNode;
   active?: boolean;
+  onClick?: () => void;
+  onClose?: (e: React.MouseEvent) => void;
 }) {
   return (
     <li
       className={cn(
-        "flex gap-1.5 items-center justify-center h-10 px-4 cursor-pointer hover:bg-muted text-xs font-medium [&>svg]:size-3.5 border-b-2 border-transparent",
-        "data-[active=true]:border-primary data-[active=true]:text-primary",
+        "group relative flex gap-1.5 items-center h-10 px-3 cursor-pointer data-[active=false]:hover:bg-muted",
+        "text-xs font-medium [&>svg]:size-3.5 border-r border-l border-r-muted border-l-muted text-foreground/90",
+        "data-[active=true]:border-b-primary data-[active=true]:border-b data-[active=true]:text-primary",
+        "max-w-48 min-w-12"
       )}
       data-active={active}
+      onClick={onClick}
     >
       {children}
+
+      {onClose && (
+        <button
+          onClick={onClose}
+          className={cn(
+            "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity",
+            "rounded-sm h-full w-8 flex items-center justify-center",
+            "bg-muted group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground"
+          )}
+          aria-label="Close tab"
+        >
+          <X className="size-3.5" />
+        </button>
+      )}
     </li>
   );
 }

@@ -19,7 +19,7 @@ export type UpdateNoteReq = {
 export type UpsertNoteReq = {
   id: string;
   collectionId?: string;
-  title?: string;
+  // title?: string;
   content?: string;
   updatedAt?: string;
   createdAt?: string;
@@ -35,7 +35,6 @@ export const noteApi = {
     const note: Note = {
       id: crypto.randomUUID(),
       collectionId: data.collectionId,
-      title: data.title,
       content: data.content,
       createdAt: now,
       updatedAt: now,
@@ -57,7 +56,7 @@ export const noteApi = {
           !unsynced ||
           !note.syncedAt ||
           new Date(note.syncedAt ?? new Date(0)).getTime() <
-            new Date(note.updatedAt).getTime(),
+            new Date(note.updatedAt).getTime()
       )
       .toArray();
     if (collectionId) {
@@ -107,7 +106,6 @@ export const noteApi = {
       const note: Note = {
         id: data.id,
         collectionId: data.collectionId,
-        title: data.title,
         content: data.content,
         createdAt: data.createdAt ?? now,
         updatedAt: data.updatedAt ?? now,
@@ -166,7 +164,7 @@ export const useCreateNote = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -224,7 +222,7 @@ export const useUpdateNote = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -254,7 +252,7 @@ export const useDeleteNote = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };

@@ -13,11 +13,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { markdownToText, truncateString } from "@/lib/string";
+import {
+  extractFirstLineFromContent,
+  markdownToText,
+  truncateString,
+} from "@/lib/string";
 import { ROUTES } from "@/lib/routes";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useSessionTabs } from "../session-tabs";
 
 type Props = {
   id: string;
@@ -28,11 +33,11 @@ type Props = {
 
 export function NoteItem({ id, content = "", createdAt, updatedAt }: Props) {
   const displayContent = content
-    ? markdownToText(content)
+    ? markdownToText(content, 200)
     : "No additional content";
 
   const displayTitle = content
-    ? truncateString(displayContent, 50)
+    ? extractFirstLineFromContent(content, 80)
     : "Untitled Note";
 
   const router = useRouter();
@@ -63,8 +68,13 @@ export function NoteItem({ id, content = "", createdAt, updatedAt }: Props) {
     });
   };
 
+  const { addTab } = useSessionTabs();
   const handleClick = () => {
     router.push(ROUTES.NOTE(id));
+    addTab({
+      title: displayTitle,
+      pathname: ROUTES.NOTE(id),
+    });
   };
 
   return (

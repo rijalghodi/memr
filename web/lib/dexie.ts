@@ -29,7 +29,6 @@ export type Project = {
 export type Note = {
   id: string;
   collectionId?: string;
-  title?: string;
   content?: string;
   createdAt: string;
   updatedAt: string;
