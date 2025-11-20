@@ -51,7 +51,7 @@ func (r *UserRepository) GetUserByID(id string) (*model.User, error) {
 }
 
 func (r *UserRepository) CreateUser(user *model.User) error {
-	return r.db.Create(user).Error
+	return r.db.Create(&user).Error
 }
 
 func (r *UserRepository) UpdateUser(user *model.User) error {

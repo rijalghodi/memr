@@ -27,32 +27,29 @@ func NewAuthUsecase(userRepo *repository.UserRepository, tokenUsecase *TokenUsec
 
 func (u *AuthUsecase) LoginGoogleUser(c *fiber.Ctx, req *contract.GoogleLoginReq) (*contract.GoogleLoginRes, error) {
 	userFromDB, err := u.userRepo.GetUserByEmail(req.Email)
-	if err != nil {
-		if err.Error() == "User not found" {
-			user := &model.User{
-				Name:       req.Name,
-				Email:      req.Email,
-				IsVerified: req.VerifiedEmail,
-			}
 
-			if err := u.userRepo.CreateUser(user); err != nil {
-				logger.Log.Errorf("Failed to create user: %+v", err)
-				return nil, err
-			}
-
-			tokens, err := u.tokenUsecase.GenerateTokenPair(user.ID)
-			if err != nil {
-				logger.Log.Error("Failed to generate token pair", zap.Error(err), zap.String("userID", user.ID))
-				return nil, err
-			}
-
-			return &contract.GoogleLoginRes{
-				TokenRes: *tokens,
-				UserRes:  u.buildUserRes(user),
-			}, nil
+	if userFromDB == nil || err != nil {
+		user := &model.User{
+			Name:       req.Name,
+			Email:      req.Email,
+			IsVerified: req.VerifiedEmail,
 		}
 
-		return nil, err
+		if err := u.userRepo.CreateUser(user); err != nil {
+			logger.Log.Errorf("Failed to create user: %+v", err)
+			return nil, err
+		}
+
+		tokens, err := u.tokenUsecase.GenerateTokenPair(user.ID)
+		if err != nil {
+			logger.Log.Error("Failed to generate token pair", zap.Error(err), zap.String("userID", user.ID))
+			return nil, err
+		}
+
+		return &contract.GoogleLoginRes{
+			TokenRes: *tokens,
+			UserRes:  u.buildUserRes(user),
+		}, nil
 	}
 
 	userFromDB.IsVerified = req.VerifiedEmail
