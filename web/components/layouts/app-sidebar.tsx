@@ -11,6 +11,7 @@ import {
   SquarePen,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 import {
@@ -30,16 +31,22 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import {
+  COLLECTION_TITLE_FALLBACK,
+  NOTE_TITLE_FALLBACK,
+  PROJECT_TITLE_FALLBACK,
+} from "@/lib/constant";
+import { ROUTES } from "@/lib/routes";
 import { useGetCollections } from "@/service/local/api-collection";
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 import { useGetProjects } from "@/service/local/api-project";
 import { useGetSetting } from "@/service/local/api-setting";
 
+import { useSessionTabs } from "../session-tabs";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -47,10 +54,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui";
-import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
-import { useSessionTabs } from "../session-tabs";
-import { ROUTES } from "@/lib/routes";
-import { useRouter } from "next/navigation";
 
 type Menu = {
   title: string;
@@ -122,7 +125,7 @@ export function SidebarEntityMenus() {
         href: ROUTES.COLLECTIONS,
         submenu:
           collections?.slice(0, 5).map((collection) => ({
-            title: collection.title || "Untitled Collection",
+            title: collection.title || COLLECTION_TITLE_FALLBACK,
             href: ROUTES.COLLECTION(collection.id),
           })) ?? [],
       },
@@ -131,12 +134,12 @@ export function SidebarEntityMenus() {
         href: ROUTES.PROJECTS,
         submenu:
           projects?.slice(0, 5).map((project) => ({
-            title: project.title || "Untitled Project",
+            title: project.title || PROJECT_TITLE_FALLBACK,
             href: ROUTES.PROJECT(project.id),
           })) ?? [],
       },
     ],
-    [notes]
+    [notes],
   );
 
   return (
@@ -149,9 +152,9 @@ export function SidebarEntityMenus() {
                 <SidebarMenuButton size="sm" className="font-semibold group">
                   <ChevronDown className="size-3 group-data-[state=open]:-rotate-180 transform transition-transform duration-200 ease-in-out" />
                   <span className="truncate">{item.title}</span>
-                  <Button variant="plain-primary" size="icon-sm">
-                    <Plus />
-                  </Button>
+                  <div className="">
+                    <Plus className="size-3.5 text-muted-foreground hover:text-foreground transition-colors duration-200 ease-in-out" />
+                  </div>
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent>

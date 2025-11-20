@@ -1,19 +1,14 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
 
+import { useSessionTabs } from "@/components/session-tabs";
+import { RichTextEditor } from "@/components/tiptap/rich-text-editor";
 import { useDebounce } from "@/hooks/use-debounce";
 import { AUTOSAVE_INTERVAL, NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { ROUTES } from "@/lib/routes";
 import { noteApi, useGetNote } from "@/service/local/api-note";
-
-import { useSessionTabs } from "@/components/session-tabs";
-import {
-  RichTextEditor,
-  RichTextEditorRef,
-} from "@/components/tiptap/rich-text-editor";
-import { Loader2 } from "lucide-react";
 
 type Props = {
   noteId: string;

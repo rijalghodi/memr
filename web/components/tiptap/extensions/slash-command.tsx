@@ -1,27 +1,28 @@
+import { flip, offset, shift, useFloating } from "@floating-ui/react-dom";
 import { Editor, Extension } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useFloating, offset, flip, shift } from "@floating-ui/react-dom";
-import { cn } from "@/lib/utils";
 import {
-  List,
-  Minus,
-  TextQuote,
   ChevronRight,
+  Code2,
   Heading1,
   Heading2,
   Heading3,
+  List,
   ListOrdered,
-  Code2,
+  Minus,
+  TextQuote,
 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandItem,
 } from "@/components/ui/command";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { CommandList } from "@/components/ui/command";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 interface CommandItemType {
   title: string;
@@ -115,7 +116,7 @@ export const SlashCommandExtension = Extension.create({
                 0,
                 $from.parentOffset,
                 "\n",
-                " "
+                " ",
               );
 
               const isSlashCommandOpened =
@@ -129,7 +130,7 @@ export const SlashCommandExtension = Extension.create({
                     detail: {
                       text: currentLineText.slice(1, -1).trim(),
                     },
-                  })
+                  }),
                 );
               }
 
@@ -149,7 +150,7 @@ export const SlashCommandExtension = Extension.create({
               0,
               $from.parentOffset,
               "\n",
-              " "
+              " ",
             );
 
             // Simulate updated line text by inserting text
@@ -167,7 +168,7 @@ export const SlashCommandExtension = Extension.create({
                   detail: {
                     text: updatedLineText.slice(1).trim(),
                   },
-                })
+                }),
               );
             }
             return false;
@@ -215,7 +216,7 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
         setSelectedIndex(-1);
       }
     },
-    [editor, search]
+    [editor, search],
   );
 
   const filteredMenuItems = useMemo(
@@ -224,9 +225,9 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
         (item) =>
           item.title.toLowerCase().includes(search.toLowerCase()) ||
           item.description.toLowerCase().includes(search.toLowerCase()) ||
-          item.keywords.toLowerCase().includes(search.toLowerCase())
+          item.keywords.toLowerCase().includes(search.toLowerCase()),
       ),
-    [search]
+    [search],
   );
 
   const handleKeyDown = useCallback(
@@ -270,7 +271,7 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
           break;
       }
     },
-    [open, selectedIndex, filteredMenuItems, executeCommand, editor]
+    [open, selectedIndex, filteredMenuItems, executeCommand, editor],
   );
 
   useEffect(() => {
@@ -316,12 +317,12 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
 
     (editorElement as HTMLElement).addEventListener(
       "keydown",
-      handleEditorKeyDown
+      handleEditorKeyDown,
     );
     return () =>
       (editorElement as HTMLElement).removeEventListener(
         "keydown",
-        handleEditorKeyDown
+        handleEditorKeyDown,
       );
   }, [handleKeyDown, editor]);
 
@@ -366,7 +367,7 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
                   onSelect={() => executeCommand(item.command)}
                   className={cn(
                     "gap-3 rounded-sm px-3",
-                    itemIndex === selectedIndex ? "bg-accent/50" : ""
+                    itemIndex === selectedIndex ? "bg-accent/50" : "",
                   )}
                   aria-selected={itemIndex === selectedIndex}
                   ref={(el) => {

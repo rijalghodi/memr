@@ -9,12 +9,13 @@ import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Typography from "@tiptap/extension-typography";
 import Underline from "@tiptap/extension-underline";
+import { Markdown } from "@tiptap/markdown";
 import StarterKit from "@tiptap/starter-kit";
 
 import SearchAndReplace from "@/components/tiptap/extensions/search-and-replace";
-import { SlashCommandExtension } from "./slash-command";
+
 import { FloatingToolbarExtension } from "./floating-toolbar";
-import { Markdown } from "@tiptap/markdown";
+import { SlashCommandExtension } from "./slash-command";
 
 export const extensions = [
   StarterKit.configure({

@@ -53,7 +53,7 @@ type SessionTabsContextValue = {
 };
 
 export const SessionTabsContext = createContext<SessionTabsContextValue | null>(
-  null
+  null,
 );
 
 export function SessionTabsProvider({
@@ -63,7 +63,7 @@ export function SessionTabsProvider({
 }) {
   const pathname = usePathname();
   const [sessionTabs, setSessionTabs] = useState<SessionTab[]>(() =>
-    loadTabsFromStorage()
+    loadTabsFromStorage(),
   );
 
   // Sync to localStorage whenever tabs change
@@ -86,7 +86,7 @@ export function SessionTabsProvider({
         // This function exists for API completeness
       }
     },
-    [sessionTabs]
+    [sessionTabs],
   );
 
   const addTab = useCallback(
@@ -102,7 +102,7 @@ export function SessionTabsProvider({
       setSessionTabs((prevTabs) => {
         // Check if pathname already exists - replace it
         const existingIndex = prevTabs.findIndex(
-          (tab) => tab.pathname === pathname
+          (tab) => tab.pathname === pathname,
         );
 
         const newTab: SessionTab = {
@@ -133,13 +133,13 @@ export function SessionTabsProvider({
         return newTabs;
       });
     },
-    []
+    [],
   );
 
   const updateTabTitle = useCallback((pathname: string, title: string) => {
     setSessionTabs((prevTabs) => {
       return prevTabs.map((tab) =>
-        tab.pathname === pathname ? { ...tab, title } : tab
+        tab.pathname === pathname ? { ...tab, title } : tab,
       );
     });
   }, []);

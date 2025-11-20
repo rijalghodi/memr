@@ -13,3 +13,10 @@ export const AUTOSAVE_INTERVAL = process.env.NEXT_PUBLIC_AUTOSAVE_INTERVAL
 
 export const NOTE_TITLE_FALLBACK = "Untitled Note";
 export const NOTE_CONTENT_EXCERPT_FALLBACK = "No additional content";
+
+export const TASK_TITLE_FALLBACK = "Untitled Task";
+export const TASK_DESCRIPTION_EXCERPT_FALLBACK = "No additional description";
+
+export const COLLECTION_TITLE_FALLBACK = "Untitled Collection";
+
+export const PROJECT_TITLE_FALLBACK = "Untitled Project";

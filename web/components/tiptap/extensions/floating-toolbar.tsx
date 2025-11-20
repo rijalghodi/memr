@@ -1,21 +1,23 @@
 "use client";
 
+import { flip, offset, shift, useFloating } from "@floating-ui/react-dom";
 import { Editor, Extension } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
 import { useCallback, useEffect, useState } from "react";
-import { useFloating, offset, flip, shift } from "@floating-ui/react-dom";
-import { BoldToolbar } from "../toolbars/bold";
-import { ItalicToolbar } from "../toolbars/italic";
-import { UnderlineToolbar } from "../toolbars/underline";
-import { LinkToolbar } from "../toolbars/link";
-import { ToolbarProvider } from "../toolbars/toolbar-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
+
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { HeadingsToolbar } from "../toolbars/headings";
-import { BulletListToolbar } from "../toolbars/bullet-list";
-import { OrderedListToolbar } from "../toolbars/ordered-list";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 import { BlockquoteToolbar } from "../toolbars/blockquote";
+import { BoldToolbar } from "../toolbars/bold";
+import { BulletListToolbar } from "../toolbars/bullet-list";
+import { HeadingsToolbar } from "../toolbars/headings";
+import { ItalicToolbar } from "../toolbars/italic";
+import { LinkToolbar } from "../toolbars/link";
+import { OrderedListToolbar } from "../toolbars/ordered-list";
+import { ToolbarProvider } from "../toolbars/toolbar-provider";
+import { UnderlineToolbar } from "../toolbars/underline";
 
 export const FloatingToolbarExtension = Extension.create({
   name: "floatingToolbar",
@@ -99,7 +101,7 @@ export const FloatingToolbar = ({ editor }: { editor: Editor | null }) => {
         // Try to find the element at the coordinates
         const elementAtPoint = document.elementFromPoint(
           coords.left,
-          coords.top
+          coords.top,
         );
         if (elementAtPoint) {
           // Find the closest element within the editor
