@@ -142,7 +142,7 @@
   line-height: 1.625;
   margin: var(--editor-spacing-4) 0;
   color: var(--editor-text-default);
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 
 .ProseMirror > p {
@@ -162,23 +162,23 @@
 }
 
 .ProseMirror h1 {
-  font-size: 2.5rem;
-  margin: var(--editor-spacing-8) 0 var(--editor-spacing-4);
+  font-size: 1.75rem;
+  margin: var(--editor-spacing-6) 0 var(--editor-spacing-4);
 }
 
 .ProseMirror h2 {
-  font-size: 2rem;
-  margin: var(--editor-spacing-8) 0 var(--editor-spacing-4);
+  font-size: 1.5rem;
+  margin: var(--editor-spacing-6) 0 var(--editor-spacing-4);
 }
 
 .ProseMirror h3 {
-  font-size: 1.75rem;
-  margin: var(--editor-spacing-6) 0 var(--editor-spacing-3);
+  font-size: 1.25rem;
+  margin: var(--editor-spacing-6) 0 var(--editor-spacing-4);
 }
 
 .ProseMirror h4 {
-  font-size: 1.25rem;
-  margin: var(--editor-spacing-4) 0 var(--editor-spacing-2);
+  font-size: 1.125rem;
+  margin: var(--editor-spacing-4) 0 var(--editor-spacing-4);
 }
 
 .ProseMirror a {
@@ -395,16 +395,16 @@
   }
 
   .ProseMirror h1 {
-    font-size: 2rem;
-  }
-  .ProseMirror h2 {
-    font-size: 1.75rem;
-  }
-  .ProseMirror h3 {
     font-size: 1.5rem;
   }
+  .ProseMirror h2 {
+    font-size: 1.325rem;
+  }
+  .ProseMirror h3 {
+    font-size: 1.125rem;
+  }
   .ProseMirror h4 {
-    font-size: 1.25rem;
+    font-size: 1rem;
   }
   .ProseMirror p {
     font-size: 1rem;
