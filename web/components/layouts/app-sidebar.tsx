@@ -89,7 +89,7 @@ export function AppSidebar() {
           Add Note
         </SidebarMenuButton>
         <SidebarMenuButton asChild size="default">
-          <Link href="/projects">
+          <Link href={ROUTES.TASKS}>
             <SquareCheckBig />
             Todo
           </Link>
@@ -139,7 +139,7 @@ export function SidebarEntityMenus() {
           })) ?? [],
       },
     ],
-    [notes],
+    [notes]
   );
 
   return (

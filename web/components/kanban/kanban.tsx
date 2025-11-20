@@ -23,17 +23,13 @@ export type Task = {
   status?: number;
   sortOrder?: number | string;
   dueDate?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
-  syncedAt?: string;
 };
 
 // Group item for list reordering (ReactSortable requires objects with id)
-type GroupItem = { id: string | number; title: string };
+export type GroupItem = { id: string; title: string };
 
 // Helper function to group tasks by group
-function groupTasksByGroup(tasks: Task[]): Record<string | number, Task[]> {
+function groupTasksByGroup(tasks: Task[]): Record<string, Task[]> {
   return tasks?.reduce(
     (acc, task) => {
       if (!acc[task.group]) {
@@ -42,7 +38,7 @@ function groupTasksByGroup(tasks: Task[]): Record<string | number, Task[]> {
       acc[task.group].push(task);
       return acc;
     },
-    {} as Record<string | number, Task[]>,
+    {} as Record<string, Task[]>
   );
 }
 
@@ -62,24 +58,25 @@ const Card: React.FC<{ task: Task }> = ({ task }) => (
 
 // List component
 const List: React.FC<{
-  group: string;
+  groupId: string;
+  groupTitle: string;
   tasks: Task[];
   onTaskDrop: (group: string, newTasks: Task[], oldTasks: Task[]) => void;
   onTaskAdd: (
-    group: string,
-    taskData: Pick<Task, "title" | "dueDate" | "description">,
+    groupId: string,
+    taskData: Pick<Task, "title" | "dueDate" | "description">
   ) => void;
-}> = ({ group, tasks, onTaskDrop, onTaskAdd }) => {
+}> = ({ groupId, groupTitle, tasks, onTaskDrop, onTaskAdd }) => {
   const previousTasksRef = useRef<Task[]>(tasks);
   const [open, setOpen] = useState(false);
 
   const handleSetList = useCallback(
     (newTasks: Task[]) => {
       const oldTasks = previousTasksRef.current;
-      onTaskDrop(group, newTasks, oldTasks);
+      onTaskDrop(groupId, newTasks, oldTasks);
       previousTasksRef.current = newTasks;
     },
-    [group, onTaskDrop],
+    [groupId, onTaskDrop]
   );
 
   // Update ref when tasks change from external source
@@ -94,7 +91,7 @@ const List: React.FC<{
           <div className="flex items-center justify-between">
             <div className="flex items-end gap-2">
               <h2 className="font-semibold text-sm leading-none capitalize">
-                {group}
+                {groupTitle}
               </h2>
               <span className="text-xs text-muted-foreground leading-none">
                 {tasks.length}
@@ -120,7 +117,7 @@ const List: React.FC<{
           <CollapsibleContent className={cn("relative", open && "z-1000")}>
             <TaskAdd
               onSubmit={(data) => {
-                onTaskAdd(group, data);
+                onTaskAdd(groupId, data);
               }}
             />
           </CollapsibleContent>
@@ -136,7 +133,7 @@ const List: React.FC<{
             animation={200}
             className={cn(
               "space-y-2 min-h-[300px]",
-              tasks.length === 0 && "bg-muted/50 rounded-md",
+              tasks.length === 0 && "bg-muted/50 rounded-md"
             )}
             ghostClass="opacity-50"
             dragClass="cursor-grabbing"
@@ -162,7 +159,10 @@ export function Kanban({
 }: {
   tasks: Task[];
   onTaskUpdate: (data: Task) => void;
-  onTaskAdd: (data: Task) => void;
+  onTaskAdd: (
+    group: string,
+    data: Pick<Task, "title" | "dueDate" | "description">
+  ) => void;
   onTaskDelete: (data: Task) => void;
   groupOrder: GroupItem[];
 }) {
@@ -176,7 +176,7 @@ export function Kanban({
     (group: string, newTasks: Task[], oldTasks: Task[]) => {
       // Find tasks that were added (moved from another list)
       const addedTasks = newTasks.filter(
-        (task) => !oldTasks.some((t) => t.id === task.id),
+        (task) => !oldTasks.some((t) => t.id === task.id)
       );
 
       // Update group for tasks that were moved to this list
@@ -201,25 +201,24 @@ export function Kanban({
         }
       });
     },
-    [onTaskUpdate],
+    [onTaskUpdate]
   );
 
   // Handle task add
   const handleTaskAdd = useCallback(
     (
       group: string,
-      taskData: Pick<Task, "title" | "dueDate" | "description">,
+      taskData: Pick<Task, "title" | "dueDate" | "description">
     ) => {
-      onTaskAdd({
+      onTaskAdd(group, {
         ...taskData,
-        id: "", // Parent should generate this
         group: group,
         title: taskData.title,
         description: taskData.description || undefined,
         dueDate: taskData.dueDate || undefined,
       } as Task);
     },
-    [onTaskAdd],
+    [onTaskAdd]
   );
 
   // Handle list reorder (group columns)
@@ -238,7 +237,7 @@ export function Kanban({
   return (
     <div id="kanban" className="h-full w-full flex flex-col">
       <ScrollArea className="flex-1 w-full">
-        <div className="p-4 h-full">
+        <div className="h-full">
           <ReactSortable
             list={groupOrderState}
             setList={handleListReorder}
@@ -251,8 +250,9 @@ export function Kanban({
               const groupTasks = tasksByGroup[groupItem.title] || [];
               return (
                 <List
-                  key={groupItem.title}
-                  group={groupItem.title}
+                  key={groupItem.id}
+                  groupId={groupItem.id}
+                  groupTitle={groupItem.title}
                   tasks={groupTasks}
                   onTaskDrop={handleTaskDrop}
                   onTaskAdd={handleTaskAdd}
