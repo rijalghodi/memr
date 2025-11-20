@@ -39,7 +39,9 @@ export function Main({ children }: Props) {
         {/* Mmain coontent */}
         <div className="bg-background rounded-t-2xl flex-1 shadow-lg">
           <SessionTabs />
-          <div className="overflow-y-auto h-[calc(100vh-8rem)]">{children}</div>
+          <div className="overflow-y-auto h-[calc(100vh-5.5rem)]">
+            {children}
+          </div>
         </div>
         {/* Chat Sidebar */}
         <div className="bg-background rounded-t-2xl w-full min-w-[300px] max-w-[400px]">

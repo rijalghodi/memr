@@ -2,6 +2,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 
 import { db, type Note } from "@/lib/dexie";
+import { extractFirstLineFromContent } from "@/lib/string";
 
 export type CreateNoteReq = {
   collectionId?: string;
@@ -27,7 +28,9 @@ export type UpsertNoteReq = {
   syncedAt?: string;
 };
 
-export type NoteRes = Note;
+export type NoteRes = Note & {
+  title?: string;
+};
 
 export const noteApi = {
   create: async (data: CreateNoteReq): Promise<NoteRes> => {
@@ -73,13 +76,19 @@ export const noteApi = {
       });
     }
 
-    return notes;
+    return notes.map((note) => ({
+      ...note,
+      title: extractFirstLineFromContent(note.content ?? ""),
+    }));
   },
 
   getById: async (id: string): Promise<NoteRes | undefined> => {
     const note = await db.notes.get(id);
     if (note && !note.deletedAt) {
-      return note;
+      return {
+        ...note,
+        title: extractFirstLineFromContent(note.content ?? ""),
+      };
     }
     return undefined;
   },
