@@ -2,8 +2,8 @@
 
 import { format } from "date-fns";
 import { FileText, MoreHorizontal, Trash } from "lucide-react";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   NOTE_CONTENT_EXCERPT_FALLBACK,
@@ -44,7 +44,7 @@ export function NoteItem({
     : NOTE_CONTENT_EXCERPT_FALLBACK;
   const displayTitle = title || NOTE_TITLE_FALLBACK;
 
-  const router = useRouter();
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { mutate: deleteNote, isLoading: isDeleting } = useDeleteNote({
     onSuccess: () => {
@@ -74,7 +74,7 @@ export function NoteItem({
 
   const { addTab } = useSessionTabs();
   const handleClick = () => {
-    router.push(ROUTES.NOTE(id));
+    navigate(ROUTES.NOTE(id));
     addTab({
       title: displayTitle,
       pathname: ROUTES.NOTE(id),

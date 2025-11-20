@@ -38,7 +38,7 @@ function groupTasksByGroup(tasks: Task[]): Record<string, Task[]> {
       acc[task.group].push(task);
       return acc;
     },
-    {} as Record<string, Task[]>
+    {} as Record<string, Task[]>,
   );
 }
 
@@ -64,7 +64,7 @@ const List: React.FC<{
   onTaskDrop: (group: string, newTasks: Task[], oldTasks: Task[]) => void;
   onTaskAdd: (
     groupId: string,
-    taskData: Pick<Task, "title" | "dueDate" | "description">
+    taskData: Pick<Task, "title" | "dueDate" | "description">,
   ) => void;
 }> = ({ groupId, groupTitle, tasks, onTaskDrop, onTaskAdd }) => {
   const previousTasksRef = useRef<Task[]>(tasks);
@@ -76,7 +76,7 @@ const List: React.FC<{
       onTaskDrop(groupId, newTasks, oldTasks);
       previousTasksRef.current = newTasks;
     },
-    [groupId, onTaskDrop]
+    [groupId, onTaskDrop],
   );
 
   // Update ref when tasks change from external source
@@ -133,7 +133,7 @@ const List: React.FC<{
             animation={200}
             className={cn(
               "space-y-2 min-h-[300px]",
-              tasks.length === 0 && "bg-muted/50 rounded-md"
+              tasks.length === 0 && "bg-muted/50 rounded-md",
             )}
             ghostClass="opacity-50"
             dragClass="cursor-grabbing"
@@ -161,7 +161,7 @@ export function Kanban({
   onTaskUpdate: (data: Task) => void;
   onTaskAdd: (
     group: string,
-    data: Pick<Task, "title" | "dueDate" | "description">
+    data: Pick<Task, "title" | "dueDate" | "description">,
   ) => void;
   onTaskDelete: (data: Task) => void;
   groupOrder: GroupItem[];
@@ -176,7 +176,7 @@ export function Kanban({
     (group: string, newTasks: Task[], oldTasks: Task[]) => {
       // Find tasks that were added (moved from another list)
       const addedTasks = newTasks.filter(
-        (task) => !oldTasks.some((t) => t.id === task.id)
+        (task) => !oldTasks.some((t) => t.id === task.id),
       );
 
       // Update group for tasks that were moved to this list
@@ -201,14 +201,14 @@ export function Kanban({
         }
       });
     },
-    [onTaskUpdate]
+    [onTaskUpdate],
   );
 
   // Handle task add
   const handleTaskAdd = useCallback(
     (
       group: string,
-      taskData: Pick<Task, "title" | "dueDate" | "description">
+      taskData: Pick<Task, "title" | "dueDate" | "description">,
     ) => {
       onTaskAdd(group, {
         ...taskData,
@@ -218,7 +218,7 @@ export function Kanban({
         dueDate: taskData.dueDate || undefined,
       } as Task);
     },
-    [onTaskAdd]
+    [onTaskAdd],
   );
 
   // Handle list reorder (group columns)

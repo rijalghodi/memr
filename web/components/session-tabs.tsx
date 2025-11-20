@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import React, {
   createContext,
   useCallback,
@@ -8,6 +7,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { useLocation } from "react-router-dom";
 
 export type SessionTab = {
   id: string;
@@ -61,7 +61,8 @@ export function SessionTabsProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
   const [sessionTabs, setSessionTabs] = useState<SessionTab[]>(() =>
     loadTabsFromStorage(),
   );

@@ -1,7 +1,6 @@
 import { Home, RefreshCcw, X } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -21,7 +20,7 @@ export function Main({ children }: Props) {
     <div className="flex flex-col h-full">
       <div className="h-12 flex items-center justify-between px-4">
         <div />
-        <Image src={logo} alt="logo" width={80} height={24} />
+        <img src={logo} alt="logo" width={80} height={24} />
 
         <Button
           variant="ghost-primary"
@@ -53,17 +52,17 @@ export function Main({ children }: Props) {
 }
 
 export function SessionTabs() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { sessionTabs, activeTab, pathname, setActiveTab, closeTab } =
     useSessionTabs();
   const isHomeActive = pathname === ROUTES.HOME;
 
   const handleTabClick = (pathname: string) => {
-    router.push(pathname);
+    navigate(pathname);
   };
 
   const handleHomeClick = () => {
-    router.push(ROUTES.HOME);
+    navigate(ROUTES.HOME);
   };
 
   const handleCloseTab = (e: React.MouseEvent, id: string) => {
@@ -77,13 +76,13 @@ export function SessionTabs() {
     if (isActive) {
       if (tabIndex > 0) {
         // Navigate to previous tab
-        router.push(sessionTabs[tabIndex - 1].pathname);
+        navigate(sessionTabs[tabIndex - 1].pathname);
       } else if (sessionTabs.length > 1) {
         // Navigate to next tab (now at index 0)
-        router.push(sessionTabs[1].pathname);
+        navigate(sessionTabs[1].pathname);
       } else {
         // No more tabs, navigate to home
-        router.push(ROUTES.HOME);
+        navigate(ROUTES.HOME);
       }
     }
   };
@@ -129,7 +128,7 @@ function SessionTabItem({
         "group relative flex gap-1.5 items-center h-full px-3 cursor-pointer data-[active=false]:hover:bg-accent",
         "text-[0.675rem] font-medium [&>svg]:size-3.5 border-r border-l border-r-muted border-l-muted text-foreground/90 border-b border-b-transparent",
         "data-[active=true]:border-b-primary data-[active=true]:border-b data-[active=true]:text-primary transition-all duration-100",
-        "max-w-48 min-w-12"
+        "max-w-48 min-w-20",
       )}
       data-active={active}
       onClick={onClick}
@@ -142,7 +141,7 @@ function SessionTabItem({
           className={cn(
             "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-100",
             "h-full pr-2 pl-0.5 flex items-center justify-center",
-            "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground"
+            "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground",
           )}
           aria-label="Close tab"
         >

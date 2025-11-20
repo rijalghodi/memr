@@ -1,8 +1,8 @@
 "use client";
 
 import { ArrowDownUp, ListFilter, Loader, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { ROUTES } from "@/lib/routes";
@@ -20,7 +20,7 @@ type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
 export function NoteDashboard({}: Props) {
   const [sortBy, setSortBy] = useState<SortByValue>("updatedAt");
-  const router = useRouter();
+  const navigate = useNavigate();
   const { data: notes, isLoading } = useGetNotes({ sortBy });
 
   const handleSortChange = (value: string) => {
@@ -31,7 +31,7 @@ export function NoteDashboard({}: Props) {
   const { addTab } = useSessionTabs();
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
-      router.push(ROUTES.NOTE(data.id));
+      navigate(ROUTES.NOTE(data.id));
       addTab({
         title: NOTE_TITLE_FALLBACK,
         pathname: ROUTES.NOTE(data.id),

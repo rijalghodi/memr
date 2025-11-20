@@ -1,20 +1,10 @@
 "use client";
 
-import { ArrowDownUp, ListFilter, Loader } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
-import {
-  useCreateTask,
-  useDeleteTask,
-  useGetTasks,
-  useUpdateTask,
-} from "@/service/local/api-task";
-
-import { Kanban, type Task as KanbanTask, GroupItem } from "../kanban/kanban";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
-import { Button } from "../ui/button";
-import { DropdownFilter } from "../ui/drropdown-filter";
 import { Task } from "@/lib/dexie";
+
+import { GroupItem, Kanban, type Task as KanbanTask } from "../kanban/kanban";
 
 type Props = {
   tasks: Task[];
@@ -74,7 +64,7 @@ export function TaskKanban({
 
   const handleTaskAdd = (
     group: string,
-    data: Pick<Task, "title" | "dueDate" | "description">
+    data: Pick<Task, "title" | "dueDate" | "description">,
   ) => {
     // const status = GROUP_TO_STATUS[group] ?? 0;
     console.log("group", group);

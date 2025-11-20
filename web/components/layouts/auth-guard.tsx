@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { toast } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
@@ -39,8 +38,8 @@ export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
     return (
       <>
         <div className="flex justify-center items-center h-screen w-screen">
-          <Image
-            src={Logo.src}
+          <img
+            src={Logo}
             alt="Logo"
             width={100}
             height={100}
@@ -77,13 +76,13 @@ export function AuthGuard({
 }) {
   const { isAuthenticated, isLoading, error } = useAuthGuard();
 
-  const router = useRouter();
+  const navigate = useNavigate();
   useEffect(() => {
     if (error) {
       if (mustNotAuthenticated) {
         return;
       } else {
-        router.push(ROUTES.LOGIN);
+        navigate(ROUTES.LOGIN);
         return;
       }
     }
@@ -91,7 +90,7 @@ export function AuthGuard({
     if (isLoading) return;
 
     if (mustNotAuthenticated && isAuthenticated) {
-      router.push(ROUTES.HOME);
+      navigate(ROUTES.HOME);
       return;
     }
 
@@ -99,17 +98,17 @@ export function AuthGuard({
       toast.error("You are not authenticated", {
         description: "Please login to continue",
       });
-      router.push(ROUTES.LOGIN);
+      navigate(ROUTES.LOGIN);
       return;
     }
-  }, [error, isLoading, mustNotAuthenticated]);
+  }, [error, isLoading, mustNotAuthenticated, navigate, isAuthenticated]);
 
   if (isLoading || (!mustNotAuthenticated && !isAuthenticated))
     return (
       <>
         <div className="flex justify-center items-center h-screen w-screen">
-          <Image
-            src={Logo.src}
+          <img
+            src={Logo}
             alt="Logo"
             width={100}
             height={100}
