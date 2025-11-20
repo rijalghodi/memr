@@ -1,6 +1,6 @@
 import { NoteDashboard } from "@/components/notes/note-dashboard";
 
-export default function NotesPage() {
+export function HomePage() {
   return (
     <>
       <NoteDashboard />

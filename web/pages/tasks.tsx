@@ -1,6 +1,6 @@
 import { TaskDashboard } from "@/components/tasks/task-dashboard";
 
-export default function TasksPage() {
+export function TasksPage() {
   return (
     <>
       <TaskDashboard />

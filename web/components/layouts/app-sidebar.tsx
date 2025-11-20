@@ -10,9 +10,8 @@ import {
   SquareCheckBig,
   SquarePen,
 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   Collapsible,
@@ -63,12 +62,12 @@ type Menu = {
 };
 
 export function AppSidebar() {
-  const router = useRouter();
+  const navigate = useNavigate();
   // handle add button
   const { addTab } = useSessionTabs();
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
-      router.push(ROUTES.NOTE(data.id));
+      navigate(ROUTES.NOTE(data.id));
       addTab({
         title: NOTE_TITLE_FALLBACK,
         pathname: ROUTES.NOTE(data.id),
@@ -89,7 +88,7 @@ export function AppSidebar() {
           Add Note
         </SidebarMenuButton>
         <SidebarMenuButton asChild size="default">
-          <Link href={ROUTES.TASKS}>
+          <Link to={ROUTES.TASKS}>
             <SquareCheckBig />
             Todo
           </Link>
@@ -139,7 +138,7 @@ export function SidebarEntityMenus() {
           })) ?? [],
       },
     ],
-    [notes]
+    [notes],
   );
 
   return (
@@ -171,7 +170,7 @@ export function SidebarEntityMenus() {
                             key={`${idx}-entity-menu-sub-item`}
                           >
                             <SidebarMenuSubButton size="sm" asChild>
-                              <Link href={subitem.href}>
+                              <Link to={subitem.href}>
                                 <FileText />
                                 {subitem.title || NOTE_TITLE_FALLBACK}
                               </Link>
@@ -186,7 +185,7 @@ export function SidebarEntityMenus() {
                             className="font-semibold w-fit"
                             asChild
                           >
-                            <Link href={item.seeAllHref}>
+                            <Link to={item.seeAllHref}>
                               See All
                               <ArrowRight />
                             </Link>

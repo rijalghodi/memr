@@ -3,6 +3,7 @@
 import { ArrowDownUp, ListFilter, Loader } from "lucide-react";
 import { useState } from "react";
 
+import type { Task } from "@/lib/dexie";
 import {
   useCreateTask,
   useDeleteTask,
@@ -14,7 +15,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
 import { TaskKanban } from "./task-kanban";
-import type { Task } from "@/lib/dexie";
 
 type Props = {};
 
@@ -48,7 +48,7 @@ export function TaskDashboard({}: Props) {
   });
 
   const handleTaskAdd = (
-    task: Omit<Task, "id" | "createdAt" | "updatedAt">
+    task: Omit<Task, "id" | "createdAt" | "updatedAt">,
   ) => {
     createTask({
       title: task.title,
