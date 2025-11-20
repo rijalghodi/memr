@@ -10,3 +10,6 @@ export const SYNC_GRACE_PERIOD = process.env.NEXT_PUBLIC_SYNC_GRACE_PERIOD
 export const AUTOSAVE_INTERVAL = process.env.NEXT_PUBLIC_AUTOSAVE_INTERVAL
   ? parseInt(process.env.NEXT_PUBLIC_AUTOSAVE_INTERVAL)
   : 1 * 1000;
+
+export const NOTE_TITLE_FALLBACK = "Untitled Note";
+export const NOTE_CONTENT_EXCERPT_FALLBACK = "No additional content";

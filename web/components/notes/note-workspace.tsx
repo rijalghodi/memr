@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useDebounce } from "@/hooks/use-debounce";
-import { AUTOSAVE_INTERVAL } from "@/lib/constant";
+import { AUTOSAVE_INTERVAL, NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { ROUTES } from "@/lib/routes";
 import {
   extractFirstLineFromContent,
@@ -48,9 +48,9 @@ export function NoteWorkspace({ noteId }: Props) {
     const currentContent = content || "";
     const title = currentContent
       ? extractFirstLineFromContent(currentContent, 80)
-      : "Untitled Note";
+      : NOTE_TITLE_FALLBACK;
 
-    updateTabTitle(ROUTES.NOTE(noteId), title || "Untitled Note");
+    updateTabTitle(ROUTES.NOTE(noteId), title || NOTE_TITLE_FALLBACK);
   }, [content, noteId, updateTabTitle, contentLoaded]);
 
   // Autosave debounced content

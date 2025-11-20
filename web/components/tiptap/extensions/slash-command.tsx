@@ -14,7 +14,12 @@ import {
   ListOrdered,
   Code2,
 } from "lucide-react";
-import { Command, CommandEmpty, CommandItem } from "@/components/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CommandList } from "@/components/ui/command";
 
@@ -345,44 +350,45 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
       <Command
         role="listbox"
         ref={commandRef}
-        className="w-72 overflow-hidden rounded-lg border bg-popover shadow-lg"
+        className="w-56 overflow-hidden rounded-lg border bg-popover shadow-lg"
       >
         <ScrollArea className="max-h-[330px]">
           <CommandList>
             <CommandEmpty className="py-3 text-center text-sm text-muted-foreground">
               No results found
             </CommandEmpty>
-
-            {filteredMenuItems.map((item, itemIndex) => (
-              <CommandItem
-                role="option"
-                key={`${item.title}-${itemIndex}`}
-                value={item.title}
-                onSelect={() => executeCommand(item.command)}
-                className={cn(
-                  "gap-3",
-                  itemIndex === selectedIndex ? "bg-accent/50" : ""
-                )}
-                aria-selected={itemIndex === selectedIndex}
-                ref={(el) => {
-                  itemRefs.current[itemIndex] = el;
-                }}
-                tabIndex={itemIndex === selectedIndex ? 0 : -1}
-              >
-                <div className="flex h-9 w-9 items-center justify-center rounded-md border bg-background">
-                  <item.icon className="h-4 w-4" />
-                </div>
-                <div className="flex flex-1 flex-col">
-                  <span className="text-sm font-medium">{item.title}</span>
-                  <span className="text-xs text-muted-foreground">
+            <CommandGroup heading="Blocks">
+              {filteredMenuItems.map((item, itemIndex) => (
+                <CommandItem
+                  role="option"
+                  key={`${item.title}-${itemIndex}`}
+                  value={item.title}
+                  onSelect={() => executeCommand(item.command)}
+                  className={cn(
+                    "gap-3 rounded-sm px-3",
+                    itemIndex === selectedIndex ? "bg-accent/50" : ""
+                  )}
+                  aria-selected={itemIndex === selectedIndex}
+                  ref={(el) => {
+                    itemRefs.current[itemIndex] = el;
+                  }}
+                  tabIndex={itemIndex === selectedIndex ? 0 : -1}
+                >
+                  <div className="flex size-5 items-center justify-center">
+                    <item.icon className="size-4" />
+                  </div>
+                  <div className="flex flex-1 flex-col">
+                    <span className="text-sm">{item.title}</span>
+                    {/* <span className="text-xs text-muted-foreground">
                     {item.description}
-                  </span>
-                </div>
-                <kbd className="ml-auto flex h-5 items-center rounded bg-muted px-1.5 text-xs text-muted-foreground">
-                  ↵
-                </kbd>
-              </CommandItem>
-            ))}
+                  </span> */}
+                  </div>
+                  <kbd className="ml-auto flex h-5 items-center rounded bg-muted px-1.5 text-xs text-muted-foreground">
+                    ↵
+                  </kbd>
+                </CommandItem>
+              ))}
+            </CommandGroup>
           </CommandList>
         </ScrollArea>
       </Command>
