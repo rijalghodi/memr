@@ -1,15 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 import { toast } from "@/components/ui";
 import { setAuthCookie } from "@/lib/auth-cookie";
 import { ROUTES } from "@/lib/routes";
-import { Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "@/public/logo.png";
-import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,7 +46,7 @@ export default function LoginPage() {
         width={100}
         height={100}
         className={cn(
-          "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32"
+          "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32",
         )}
       />
     </div>

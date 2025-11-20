@@ -129,7 +129,7 @@ function SessionTabItem({
         "group relative flex gap-1.5 items-center h-full px-3 cursor-pointer data-[active=false]:hover:bg-accent",
         "text-[0.625rem] font-medium [&>svg]:size-3.5 border-r border-l border-r-muted border-l-muted text-foreground/90 border-b border-b-transparent",
         "data-[active=true]:border-b-primary data-[active=true]:border-b data-[active=true]:text-primary transition-all duration-100",
-        "max-w-48 min-w-12"
+        "max-w-48 min-w-12",
       )}
       data-active={active}
       onClick={onClick}
@@ -142,7 +142,7 @@ function SessionTabItem({
           className={cn(
             "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-100",
             "h-full pr-2 pl-0.5 flex items-center justify-center",
-            "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground"
+            "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground",
           )}
           aria-label="Close tab"
         >

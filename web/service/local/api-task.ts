@@ -58,6 +58,7 @@ export const taskApi = {
 
   getAll: async (params?: {
     projectId?: string;
+    sortBy?: "updatedAt" | "viewedAt" | "createdAt";
     unsynced?: boolean;
   }): Promise<TaskRes[]> => {
     const projectId = params?.projectId;
@@ -176,9 +177,14 @@ export const useCreateTask = ({
   return { mutate, isLoading };
 };
 
-export const useGetTasks = (projectId?: string) => {
+export const useGetTasks = (params?: {
+  projectId?: string;
+  sortBy?: "updatedAt" | "viewedAt" | "createdAt";
+  unsynced?: boolean;
+}) => {
+  const { projectId, sortBy, unsynced } = params ?? {};
   const tasks = useLiveQuery(async () => {
-    return await taskApi.getAll({ projectId });
+    return await taskApi.getAll({ projectId, sortBy, unsynced });
   }, [projectId]);
 
   return {

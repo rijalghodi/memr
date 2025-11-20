@@ -1,17 +1,19 @@
 "use client";
 import "./tiptap.css";
-import { cn } from "@/lib/utils";
+
 import {
+  type Editor,
   EditorContent,
   type Extension,
   useEditor,
-  type Editor,
 } from "@tiptap/react";
-import { EditorToolbar } from "./toolbars/editor-toolbar";
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { SlashCommand } from "./extensions/slash-command";
-import { FloatingToolbar } from "./extensions/floating-toolbar";
+import { useEffect, useRef } from "react";
+
+import { cn } from "@/lib/utils";
+
 import { extensions } from "./extensions/extensions";
+import { FloatingToolbar } from "./extensions/floating-toolbar";
+import { SlashCommand } from "./extensions/slash-command";
 
 export interface RichTextEditorRef {
   editor: Editor | null;
@@ -74,7 +76,7 @@ export function RichTextEditor({
     <div
       className={cn(
         "relative max-h-[calc(100dvh-6rem)] w-full overflow-y-scroll bg-card pb-[60px] sm:pb-0",
-        className
+        className,
       )}
     >
       <FloatingToolbar editor={editor} />

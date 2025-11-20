@@ -1,23 +1,11 @@
 "use client";
 
-import {
-  getRedirectResult,
-  GoogleAuthProvider,
-  signInWithRedirect,
-} from "firebase/auth";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
-import { toast } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { IconGoogle } from "@/components/ui/icon-google";
-import { setAuthCookie } from "@/lib/auth-cookie";
 import { BRAND } from "@/lib/brand";
-import { auth } from "@/lib/firebase";
-import { ROUTES } from "@/lib/routes";
 import logo from "@/public/logo-long.png";
-import { useGoogleOAuth } from "@/service/api-auth";
 
 export default function LoginPage() {
   // const router = useRouter();

@@ -59,7 +59,7 @@ export const noteApi = {
           !unsynced ||
           !note.syncedAt ||
           new Date(note.syncedAt ?? new Date(0)).getTime() <
-            new Date(note.updatedAt).getTime()
+            new Date(note.updatedAt).getTime(),
       )
       .toArray();
     if (collectionId) {
@@ -173,7 +173,7 @@ export const useCreateNote = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -231,7 +231,7 @@ export const useUpdateNote = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -261,7 +261,7 @@ export const useDeleteNote = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };

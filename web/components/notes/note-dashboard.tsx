@@ -1,25 +1,18 @@
 "use client";
 
-import {
-  ArrowDownUp,
-  Filter,
-  ListFilter,
-  Loader,
-  Loader2,
-  Plus,
-} from "lucide-react";
+import { ArrowDownUp, ListFilter, Loader, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
+import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { ROUTES } from "@/lib/routes";
-import { noteApi, noteApiHook, useGetNotes } from "@/service/local/api-note";
+import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 
+import { useSessionTabs } from "../session-tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
 import { NoteItem } from "./note-item";
-import { useSessionTabs } from "../session-tabs";
-import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 
 type Props = {};
 
@@ -57,7 +50,7 @@ export function NoteDashboard({}: Props) {
       {/* Header */}
       <Collapsible key="note-filter-collapsible">
         <div className="flex items-center justify-between px-6 pt-6 pb-3">
-          <h1 className="text-2xl font-semibold">Notes</h1>
+          <h1 className="text-3xl font-semibold">Notes</h1>
           <div className="flex items-center gap-0">
             <Button variant="ghost" size="icon" onClick={handleAddNote}>
               <Plus />
