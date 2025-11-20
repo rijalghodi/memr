@@ -48,17 +48,24 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Shadows */
+  /* Box Shadow */
+  --shadow-md: 0px 4px 20px 0px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0px 8px 40px 0px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0px 16px 80px 0px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0px 32px 160px 0px rgba(0, 0, 0, 0.1);
 }
 
 :root {
   --font-inter: "Inter", sans-serif;
   font-family: var(--font-inter);
   --radius: 0.75rem;
-  --background: oklch(0.989 0 0);
+  --background: oklch(0.997 0 0);
   --foreground: oklch(0.355 0 0);
-  --card: oklch(0.989 0 0);
+  --card: oklch(0.997 0 0);
   --card-foreground: oklch(0.355 0 0);
-  --popover: oklch(0.989 0 0);
+  --popover: oklch(0.997 0 0);
   --popover-foreground: oklch(0.355 0 0);
   /* --primary: oklch(0.355 0 0); */
   --primary: oklch(0.503 0.204 291);

@@ -29,7 +29,7 @@ type ConfirmationContextType = {
 };
 
 const ConfirmationContext = React.createContext<ConfirmationContextType | null>(
-  null,
+  null
 );
 
 export function useConfirmation() {
@@ -48,7 +48,7 @@ export function ConfirmationProvider({
   const [isOpen, setIsOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [options, setOptions] = React.useState<ConfirmationOptions | null>(
-    null,
+    null
   );
 
   const confirm = React.useCallback((newOptions: ConfirmationOptions) => {
@@ -63,7 +63,7 @@ export function ConfirmationProvider({
     try {
       await options.onConfirm();
       setIsOpen(false);
-      setOptions(null);
+      // setOptions(null);
     } catch (error) {
       // Error handling is expected to be done in the onConfirm callback
       console.error("Confirmation action failed:", error);
@@ -75,7 +75,7 @@ export function ConfirmationProvider({
   const handleCancel = React.useCallback(() => {
     if (!loading) {
       setIsOpen(false);
-      setOptions(null);
+      // setOptions(null);
     }
   }, [loading]);
 
@@ -83,7 +83,7 @@ export function ConfirmationProvider({
     () => ({
       confirm,
     }),
-    [confirm],
+    [confirm]
   );
 
   const title = options?.title || "Confirm Action";
@@ -100,19 +100,8 @@ export function ConfirmationProvider({
         open={isOpen}
         onOpenChange={(open) => !open && !loading && handleCancel()}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="sm:max-w-sm">
           <AlertDialogHeader>
-            <div>
-              {variant === "destructive" ? (
-                <div className="flex justify-center items-center h-12 w-12 rounded-full bg-destructive/10">
-                  <Trash className="size-5 text-destructive" />
-                </div>
-              ) : (
-                <div className="flex justify-center items-center h-12 w-12 rounded-full bg-primary/10">
-                  <Info className="size-5 text-primary" />
-                </div>
-              )}
-            </div>
             <AlertDialogTitle>{title}</AlertDialogTitle>
             <AlertDialogDescription>{message}</AlertDialogDescription>
           </AlertDialogHeader>
@@ -126,7 +115,7 @@ export function ConfirmationProvider({
             </AlertDialogCancel>
             <Button
               className="flex-1"
-              color={variant === "destructive" ? "destructive" : "primary"}
+              variant={variant === "destructive" ? "destructive" : "default"}
               onClick={handleConfirm}
               disabled={loading}
             >
