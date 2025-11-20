@@ -39,7 +39,7 @@ export function Main({ children }: Props) {
         {/* Mmain coontent */}
         <div className="bg-background rounded-2xl flex-1 shadow-lg">
           <SessionTabs />
-          {children}
+          <div className="overflow-y-auto h-[calc(100vh-8rem)]">{children}</div>
         </div>
         {/* Chat Sidebar */}
         <div className="bg-background rounded-2xl w-full min-w-[300px] max-w-[400px]">
@@ -137,7 +137,7 @@ function SessionTabItem({
           onClick={onClose}
           className={cn(
             "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity",
-            "rounded-sm h-full w-8 flex items-center justify-center",
+            "rounded-sm h-full pr-2 pl-0.5 flex items-center justify-center",
             "bg-muted group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground"
           )}
           aria-label="Close tab"
