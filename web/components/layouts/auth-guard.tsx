@@ -104,7 +104,7 @@ export function AuthGuard({
     }
   }, [error, isLoading, mustNotAuthenticated]);
 
-  if (isLoading)
+  if (isLoading || (!mustNotAuthenticated && !isAuthenticated))
     return (
       <>
         <div className="flex justify-center items-center h-screen w-screen">
