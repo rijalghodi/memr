@@ -12,12 +12,14 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 import { ROUTES } from "@/lib/routes";
-import { noteApiHook, useGetNotes } from "@/service/local/api-note";
+import { noteApi, noteApiHook, useGetNotes } from "@/service/local/api-note";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
 import { NoteItem } from "./note-item";
+import { useSessionTabs } from "../session-tabs";
+import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 
 type Props = {};
 
@@ -33,15 +35,19 @@ export function NoteDashboard({}: Props) {
   };
 
   // add noote
+  const { addTab } = useSessionTabs();
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
       router.push(ROUTES.NOTE(data.id));
+      addTab({
+        title: NOTE_TITLE_FALLBACK,
+        pathname: ROUTES.NOTE(data.id),
+      });
     },
   });
 
   const handleAddNote = () => {
     createNote({
-      title: "",
       content: "",
     });
   };

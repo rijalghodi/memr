@@ -44,6 +44,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui";
+import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 
 type Menu = {
   title: string;
@@ -92,7 +93,8 @@ export function SidebarEntityMenus() {
         submenu:
           notes?.slice(0, 5).map((note) => ({
             title:
-              extractTitleFromContent(note.content || "") || "Untitled Note",
+              extractTitleFromContent(note.content || "") ||
+              NOTE_TITLE_FALLBACK,
             href: `/notes/${note.id}`,
           })) ?? [],
       },
