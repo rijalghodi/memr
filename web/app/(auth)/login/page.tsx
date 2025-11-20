@@ -20,53 +20,53 @@ import logo from "@/public/logo-long.png";
 import { useGoogleOAuth } from "@/service/api-auth";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { mutate: googleOAuth, isPending } = useGoogleOAuth({
-    onSuccess: (data) => {
-      if (data.data) {
-        const {
-          accessToken,
-          refreshToken,
-          accessTokenExpiresAt,
-          refreshTokenExpiresAt,
-        } = data.data;
+  // const router = useRouter();
+  // const { mutate: googleOAuth, isPending } = useGoogleOAuth({
+  //   onSuccess: (data) => {
+  //     if (data.data) {
+  //       const {
+  //         accessToken,
+  //         refreshToken,
+  //         accessTokenExpiresAt,
+  //         refreshTokenExpiresAt,
+  //       } = data.data;
 
-        setAuthCookie({
-          accessToken,
-          refreshToken,
-          accessTokenExpires: accessTokenExpiresAt,
-          refreshTokenExpires: refreshTokenExpiresAt,
-        });
+  //       setAuthCookie({
+  //         accessToken,
+  //         refreshToken,
+  //         accessTokenExpires: accessTokenExpiresAt,
+  //         refreshTokenExpires: refreshTokenExpiresAt,
+  //       });
 
-        toast.success("Successfully logged in!");
-        router.push(ROUTES.HOME);
-      }
-    },
-    onError: (error) => {
-      toast.error(error || "Failed to login with Google");
-    },
-  });
+  //       toast.success("Successfully logged in!");
+  //       router.push(ROUTES.HOME);
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error || "Failed to login with Google");
+  //   },
+  // });
 
-  const handleGoogleLogin = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      signInWithRedirect(auth, provider);
-    } catch (error: any) {
-      if (error.code !== "auth/popup-closed-by-user") {
-        toast.error(error.message || "Failed to sign in with Google");
-      }
-    }
-  };
+  // const handleGoogleLogin = async () => {
+  //   try {
+  //     const provider = new GoogleAuthProvider();
+  //     signInWithRedirect(auth, provider);
+  //   } catch (error: any) {
+  //     if (error.code !== "auth/popup-closed-by-user") {
+  //       toast.error(error.message || "Failed to sign in with Google");
+  //     }
+  //   }
+  // };
 
-  useEffect(() => {
-    const performGoogleOAuth = async () => {
-      const result = await getRedirectResult(auth);
-      if (!result) return;
-      const idToken = await result.user.getIdToken();
-      googleOAuth({ idToken });
-    };
-    performGoogleOAuth();
-  }, []);
+  // useEffect(() => {
+  //   const performGoogleOAuth = async () => {
+  //     const result = await getRedirectResult(auth);
+  //     if (!result) return;
+  //     const idToken = await result.user.getIdToken();
+  //     googleOAuth({ idToken });
+  //   };
+  //   performGoogleOAuth();
+  // }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-sidebar">
@@ -101,10 +101,9 @@ export default function LoginPage() {
             className="px-10! rounded-full"
             type="button"
             onClick={loginWithGoogle}
-            disabled={isPending}
           >
             <IconGoogle size={20} />
-            {isPending ? "Signing in..." : "Continue with Google"}
+            Continue with Google
           </Button>
         </div>
       </div>

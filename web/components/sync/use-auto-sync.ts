@@ -54,7 +54,6 @@ export function useAutoSync() {
             await noteApi.upsert({
               id: change.entityId,
               collectionId: change.collectionId,
-              title: change.title,
               content: change.content,
               updatedAt: change.updatedAt,
               createdAt: change.createdAt,
@@ -152,7 +151,6 @@ export function useAutoSync() {
         allChanges.push({
           entityId: note.id,
           type: "note",
-          title: note.title,
           content: note.content,
           collectionId: note.collectionId,
           updatedAt: note.updatedAt,
