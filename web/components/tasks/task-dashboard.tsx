@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDownUp, ListFilter, Loader } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import {
   useCreateTask,
@@ -10,29 +10,15 @@ import {
   useUpdateTask,
 } from "@/service/local/api-task";
 
-import { Kanban, type Task as KanbanTask } from "../kanban/kanban";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
+import { TaskKanban } from "./task-kanban";
+import type { Task } from "@/lib/dexie";
 
 type Props = {};
 
 type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
-
-// Status to group title mapping
-const STATUS_TO_GROUP: Record<number, string> = {
-  0: "To Do",
-  1: "In Progress",
-  2: "Done",
-  [-1]: "Cancelled",
-};
-
-const GROUP_TO_STATUS: Record<string, number> = {
-  "To Do": 0,
-  "In Progress": 1,
-  Done: 2,
-  Cancelled: -1,
-};
 
 export function TaskDashboard({}: Props) {
   const [sortBy, setSortBy] = useState<SortByValue>("updatedAt");
@@ -41,23 +27,6 @@ export function TaskDashboard({}: Props) {
   const handleSortChange = (value: string) => {
     setSortBy(value as SortByValue);
   };
-
-  // Convert dexie tasks to kanban tasks
-  const kanbanTasks = useMemo<KanbanTask[]>(() => {
-    return dexieTasks.map((task) => ({
-      id: task.id,
-      group: STATUS_TO_GROUP[task.status] || "To Do",
-      title: task.title || "",
-      description: task.description,
-      status: task.status,
-      sortOrder: task.sortOrder,
-      dueDate: task.dueDate,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      deletedAt: task.deletedAt,
-      syncedAt: task.syncedAt,
-    }));
-  }, [dexieTasks]);
 
   // Task handlers
   const { mutate: createTask } = useCreateTask({
@@ -78,31 +47,33 @@ export function TaskDashboard({}: Props) {
     },
   });
 
-  const handleTaskAdd = (kanbanTask: KanbanTask) => {
-    const status = GROUP_TO_STATUS[kanbanTask.group] ?? 0;
+  const handleTaskAdd = (
+    task: Omit<Task, "id" | "createdAt" | "updatedAt">
+  ) => {
     createTask({
-      title: kanbanTask.title,
-      description: kanbanTask.description,
-      status: status,
-      sortOrder: kanbanTask.sortOrder?.toString(),
-      dueDate: kanbanTask.dueDate,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      sortOrder: task.sortOrder,
+      dueDate: task.dueDate,
+      projectId: task.projectId,
     });
   };
 
-  const handleTaskUpdate = (kanbanTask: KanbanTask) => {
-    const status = GROUP_TO_STATUS[kanbanTask.group] ?? 0;
+  const handleTaskUpdate = (id: string, task: Partial<Task>) => {
     updateTask({
-      id: kanbanTask.id,
-      title: kanbanTask.title,
-      description: kanbanTask.description,
-      status: status,
-      sortOrder: kanbanTask.sortOrder?.toString(),
-      dueDate: kanbanTask.dueDate,
+      id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      sortOrder: task.sortOrder,
+      dueDate: task.dueDate,
+      projectId: task.projectId,
     });
   };
 
-  const handleTaskDelete = (kanbanTask: KanbanTask) => {
-    deleteTask(kanbanTask.id);
+  const handleTaskDelete = (id: string) => {
+    deleteTask(id);
   };
 
   return (
@@ -145,6 +116,7 @@ export function TaskDashboard({}: Props) {
           </div>
         </CollapsibleContent>
       </Collapsible>
+
       {/* Content */}
       <div data-slot="content" className="pb-6">
         {isLoading ? (
@@ -155,20 +127,12 @@ export function TaskDashboard({}: Props) {
             </span>
           </div>
         ) : (
-          <div className="flex flex-col">
-            <Kanban
-              tasks={kanbanTasks}
-              onTaskUpdate={handleTaskUpdate}
-              onTaskAdd={handleTaskAdd}
-              onTaskDelete={handleTaskDelete}
-              groupOrder={[
-                { id: 0, title: "To Do" },
-                { id: 1, title: "In Progress" },
-                { id: 2, title: "Done" },
-                { id: -1, title: "Cancelled" },
-              ]}
-            />
-          </div>
+          <TaskKanban
+            tasks={dexieTasks}
+            onAddTask={handleTaskAdd}
+            onUpdateTask={handleTaskUpdate}
+            onDeleteTask={handleTaskDelete}
+          />
         )}
       </div>
     </div>
