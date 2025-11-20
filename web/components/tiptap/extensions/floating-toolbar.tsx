@@ -31,12 +31,12 @@ export const FloatingToolbarExtension = Extension.create({
             },
           },
         },
-        appendTransaction(transactions, oldState, newState) {
-          if (transactions.some((tr) => tr.selectionSet || tr.docChanged)) {
-            window.dispatchEvent(new CustomEvent("floating-toolbar-update"));
-          }
-          return null;
-        },
+        // appendTransaction(transactions, oldState, newState) {
+        //   if (transactions.some((tr) => tr.selectionSet || tr.docChanged)) {
+        //     window.dispatchEvent(new CustomEvent("floating-toolbar-update"));
+        //   }
+        //   return null;
+        // },
       }),
     ];
   },
@@ -254,7 +254,7 @@ export const FloatingToolbar = ({ editor }: { editor: Editor | null }) => {
       className="z-50"
     >
       <TooltipProvider>
-        <div className="w-full min-w-full mx-0 shadow-md border rounded-md bg-background">
+        <div className="w-full min-w-full mx-0 shadow-lg border rounded-md bg-background">
           <ToolbarProvider editor={editor}>
             <ScrollArea className="h-fit py-0.5 w-full">
               <div className="flex items-center gap-0.5">
