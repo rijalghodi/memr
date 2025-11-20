@@ -37,12 +37,12 @@ export function Main({ children }: Props) {
       </div>
       <div className="flex w-full h-full gap-2 flex-1">
         {/* Mmain coontent */}
-        <div className="bg-background rounded-2xl flex-1 shadow-lg">
+        <div className="bg-background rounded-t-2xl flex-1 shadow-lg">
           <SessionTabs />
           <div className="overflow-y-auto h-[calc(100vh-8rem)]">{children}</div>
         </div>
         {/* Chat Sidebar */}
-        <div className="bg-background rounded-2xl w-full min-w-[300px] max-w-[400px]">
+        <div className="bg-background rounded-t-2xl w-full min-w-[300px] max-w-[400px]">
           <ExampleChat />
         </div>
       </div>
@@ -124,9 +124,9 @@ function SessionTabItem({
   return (
     <li
       className={cn(
-        "group relative flex gap-1.5 items-center h-10 px-3 cursor-pointer data-[active=false]:hover:bg-accent",
-        "text-xs font-medium [&>svg]:size-3.5 border-r border-l border-r-muted border-l-muted text-foreground/90",
-        "data-[active=true]:border-b-primary data-[active=true]:border-b data-[active=true]:text-primary",
+        "group relative flex gap-1.5 items-center h-full px-3 cursor-pointer data-[active=false]:hover:bg-accent",
+        "text-[0.625rem] font-medium [&>svg]:size-3.5 border-r border-l border-r-muted border-l-muted text-foreground/90 border-b border-b-transparent",
+        "data-[active=true]:border-b-primary data-[active=true]:border-b data-[active=true]:text-primary transition-all duration-100",
         "max-w-48 min-w-12"
       )}
       data-active={active}
@@ -138,7 +138,7 @@ function SessionTabItem({
         <button
           onClick={onClose}
           className={cn(
-            "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity",
+            "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-100",
             "h-full pr-2 pl-0.5 flex items-center justify-center",
             "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground"
           )}

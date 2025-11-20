@@ -104,7 +104,7 @@ export function NoteItem({ id, content = "", createdAt, updatedAt }: Props) {
         <div className="flex items-center gap-2">
           <div
             className={cn(
-              "text-xs group-hover/note-item:hidden",
+              "text-xs group-hover/note-item:hidden fade-in duration-100",
               isDropdownOpen && "hidden"
             )}
           >
