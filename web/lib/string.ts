@@ -1,4 +1,4 @@
-export function markdownToText(content: string) {
+export function markdownToText(content: string, maxLength?: number) {
   // Get the first line for the title candidate
   let line = content.trim();
 
@@ -24,7 +24,20 @@ export function markdownToText(content: string) {
   // Remove multiple spaces
   line = line.replace(/\s+/g, " ");
 
+  if (maxLength) {
+    line = line.slice(0, maxLength);
+  }
+
   return line.trim();
+}
+
+export function extractFirstLineFromContent(
+  content: string,
+  maxLength?: number
+) {
+  const trimmed = content.trim();
+  const firstLine = trimmed.split("\n")[0];
+  return markdownToText(firstLine, maxLength);
 }
 
 export function truncateString(str: string, maxLength: number) {

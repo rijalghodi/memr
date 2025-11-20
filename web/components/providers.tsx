@@ -6,14 +6,17 @@ import { AuthGuardProvider } from "./layouts/auth-guard";
 import { QueryProvider } from "./query-provider";
 import { ConfirmationProvider } from "./ui/confirmation-dialog";
 import { Toaster } from "./ui/sonner";
+import { SessionTabsProvider } from "./session-tabs";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryProvider>
       <ConfirmationProvider>
         <AuthGuardProvider>
-          {children}
-          <Toaster />
+          <SessionTabsProvider>
+            {children}
+            <Toaster />
+          </SessionTabsProvider>
         </AuthGuardProvider>
       </ConfirmationProvider>
       {/* <NextThemesProvider

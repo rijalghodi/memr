@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowDownUp, Filter, ListFilter, Plus } from "lucide-react";
+import {
+  ArrowDownUp,
+  Filter,
+  ListFilter,
+  Loader,
+  Loader2,
+  Plus,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -85,11 +92,14 @@ export function NoteDashboard({}: Props) {
       {/* Content */}
       <div data-slot="content" className="">
         {isLoading ? (
-          <div className="px-6 py-6 text-center text-muted-foreground">
-            Loading notes...
+          <div className="p-6 h-[300px] text-center flex flex-col gap-4 items-center justify-center">
+            <Loader className="size-6 animate-spin text-primary" />
+            <span className="text-sm text-muted-foreground">
+              Loading notes...
+            </span>
           </div>
         ) : notes.length === 0 ? (
-          <div className="px-6 py-20 text-center text-muted-foreground">
+          <div className="p-6 h-[300px] text-center text-muted-foreground">
             No notes found
           </div>
         ) : (
