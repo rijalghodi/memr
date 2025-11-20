@@ -13,11 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import {
-  extractFirstLineFromContent,
-  markdownToText,
-  truncateString,
-} from "@/lib/string";
+import { markdownToText, truncateString } from "@/lib/string";
 import { ROUTES } from "@/lib/routes";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -30,19 +26,23 @@ import {
 
 type Props = {
   id: string;
+  title?: string;
   content?: string;
   createdAt: string;
   updatedAt: string;
 };
 
-export function NoteItem({ id, content = "", createdAt, updatedAt }: Props) {
+export function NoteItem({
+  id,
+  title,
+  content = "",
+  createdAt,
+  updatedAt,
+}: Props) {
   const displayContent = content
     ? markdownToText(content, 200)
     : NOTE_CONTENT_EXCERPT_FALLBACK;
-
-  const displayTitle = content
-    ? extractFirstLineFromContent(content, 80)
-    : NOTE_TITLE_FALLBACK;
+  const displayTitle = title || NOTE_TITLE_FALLBACK;
 
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -84,12 +84,12 @@ export function NoteItem({ id, content = "", createdAt, updatedAt }: Props) {
   return (
     <div
       className={cn(
-        "px-6 group hover:bg-muted cursor-pointer group/note-item transition-colors",
+        "px-6 group hover:bg-muted cursor-pointer group/note-item transition-colors border-b border-b-muted group-last:border-b-0",
         isDropdownOpen && "bg-muted"
       )}
       onClick={handleClick}
     >
-      <div className="flex justify-between items-center py-4 border-b group-last:border-b-0">
+      <div className="flex justify-between items-center py-4">
         <div className="grid grid-cols-[28px_1fr] gap-1 gap-y-0.5 flex-1">
           <div className="flex items-center justify-start">
             <FileText className="size-4 text-muted-foreground" />

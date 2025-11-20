@@ -96,7 +96,7 @@ export function NoteDashboard({}: Props) {
         </CollapsibleContent>
       </Collapsible>
       {/* Content */}
-      <div data-slot="content" className="">
+      <div data-slot="content" className="pb-6">
         {isLoading ? (
           <div className="p-6 h-[300px] text-center flex flex-col gap-4 items-center justify-center">
             <Loader className="size-6 animate-spin text-primary" />
@@ -114,6 +114,7 @@ export function NoteDashboard({}: Props) {
               <NoteItem
                 key={note.id}
                 id={note.id}
+                title={note.title}
                 content={note.content}
                 createdAt={note.createdAt}
                 updatedAt={note.updatedAt}

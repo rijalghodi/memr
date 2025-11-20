@@ -4,7 +4,9 @@ import { format } from "date-fns";
 import {
   ArrowRight,
   ChevronDown,
+  FileText,
   LogOutIcon,
+  Plus,
   SquareCheckBig,
   SquarePen,
 } from "lucide-react";
@@ -29,7 +31,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useGetCollections } from "@/service/local/api-collection";
-import { useGetNotes } from "@/service/local/api-note";
+import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 import { useGetProjects } from "@/service/local/api-project";
 import { useGetSetting } from "@/service/local/api-setting";
 
@@ -37,6 +39,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,6 +48,9 @@ import {
   DropdownMenuTrigger,
 } from "../ui";
 import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
+import { useSessionTabs } from "../session-tabs";
+import { ROUTES } from "@/lib/routes";
+import { useRouter } from "next/navigation";
 
 type Menu = {
   title: string;
@@ -54,18 +60,33 @@ type Menu = {
 };
 
 export function AppSidebar() {
+  const router = useRouter();
+  // handle add button
+  const { addTab } = useSessionTabs();
+  const { mutate: createNote } = noteApiHook.useCreateNote({
+    onSuccess: (data) => {
+      router.push(ROUTES.NOTE(data.id));
+      addTab({
+        title: NOTE_TITLE_FALLBACK,
+        pathname: ROUTES.NOTE(data.id),
+      });
+    },
+  });
+
+  const handleAddNote = () => {
+    createNote({});
+  };
+
   return (
     <Sidebar>
       <SidebarHeader className="px-4 py-3 flex flex-col gap-0">
         <ProfileButton />
-        <SidebarMenuButton asChild size="default">
-          <Link href="/">
-            <SquarePen />
-            Add Note
-          </Link>
+        <SidebarMenuButton size="default" onClick={handleAddNote}>
+          <SquarePen />
+          Add Note
         </SidebarMenuButton>
         <SidebarMenuButton asChild size="default">
-          <Link href="/">
+          <Link href="/projects">
             <SquareCheckBig />
             Todo
           </Link>
@@ -80,40 +101,38 @@ export function AppSidebar() {
 }
 
 export function SidebarEntityMenus() {
-  const { data: notes } = useGetNotes({ sortBy: "viewedAt" });
-  const { data: collections } = useGetCollections({ sortBy: "viewedAt" });
-  const { data: projects } = useGetProjects({ sortBy: "viewedAt" });
+  const { data: notes } = useGetNotes({ sortBy: "updatedAt" });
+  const { data: collections } = useGetCollections({ sortBy: "updatedAt" });
+  const { data: projects } = useGetProjects({ sortBy: "updatedAt" });
 
   const items: Menu[] = useMemo(
     () => [
       {
         title: "Notes",
-        href: "/",
-        seeAllHref: "/tasks",
+        href: ROUTES.NOTES,
+        seeAllHref: ROUTES.NOTES,
         submenu:
           notes?.slice(0, 5).map((note) => ({
-            title:
-              extractTitleFromContent(note.content || "") ||
-              NOTE_TITLE_FALLBACK,
-            href: `/notes/${note.id}`,
+            title: note.title || NOTE_TITLE_FALLBACK,
+            href: ROUTES.NOTE(note.id),
           })) ?? [],
       },
       {
         title: "Collections",
-        href: "/collections",
+        href: ROUTES.COLLECTIONS,
         submenu:
           collections?.slice(0, 5).map((collection) => ({
             title: collection.title || "Untitled Collection",
-            href: `/collections/${collection.id}`,
+            href: ROUTES.COLLECTION(collection.id),
           })) ?? [],
       },
       {
         title: "Projects",
-        href: "/projects",
+        href: ROUTES.PROJECTS,
         submenu:
           projects?.slice(0, 5).map((project) => ({
             title: project.title || "Untitled Project",
-            href: `/projects/${project.id}`,
+            href: ROUTES.PROJECT(project.id),
           })) ?? [],
       },
     ],
@@ -122,63 +141,65 @@ export function SidebarEntityMenus() {
 
   return (
     <SidebarMenu className="gap-5">
-      {items.map((item, idx) =>
-        item.submenu ? (
+      {items.map((item, idx) => {
+        return (
           <Collapsible asChild key={`${idx}-entity-menu-collapsible`}>
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton size="sm" className="font-semibold group">
                   <ChevronDown className="size-3 group-data-[state=open]:-rotate-180 transform transition-transform duration-200 ease-in-out" />
-                  {item.title}
+                  <span className="truncate">{item.title}</span>
+                  <Button variant="plain-primary" size="icon-sm">
+                    <Plus />
+                  </Button>
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {item.submenu.map((subitem, idx) => (
-                    <SidebarMenuSubItem key={`${idx}-entity-menu-sub-item`}>
-                      <SidebarMenuSubButton size="sm" asChild>
-                        <Link href={subitem.href}>
-                          <span>{subitem.title}</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                  {item.seeAllHref && (
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton
-                        size="sm"
-                        className="font-medium"
-                        asChild
-                      >
-                        <Link href={item.seeAllHref}>
-                          See All
-                          <ArrowRight />
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
+                  {item.submenu?.length === 0 ? (
+                    <div className="text-xs text-muted-foreground flex items-center h-12 px-6">
+                      No {item.title.toLowerCase()}
+                    </div>
+                  ) : (
+                    <>
+                      {item.submenu?.map((subitem, idx) => {
+                        return (
+                          <SidebarMenuSubItem
+                            key={`${idx}-entity-menu-sub-item`}
+                          >
+                            <SidebarMenuSubButton size="sm" asChild>
+                              <Link href={subitem.href}>
+                                <FileText />
+                                {subitem.title || NOTE_TITLE_FALLBACK}
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      })}
+                      {item.seeAllHref && (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            size="sm"
+                            className="font-semibold w-fit"
+                            asChild
+                          >
+                            <Link href={item.seeAllHref}>
+                              See All
+                              <ArrowRight />
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
+                    </>
                   )}
                 </SidebarMenuSub>
               </CollapsibleContent>
             </SidebarMenuItem>
           </Collapsible>
-        ) : (
-          <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton size="sm" asChild>
-              <Link href={item.href}>
-                <span>{item.title}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        )
-      )}
+        );
+      })}
     </SidebarMenu>
   );
-}
-
-export function extractTitleFromContent(content: string) {
-  if (!content) return "";
-  const title = content.trim().replace(/^\s*(\S)/, (m, c) => c);
-  return title.length > 103 ? title.slice(0, 100) + "..." : title;
 }
 
 export function ProfileButton() {

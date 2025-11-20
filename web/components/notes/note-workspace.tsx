@@ -6,11 +6,6 @@ import { useForm } from "react-hook-form";
 import { useDebounce } from "@/hooks/use-debounce";
 import { AUTOSAVE_INTERVAL, NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { ROUTES } from "@/lib/routes";
-import {
-  extractFirstLineFromContent,
-  markdownToText,
-  truncateString,
-} from "@/lib/string";
 import { noteApi, useGetNote } from "@/service/local/api-note";
 
 import { useSessionTabs } from "@/components/session-tabs";
@@ -45,12 +40,9 @@ export function NoteWorkspace({ noteId }: Props) {
   useEffect(() => {
     if (!contentLoaded.current || !noteId) return;
 
-    const currentContent = content || "";
-    const title = currentContent
-      ? extractFirstLineFromContent(currentContent, 80)
-      : NOTE_TITLE_FALLBACK;
+    const title = note?.title || NOTE_TITLE_FALLBACK;
 
-    updateTabTitle(ROUTES.NOTE(noteId), title || NOTE_TITLE_FALLBACK);
+    updateTabTitle(ROUTES.NOTE(noteId), title);
   }, [content, noteId, updateTabTitle, contentLoaded]);
 
   // Autosave debounced content
