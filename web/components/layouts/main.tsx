@@ -87,24 +87,26 @@ export function SessionTabs() {
   };
 
   return (
-    <ul className="flex items-center h-10 border-b rounded-t-2xl">
-      <SessionTabItem active={isHomeActive} onClick={handleHomeClick}>
-        <Home />
-        Home
-      </SessionTabItem>
-      {sessionTabs.map((tab) => (
-        <SessionTabItem
-          key={tab.id}
-          active={activeTab?.id === tab.id}
-          onClick={() => handleTabClick(tab.pathname)}
-          onClose={(e) => handleCloseTab(e, tab.id)}
-        >
-          <span className="w-full overflow-hidden text-ellipsis whitespace-nowrap">
-            {tab.title}
-          </span>
+    <nav className="overflow-x-auto w-full rounded-t-2xl">
+      <ul className="flex items-center h-10 border-b">
+        <SessionTabItem active={isHomeActive} onClick={handleHomeClick}>
+          <Home />
+          Home
         </SessionTabItem>
-      ))}
-    </ul>
+        {sessionTabs.map((tab) => (
+          <SessionTabItem
+            key={tab.id}
+            active={activeTab?.id === tab.id}
+            onClick={() => handleTabClick(tab.pathname)}
+            onClose={(e) => handleCloseTab(e, tab.id)}
+          >
+            <span className="w-full overflow-hidden text-ellipsis whitespace-nowrap">
+              {tab.title}
+            </span>
+          </SessionTabItem>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -122,7 +124,7 @@ function SessionTabItem({
   return (
     <li
       className={cn(
-        "group relative flex gap-1.5 items-center h-10 px-3 cursor-pointer data-[active=false]:hover:bg-muted",
+        "group relative flex gap-1.5 items-center h-10 px-3 cursor-pointer data-[active=false]:hover:bg-accent",
         "text-xs font-medium [&>svg]:size-3.5 border-r border-l border-r-muted border-l-muted text-foreground/90",
         "data-[active=true]:border-b-primary data-[active=true]:border-b data-[active=true]:text-primary",
         "max-w-48 min-w-12"
@@ -137,8 +139,8 @@ function SessionTabItem({
           onClick={onClose}
           className={cn(
             "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity",
-            "rounded-sm h-full pr-2 pl-0.5 flex items-center justify-center",
-            "bg-muted group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground"
+            "h-full pr-2 pl-0.5 flex items-center justify-center",
+            "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground"
           )}
           aria-label="Close tab"
         >
