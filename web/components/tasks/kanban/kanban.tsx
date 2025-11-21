@@ -2,18 +2,18 @@ import React, { useCallback, useMemo, useState } from "react";
 import { ReactSortable } from "react-sortablejs";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { findMovedIndex } from "@/lib/find-move";
 import { generateBetweenRank } from "@/lib/fractional-idx";
 
 import { List } from "./list";
 import { TKanbanTask } from "./type";
-import { findMovedIndex } from "@/lib/find-move";
 
 // Group item for list reordering (ReactSortable requires objects with id)
 export type GroupItem = { id: string; title: string };
 
 // Helper function to group tasks by group
 function groupTasksByGroup(
-  tasks: TKanbanTask[]
+  tasks: TKanbanTask[],
 ): Record<string, TKanbanTask[]> {
   return tasks?.reduce(
     (acc, task) => {
@@ -23,7 +23,7 @@ function groupTasksByGroup(
       acc[task.groupId].push(task);
       return acc;
     },
-    {} as Record<string, TKanbanTask[]>
+    {} as Record<string, TKanbanTask[]>,
   );
 }
 
@@ -48,19 +48,11 @@ export function KanbanTask({
     return groupTasksByGroup(tasks);
   }, [tasks]);
 
-  // Handle task drop within same list or between lists
   const handleTaskDrop = useCallback(
     (group: string, newTasks: TKanbanTask[], oldTasks: TKanbanTask[]) => {
-      console.log(
-        "handleTaskDrop",
-        group,
-        newTasks.map((t) => t.title + " " + t.sortOrder),
-        oldTasks.map((t) => t.title + " " + t.sortOrder)
-      );
-
       // Find tasks that were added (moved from another list)
       const addedTaskIdx = newTasks.findIndex(
-        (task) => !oldTasks.some((t) => t.id === task.id)
+        (task) => !oldTasks.some((t) => t.id === task.id),
       );
       const addedTask = newTasks[addedTaskIdx];
 
@@ -87,27 +79,9 @@ export function KanbanTask({
       }
 
       if (!addedTask) {
-        console.log(
-          "handleTaskDrop oldTasks",
-          oldTasks.map((t) => t.title + "-" + t.sortOrder)
-        );
-        console.log(
-          "handleTaskDrop newTasks",
-          newTasks.map((t) => t.title + "-" + t.sortOrder)
-        );
-
         const newTaskIds = newTasks.map((t) => t.id);
         const oldTaskIds = oldTasks.map((t) => t.id);
-
         const movedTaskIdx = findMovedIndex(oldTaskIds, newTaskIds);
-
-        const movedTask = newTasks[movedTaskIdx];
-        console.log(
-          "handleTaskDrop movedTask",
-          movedTask?.title + "-" + movedTask?.sortOrder
-        );
-
-        console.log("handleTaskDrop movedTaskIdx", movedTaskIdx);
 
         if (movedTaskIdx !== -1) {
           const movedTask = newTasks[movedTaskIdx];
@@ -120,18 +94,10 @@ export function KanbanTask({
           const prevSortOrder = prevTask?.sortOrder || undefined;
           const nextSortOrder = nextTask?.sortOrder || undefined;
 
-          console.log(
-            "handleTaskDrop order",
-            prevTask?.title + "-" + prevTask?.sortOrder,
-            movedTask.title + "-" + movedTask.sortOrder,
-            nextTask?.title + "-" + nextTask?.sortOrder
-          );
-
           const newSortOrder = generateBetweenRank(
             prevSortOrder,
-            nextSortOrder
+            nextSortOrder,
           );
-          console.log("handleTaskDrop newSortOrder", newSortOrder);
           onTaskUpdate(movedTask.id, {
             ...movedTask,
             sortOrder: newSortOrder,
@@ -139,7 +105,7 @@ export function KanbanTask({
         }
       }
     },
-    [onTaskUpdate]
+    [onTaskUpdate],
   );
 
   // Handle task add
@@ -164,7 +130,7 @@ export function KanbanTask({
         sortOrder: newSortOrder,
       });
     },
-    [onTaskAdd, tasks]
+    [onTaskAdd, tasks],
   );
 
   // Handle list reorder (group columns)

@@ -3,7 +3,7 @@ function isMoved(
   prev: string[],
   next: string[],
   nextIndex: Map<string, number>,
-  prevIndex: Map<string, number>
+  prevIndex: Map<string, number>,
 ): boolean {
   const i1 = prevIndex.get(value)!;
   const i2 = nextIndex.get(value)!;
@@ -35,7 +35,7 @@ export function findMoved(prev: string[], next: string[]): string | null {
 // ------------------------------------------------------------
 export function findMovedId<T extends { id: string }>(
   prev: T[],
-  next: T[]
+  next: T[],
 ): string | null {
   const prevIds = prev.map((x) => x.id);
   const nextIds = next.map((x) => x.id);

@@ -35,7 +35,7 @@ export function generateLastRank(): string {
  */
 export function generateBetweenRank(
   left: string | undefined,
-  right: string | undefined
+  right: string | undefined,
 ): string {
   // Normalize undefined to null for fractional-indexing API
   const leftKey: string | null = left === undefined ? null : left || null;
