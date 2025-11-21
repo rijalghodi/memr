@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 
 import { asciiCompare } from "@/lib/ascii-compare";
 import { db, type Task } from "@/lib/dexie";
+import { cleanUndefinedValue } from "@/lib/object";
 
 export type CreateTaskReq = {
   projectId?: string;
@@ -71,7 +72,7 @@ export const taskApi = {
           !unsynced ||
           !task.syncedAt ||
           new Date(task.syncedAt ?? new Date(0)).getTime() <
-            new Date(task.updatedAt).getTime()
+            new Date(task.updatedAt).getTime(),
       )
       .toArray();
     if (projectId) {
@@ -80,7 +81,7 @@ export const taskApi = {
     if (params?.sortBy === "sortOrder" || params?.sortBy === undefined) {
       console.log("sort order");
       tasks = tasks.sort(
-        (a, b) => asciiCompare(a.sortOrder ?? "", b.sortOrder ?? "") ?? 0
+        (a, b) => asciiCompare(a.sortOrder ?? "", b.sortOrder ?? "") ?? 0,
       );
     }
     return tasks;
@@ -100,13 +101,16 @@ export const taskApi = {
       throw new Error("Task not found");
     }
 
+    const cleanedData = cleanUndefinedValue(data);
+
     const updated: Task = {
       ...existing,
-      ...data,
+      ...cleanedData,
       updatedAt: new Date().toISOString(),
     };
     console.log("taskApi.update existing", existing);
     console.log("taskApi.update data", data);
+    console.log("taskApi.update cleanedData", cleanedData);
     console.log("taskApi.update updated", updated);
     await db.tasks.update(data.id, updated);
     return updated;
@@ -181,7 +185,7 @@ export const useCreateTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -240,7 +244,7 @@ export const useUpdateTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -270,7 +274,7 @@ export const useDeleteTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
