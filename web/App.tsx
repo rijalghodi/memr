@@ -15,7 +15,9 @@ import { NoteEditorPage } from "@/pages/note-editor";
 import { NotesPage } from "@/pages/notes";
 import { TasksPage } from "@/pages/tasks";
 
+import { CollectionNoteDashboard } from "./components/collections/collection-note-dashboard";
 import { AuthGuard } from "./components/layouts/auth-guard";
+import { CollectionsPage } from "./pages/collections";
 
 function App() {
   return (
@@ -41,7 +43,12 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path={ROUTES.HOME} element={<HomePage />} />
               <Route path={ROUTES.NOTES} element={<NotesPage />} />
-              <Route path="/notes/:noteId" element={<NoteEditorPage />} />
+              <Route path={ROUTES.NOTE} element={<NoteEditorPage />} />
+              <Route path={ROUTES.COLLECTIONS} element={<CollectionsPage />} />
+              <Route
+                path={ROUTES.COLLECTION}
+                element={<CollectionNoteDashboard />}
+              />
               <Route path={ROUTES.TASKS} element={<TasksPage />} />
             </Route>
           </Routes>

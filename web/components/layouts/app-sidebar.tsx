@@ -4,13 +4,12 @@ import { format } from "date-fns";
 import {
   ArrowRight,
   ChevronDown,
-  FileText,
   LogOutIcon,
   Plus,
   SquareCheckBig,
   SquarePen,
 } from "lucide-react";
-import { useMemo } from "react";
+import { JSX, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import {
@@ -35,12 +34,15 @@ import {
   NOTE_TITLE_FALLBACK,
   PROJECT_TITLE_FALLBACK,
 } from "@/lib/constant";
-import { ROUTES } from "@/lib/routes";
+import { getRoute, ROUTES } from "@/lib/routes";
 import { useGetCollections } from "@/service/local/api-collection";
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 import { useGetProjects } from "@/service/local/api-project";
 import { useGetSetting } from "@/service/local/api-setting";
 
+import { CollectionIcon } from "../collections/collection-icon";
+import { NoteIcon } from "../notes/note-icon";
+import { ProjectIcon } from "../projects/project-icon";
 import { useSessionTabs } from "../session-tabs";
 import {
   Avatar,
@@ -54,23 +56,16 @@ import {
   DropdownMenuTrigger,
 } from "../ui";
 
-type Menu = {
-  title: string;
-  href: string;
-  submenu?: Menu[];
-  seeAllHref?: string;
-};
-
 export function AppSidebar() {
   const navigate = useNavigate();
   // handle add button
   const { addTab } = useSessionTabs();
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
-      navigate(ROUTES.NOTE(data.id));
+      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }));
       addTab({
         title: NOTE_TITLE_FALLBACK,
-        pathname: ROUTES.NOTE(data.id),
+        pathname: getRoute(ROUTES.NOTE, { noteId: data.id }),
       });
     },
   });
@@ -102,43 +97,56 @@ export function AppSidebar() {
   );
 }
 
+type TEntityMenu = {
+  title: string;
+  href: string;
+  icon?: JSX.Element;
+  submenu?: TEntityMenu[];
+  seeAllHref?: string;
+};
+
 export function SidebarEntityMenus() {
   const { data: notes } = useGetNotes({ sortBy: "updatedAt" });
   const { data: collections } = useGetCollections({ sortBy: "updatedAt" });
   const { data: projects } = useGetProjects({ sortBy: "updatedAt" });
 
-  const items: Menu[] = useMemo(
+  const items: TEntityMenu[] = useMemo(
     () => [
       {
         title: "Notes",
         href: ROUTES.NOTES,
         seeAllHref: ROUTES.NOTES,
+        icon: <NoteIcon />,
         submenu:
           notes?.slice(0, 5).map((note) => ({
             title: note.title || NOTE_TITLE_FALLBACK,
-            href: ROUTES.NOTE(note.id),
+            href: getRoute(ROUTES.NOTE, { noteId: note.id }),
           })) ?? [],
       },
       {
         title: "Collections",
         href: ROUTES.COLLECTIONS,
+        seeAllHref: ROUTES.COLLECTIONS,
+        icon: <CollectionIcon />,
         submenu:
           collections?.slice(0, 5).map((collection) => ({
             title: collection.title || COLLECTION_TITLE_FALLBACK,
-            href: ROUTES.COLLECTION(collection.id),
+            href: getRoute(ROUTES.COLLECTION, { collectionId: collection.id }),
           })) ?? [],
       },
       {
         title: "Projects",
         href: ROUTES.PROJECTS,
+        seeAllHref: ROUTES.PROJECTS,
+        icon: <ProjectIcon />,
         submenu:
           projects?.slice(0, 5).map((project) => ({
             title: project.title || PROJECT_TITLE_FALLBACK,
-            href: ROUTES.PROJECT(project.id),
+            href: getRoute(ROUTES.PROJECT, { projectId: project.id }),
           })) ?? [],
       },
     ],
-    [notes],
+    [notes, collections, projects],
   );
 
   return (
@@ -171,28 +179,28 @@ export function SidebarEntityMenus() {
                           >
                             <SidebarMenuSubButton size="sm" asChild>
                               <Link to={subitem.href}>
-                                <FileText />
+                                {item.icon}
                                 {subitem.title || NOTE_TITLE_FALLBACK}
                               </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         );
                       })}
-                      {item.seeAllHref && (
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton
-                            size="sm"
-                            className="font-semibold w-fit"
-                            asChild
-                          >
-                            <Link to={item.seeAllHref}>
-                              See All
-                              <ArrowRight />
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      )}
                     </>
+                  )}
+                  {item.seeAllHref && (
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton
+                        size="sm"
+                        className="font-semibold w-fit"
+                        asChild
+                      >
+                        <Link to={item.seeAllHref}>
+                          See All
+                          <ArrowRight />
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
                   )}
                 </SidebarMenuSub>
               </CollapsibleContent>

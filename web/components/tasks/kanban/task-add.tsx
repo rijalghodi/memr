@@ -1,11 +1,4 @@
-import {
-  ArrowUp,
-  Calendar,
-  Calendar1,
-  Check,
-  FolderInput,
-  SendHorizonal,
-} from "lucide-react";
+import { ArrowUp, Calendar1, FolderInput } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +7,7 @@ import { TKanbanTask } from "./type";
 
 type Props = {
   onSubmit?: (
-    data: Pick<TKanbanTask, "title" | "dueDate" | "description">
+    data: Pick<TKanbanTask, "title" | "dueDate" | "description">,
   ) => void;
 };
 

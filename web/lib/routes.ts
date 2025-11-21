@@ -3,11 +3,15 @@ export const ROUTES = {
   LOGIN: "/login",
   GOOGLE_SUCCESS: "/google-success",
   NOTES: "/notes",
-  NOTE: (id: string) => `/notes/${id}`,
+  NOTE: "/notes/:noteId",
+  // NOTE: (id: string) => `/notes/${id}`,
   COLLECTIONS: "/collections",
-  COLLECTION: (id: string) => `/collections/${id}`,
+  COLLECTION: "/collections/:collectionId",
   PROJECTS: "/projects",
-  PROJECT: (id: string) => `/projects/${id}`,
+  PROJECT: "/projects/:projectId",
   TASKS: "/tasks",
-  TASK: (id: string) => `/tasks/${id}`,
+};
+
+export const getRoute = (path: string, params: Record<string, string>) => {
+  return path.replace(/:(\w+)/g, (match, p1) => params[p1] ?? match);
 };

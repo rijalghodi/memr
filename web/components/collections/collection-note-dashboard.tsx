@@ -8,17 +8,17 @@ import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 
+import { NoteEmpty } from "../notes/note-empty";
+import { NoteItem } from "../notes/note-item";
+import { NoteLoading } from "../notes/note-loading";
 import { useSessionTabs } from "../session-tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
-import { NoteEmpty } from "./note-empty";
-import { NoteItem } from "./note-item";
-import { NoteLoading } from "./note-loading";
 
 type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
-export function NoteDashboard() {
+export function CollectionNoteDashboard() {
   const [sortBy, setSortBy] = useState<SortByValue | undefined>();
   const navigate = useNavigate();
   const { data: notes, isLoading } = useGetNotes({ sortBy });
@@ -108,11 +108,11 @@ export function NoteDashboard() {
             isFiltered={isFiltered}
           />
         ) : (
-          <ul className="flex flex-col">
+          <div className="flex flex-col">
             {notes.map((note) => (
               <NoteItem key={note.id} {...note} />
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
