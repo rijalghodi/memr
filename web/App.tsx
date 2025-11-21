@@ -18,6 +18,8 @@ import { TasksPage } from "@/pages/tasks";
 import { AuthGuard } from "./components/layouts/auth-guard";
 import { CollectionWorkspacePage } from "./pages/collection-workspace";
 import { CollectionsDashboardPage } from "./pages/collections";
+import { ProjectWorkspacePage } from "./pages/project-workspace";
+import { ProjectsDashboardPage } from "./pages/projects";
 
 function App() {
   return (
@@ -52,6 +54,11 @@ function App() {
                 path={ROUTES.COLLECTION}
                 element={<CollectionWorkspacePage />}
               />
+              <Route
+                path={ROUTES.PROJECTS}
+                element={<ProjectsDashboardPage />}
+              />
+              <Route path={ROUTES.PROJECT} element={<ProjectWorkspacePage />} />
               <Route path={ROUTES.TASKS} element={<TasksPage />} />
             </Route>
           </Routes>
