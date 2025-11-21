@@ -1,4 +1,11 @@
-import { Calendar, FolderInput, SendHorizonal } from "lucide-react";
+import {
+  ArrowUp,
+  Calendar,
+  Calendar1,
+  Check,
+  FolderInput,
+  SendHorizonal,
+} from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -7,7 +14,7 @@ import { TKanbanTask } from "./type";
 
 type Props = {
   onSubmit?: (
-    data: Pick<TKanbanTask, "title" | "dueDate" | "description">,
+    data: Pick<TKanbanTask, "title" | "dueDate" | "description">
   ) => void;
 };
 
@@ -21,7 +28,7 @@ export function TaskAdd({ onSubmit }: Props) {
         onSubmit={(e) => {
           e.preventDefault();
           if (onSubmit) {
-            onSubmit({ title, dueDate: "", description: "" });
+            onSubmit({ title, dueDate: "" });
             setTitle("");
           }
         }}
@@ -38,16 +45,21 @@ export function TaskAdd({ onSubmit }: Props) {
         {/* Action Buttons Start*/}
         <div className="flex items-center justify-between mt-2">
           <div className="flex space-x-0">
-            <Button variant="ghost" size="icon-sm" className="">
-              <Calendar />
+            <Button variant="ghost" size="icon-sm" className="rounded-full">
+              <Calendar1 />
             </Button>
-            <Button variant="ghost" size="icon-sm" className="">
+            <Button variant="ghost" size="icon-sm" className="rounded-full">
               <FolderInput />
             </Button>
           </div>
           <div>
-            <Button size="icon-sm" type="submit" disabled={!title}>
-              <SendHorizonal />
+            <Button
+              size="icon-sm"
+              type="submit"
+              className="rounded-full"
+              disabled={!title}
+            >
+              <ArrowUp />
             </Button>
           </div>
         </div>

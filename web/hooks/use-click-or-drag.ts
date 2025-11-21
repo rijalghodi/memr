@@ -55,9 +55,7 @@ export function useClickOrDrag({
     startTime.current = 0;
     dragged.current = false;
 
-    try {
-      (e.target as Element).releasePointerCapture(e.pointerId);
-    } catch (_) {}
+    (e.target as Element).releasePointerCapture(e.pointerId);
   };
 
   return { onPointerDown, onPointerMove, onPointerUp };
