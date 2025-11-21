@@ -22,9 +22,10 @@ type ListProps = {
   onTaskDrop: (
     group: string,
     newTasks: TKanbanTask[],
-    oldTasks: TKanbanTask[],
+    oldTasks: TKanbanTask[]
   ) => void;
   onTaskAdd: (groupId: string, taskData: TKanbanTask) => void;
+  onTaskUpdate?: (id: string, data: Partial<TKanbanTask>) => void;
 };
 
 export function List({
@@ -33,16 +34,8 @@ export function List({
   tasks,
   onTaskDrop,
   onTaskAdd,
+  onTaskUpdate,
 }: ListProps) {
-  // Sort tasks by sortOrder
-  //   const sortedTasks = useMemo(() => {
-  //     return [...tasks].sort((a, b) => {
-  //       const aOrder = a.sortOrder || "";
-  //       const bOrder = b.sortOrder || "";
-  //       return aOrder.localeCompare(bOrder);
-  //     });
-  //   }, [tasks]);
-
   const previousTasksRef = useRef<TKanbanTask[]>(tasks);
   const [open, setOpen] = useState(false);
 
@@ -52,7 +45,7 @@ export function List({
       onTaskDrop(groupId, newTasks, oldTasks);
       previousTasksRef.current = newTasks;
     },
-    [groupId, onTaskDrop],
+    [groupId, onTaskDrop]
   );
 
   // Update ref when tasks change from external source
@@ -112,13 +105,13 @@ export function List({
             animation={200}
             className={cn(
               "space-y-2 min-h-[300px]",
-              tasks.length === 0 && "bg-muted/50 rounded-md",
+              tasks.length === 0 && "bg-muted/50 rounded-md"
             )}
             ghostClass="opacity-50"
             dragClass="cursor-grabbing"
           >
             {tasks.map((task) => (
-              <Card key={task.id} task={task} />
+              <Card key={task.id} task={task} onTaskUpdate={onTaskUpdate} />
             ))}
           </ReactSortable>
         </div>
