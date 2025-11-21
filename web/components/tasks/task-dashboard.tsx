@@ -77,7 +77,8 @@ export function TaskDashboard() {
 
   const handleTaskAdd = (groupId: string, task: TKanbanTask) => {
     console.log("handleTaskAdd", groupId, task);
-    const status = Number(groupId);
+    const status = groupId ? Number(groupId) : undefined;
+    console.log("handleTaskAdd status", status);
     createTask({
       title: task.title,
       description: task.description,
@@ -89,7 +90,8 @@ export function TaskDashboard() {
 
   const handleTaskUpdate = (id: string, task: Partial<TKanbanTask>) => {
     console.log("handleTaskUpdate", id, task);
-    const status = Number(task.groupId);
+    const status = task.groupId ? Number(task.groupId) : undefined;
+    console.log("handleTaskUpdate status", status);
     taskApi.update({
       id,
       title: task.title,
