@@ -88,9 +88,9 @@ export function SessionTabs() {
   const handleCloseAllTabs = () => {
     confirm({
       title: "Close all tabs",
-      message: `You are about to close ${sessionTabs.length} tabs. Sure?`,
+      message: `You are about to close ${sessionTabs.length} tabs. Continue?`,
       variant: "destructive",
-      confirmLabel: "Close",
+      confirmLabel: "Yes, Continue",
       cancelLabel: "Cancel",
       onConfirm: () => {
         sessionTabs.forEach((tab) => {
@@ -102,8 +102,8 @@ export function SessionTabs() {
   };
 
   return (
-    <nav className="w-full h-10.5 flex-1 relative bg-muted">
-      <ul className="flex items-center h-full overflow-hidden relative">
+    <nav className="h-10.5 flex-1 relative bg-muted flex">
+      <ul className="flex-1 flex items-center h-full overflow-hidden relative">
         <SessionTabItem
           active={isHomeActive}
           onClick={handleHomeClick}
@@ -111,44 +111,43 @@ export function SessionTabs() {
         >
           <Home /> Home
         </SessionTabItem>
-        {canScrollLeft && (
-          <button
-            onClick={scrollLeft}
-            className="z-9 bg-muted h-full px-2 hover:bg-accent transition-colors"
-            aria-label="Scroll left"
-            style={{ boxShadow: "8px 0px 20px 0px rgba(0, 0, 0, 0.15)" }}
-          >
-            <ChevronLeft className="size-4" />
-          </button>
-        )}
-        <div
-          ref={scrollContainerRef}
-          className="relative flex-1 h-full flex items-center overflow-x-auto scrollbar-hide border-t"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          {sessionTabs.map((tab) => (
-            <SessionTabItem
-              key={tab.id}
-              active={activeTab?.id === tab.id}
-              onClick={() => handleTabClick(tab.pathname)}
-              onClose={(e) => handleCloseTab(e, tab.id)}
+        <div className="relative flex-1 flex h-full items-center overflow-hidden">
+          {canScrollLeft && (
+            <button
+              onClick={scrollLeft}
+              className="z-20 absolute left-0 bg-muted h-full px-2 hover:bg-accent transition-colors"
+              aria-label="Scroll left"
+              style={{ boxShadow: "8px 0px 20px 0px rgba(0, 0, 0, 0.15)" }}
             >
-              <span className="w-full truncate">{tab.title}</span>
-            </SessionTabItem>
-          ))}
-        </div>
-
-        {canScrollRight && (
-          <button
-            onClick={scrollRight}
-            className="bg-muted h-full px-2 hover:bg-accent transition-all"
-            aria-label="Scroll right"
-            style={{ boxShadow: "-8px 0px 20px 0px rgba(0, 0, 0, 0.15)" }}
+              <ChevronLeft className="size-4" />
+            </button>
+          )}
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 flex items-center overflow-x-auto scrollbar-hide h-full"
           >
-            <ChevronRight className="size-4" />
-          </button>
-        )}
-
+            {sessionTabs.map((tab) => (
+              <SessionTabItem
+                key={tab.id}
+                active={activeTab?.id === tab.id}
+                onClick={() => handleTabClick(tab.pathname)}
+                onClose={(e) => handleCloseTab(e, tab.id)}
+              >
+                <span className="w-full truncate">{tab.title}</span>
+              </SessionTabItem>
+            ))}
+          </div>
+          {canScrollRight && (
+            <button
+              onClick={scrollRight}
+              className="z-20 absolute right-0 bg-muted h-full px-2 hover:bg-accent transition-all"
+              aria-label="Scroll right"
+              style={{ boxShadow: "-8px 0px 20px 0px rgba(0, 0, 0, 0.15)" }}
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          )}
+        </div>
         {sessionTabs.length > 0 && (
           <button
             onClick={() => handleCloseAllTabs()}
@@ -181,7 +180,7 @@ function SessionTabItem({
       className={cn(
         "group relative flex gap-1.5 items-center h-full px-3 cursor-pointer data-[active=false]:hover:bg-accent",
         "text-xs font-medium [&>svg]:size-3.5 text-foreground/90 border-b border-b-transparent",
-        "data-[active=true]:bg-background data-[active=true]:border-b-primary data-[active=true]:border-b data-[active=true]:text-primary transition-all duration-100",
+        "data-[active=true]:bg-background data-[active=true]:border-b-primary data-[active=true]:text-primary transition-all duration-100",
         "max-w-48 min-w-24",
         className
       )}
