@@ -3,7 +3,7 @@ import { Skeleton } from "../ui/skeleton";
 export function CollectionLoading() {
   return (
     <ul className="flex flex-col">
-      {Array.from({ length: 6 }).map((_, index) => (
+      {Array.from({ length: 4 }).map((_, index) => (
         <li
           key={index}
           className="px-6 border-b border-b-muted last:border-b-0"
