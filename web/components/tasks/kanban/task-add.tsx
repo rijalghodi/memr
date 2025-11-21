@@ -3,10 +3,12 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-import { Task } from "./kanban";
+import { TKanbanTask } from "./kanban";
 
 type Props = {
-  onSubmit?: (data: Pick<Task, "title" | "dueDate" | "description">) => void;
+  onSubmit?: (
+    data: Pick<TKanbanTask, "title" | "dueDate" | "description">
+  ) => void;
 };
 
 // TaskBox component is a task item after created
