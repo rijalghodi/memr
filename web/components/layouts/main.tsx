@@ -15,6 +15,7 @@ export function Main({ children }: Props) {
     <div className="flex flex-col h-full items-stretch">
       <div className="h-12 flex items-center justify-between px-4">
         <div />
+
         <img src="/logo-long.png" alt="logo" width={80} height={24} />
 
         <Button

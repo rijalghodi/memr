@@ -2,8 +2,8 @@
 
 import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
+import { useBrowserNavigate } from "@/components/browser-navigation";
 import { COLLECTION_TITLE_FALLBACK, NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
 import {
@@ -14,7 +14,6 @@ import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 
 import { NoteItem } from "../../notes/note-item";
 import { NoteLoading } from "../../notes/note-loading";
-import { useSessionTabs } from "../../session-tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../../ui";
 import { Button } from "../../ui/button";
 import { DropdownFilter } from "../../ui/drropdown-filter";
@@ -29,7 +28,7 @@ export function CollectionWorkspace({
   collectionId: string;
 }) {
   const [sortBy, setSortBy] = useState<SortByValue | undefined>();
-  const navigate = useNavigate();
+  const { navigate } = useBrowserNavigate();
   const { data: collection } = useGetCollection(collectionId);
 
   const collectionTitle = useMemo(() => collection?.title || "", [collection]);
@@ -44,14 +43,9 @@ export function CollectionWorkspace({
   };
 
   // add noote
-  const { addTab } = useSessionTabs();
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
-      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }));
-      addTab({
-        title: NOTE_TITLE_FALLBACK,
-        pathname: getRoute(ROUTES.NOTE, { noteId: data.id }),
-      });
+      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }), NOTE_TITLE_FALLBACK);
     },
   });
 
@@ -89,7 +83,10 @@ export function CollectionWorkspace({
         <div className="px-6 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CollectionIcon className="size-6" />
+              <CollectionIcon
+                className="size-6"
+                style={{ color: collection?.color }}
+              />
               <input
                 className="text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md"
                 placeholder={COLLECTION_TITLE_FALLBACK}

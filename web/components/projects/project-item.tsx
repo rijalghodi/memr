@@ -3,7 +3,6 @@
 import { format } from "date-fns";
 import { MoreHorizontal, Trash } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
@@ -11,7 +10,7 @@ import { truncateString } from "@/lib/string";
 import { cn } from "@/lib/utils";
 import { useDeleteProject } from "@/service/local/api-project";
 
-import { useSessionTabs } from "../session-tabs";
+import { useBrowserNavigate } from "../browser-navigation";
 import { Button } from "../ui/button";
 import { useConfirmation } from "../ui/confirmation-dialog";
 import {
@@ -40,7 +39,7 @@ export function ProjectItem({
 }: Props) {
   const displayTitle = title || PROJECT_TITLE_FALLBACK;
 
-  const navigate = useNavigate();
+  const { navigate } = useBrowserNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { mutate: deleteProject, isLoading: isDeleting } = useDeleteProject({
     onSuccess: () => {
@@ -68,20 +67,15 @@ export function ProjectItem({
     });
   };
 
-  const { addTab } = useSessionTabs();
   const handleClick = () => {
-    navigate(getRoute(ROUTES.PROJECT, { projectId: id }));
-    addTab({
-      title: displayTitle,
-      pathname: getRoute(ROUTES.PROJECT, { projectId: id }),
-    });
+    navigate(getRoute(ROUTES.PROJECT, { projectId: id }), displayTitle);
   };
 
   return (
     <li
       className={cn(
         "px-6 group hover:bg-muted cursor-pointer group/project-item transition-colors border-b border-b-muted group-last:border-b-0",
-        isDropdownOpen && "bg-muted"
+        isDropdownOpen && "bg-muted",
       )}
       onClick={handleClick}
     >
@@ -108,7 +102,7 @@ export function ProjectItem({
           <div
             className={cn(
               "text-xs group-hover/project-item:hidden fade-in duration-100",
-              isDropdownOpen && "hidden"
+              isDropdownOpen && "hidden",
             )}
           >
             {format(new Date(updatedAt), "EEE dd/MM/yy")}
@@ -116,7 +110,7 @@ export function ProjectItem({
           <div
             className={cn(
               "group-hover/project-item:block hidden",
-              isDropdownOpen && "block"
+              isDropdownOpen && "block",
             )}
           >
             <DropdownMenu
@@ -139,7 +133,7 @@ export function ProjectItem({
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
                   "group-hover/project-item:block hidden w-[120px]",
-                  isDropdownOpen && "block"
+                  isDropdownOpen && "block",
                 )}
               >
                 <DropdownMenuItem

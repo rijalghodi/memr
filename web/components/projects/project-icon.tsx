@@ -1,4 +1,4 @@
-import { Asterisk, LucideProps, Presentation, Target } from "lucide-react";
+import { Asterisk, LucideProps } from "lucide-react";
 
 type Props = React.SVGProps<SVGSVGElement> & LucideProps;
 
