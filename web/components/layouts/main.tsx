@@ -1,8 +1,6 @@
 import { RefreshCcw } from "lucide-react";
 import React from "react";
 
-import logo from "@/public/logo-long.png";
-
 import { useAutoSync } from "../sync/use-auto-sync";
 import { Button } from "../ui";
 import { ExampleChat } from "./example-chat";
@@ -17,7 +15,7 @@ export function Main({ children }: Props) {
     <div className="flex flex-col h-full items-stretch">
       <div className="h-12 flex items-center justify-between px-4">
         <div />
-        <img src={logo} alt="logo" width={80} height={24} />
+        <img src="/logo-long.png" alt="logo" width={80} height={24} />
 
         <Button
           variant="ghost-primary"

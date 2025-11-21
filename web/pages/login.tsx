@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { IconGoogle } from "@/components/ui/icon-google";
 import { BRAND } from "@/lib/brand";
-import logo from "@/public/logo-long.png";
 
 export function LoginPage() {
   return (
@@ -14,7 +13,12 @@ export function LoginPage() {
           {/* Heading */}
           <div className="space-y-2">
             <div className="flex justify-center mb-4">
-              <img src={logo} alt={BRAND.APP_NAME} width={150} height={60} />
+              <img
+                src="/logo.png"
+                alt={BRAND.APP_NAME}
+                width={150}
+                height={60}
+              />
             </div>
             <h1 className="text-2xl font-semibold text-foreground">
               {BRAND.APP_TAGLINE}
