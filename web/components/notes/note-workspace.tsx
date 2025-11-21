@@ -7,7 +7,7 @@ import { useSessionTabs } from "@/components/session-tabs";
 import { RichTextEditor } from "@/components/tiptap/rich-text-editor";
 import { useDebounce } from "@/hooks/use-debounce";
 import { AUTOSAVE_INTERVAL, NOTE_TITLE_FALLBACK } from "@/lib/constant";
-import { ROUTES } from "@/lib/routes";
+import { getRoute, ROUTES } from "@/lib/routes";
 import { noteApi, useGetNote } from "@/service/local/api-note";
 
 type Props = {
@@ -37,8 +37,8 @@ export function NoteWorkspace({ noteId }: Props) {
 
     const title = note?.title || NOTE_TITLE_FALLBACK;
 
-    updateTabTitle(ROUTES.NOTE(noteId), title);
-  }, [content, noteId, updateTabTitle, contentLoaded]);
+    updateTabTitle(getRoute(ROUTES.NOTE, { noteId }), title);
+  }, [content, noteId, updateTabTitle, contentLoaded, note?.title]);
 
   // Autosave debounced content
   useEffect(() => {

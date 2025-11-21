@@ -1,18 +1,15 @@
 "use client";
 
 import { format } from "date-fns";
-import { FileText, MoreHorizontal, Trash } from "lucide-react";
-import React, { useState } from "react";
+import { Hash, MoreHorizontal, Trash } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  NOTE_CONTENT_EXCERPT_FALLBACK,
-  NOTE_TITLE_FALLBACK,
-} from "@/lib/constant";
+import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
-import { markdownToText, truncateString } from "@/lib/string";
+import { truncateString } from "@/lib/string";
 import { cn } from "@/lib/utils";
-import { useDeleteNote } from "@/service/local/api-note";
+import { useDeleteCollection } from "@/service/local/api-collection";
 
 import { useSessionTabs } from "../session-tabs";
 import { Button } from "../ui/button";
@@ -27,58 +24,63 @@ import {
 type Props = {
   id: string;
   title?: string;
-  content?: string;
+  notesCount?: number;
+  color?: string;
   createdAt: string;
   updatedAt: string;
 };
 
-export function NoteItem({ id, title, content = "", updatedAt }: Props) {
-  const displayContent = content
-    ? markdownToText(content, 200)
-    : NOTE_CONTENT_EXCERPT_FALLBACK;
-  const displayTitle = title || NOTE_TITLE_FALLBACK;
+export function CollectionItem({
+  id,
+  title,
+  notesCount,
+  color,
+  updatedAt,
+}: Props) {
+  const displayTitle = title || COLLECTION_TITLE_FALLBACK;
 
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { mutate: deleteNote, isLoading: isDeleting } = useDeleteNote({
-    onSuccess: () => {
-      // Note deleted successfully
-    },
-    onError: (error) => {
-      console.error("Failed to delete note:", error);
-    },
-  });
+  const { mutate: deleteCollection, isLoading: isDeleting } =
+    useDeleteCollection({
+      onSuccess: () => {
+        // Collection deleted successfully
+      },
+      onError: (error) => {
+        console.error("Failed to delete collection:", error);
+      },
+    });
 
   const { confirm } = useConfirmation();
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent navigation when clicking delete
     confirm({
-      title: "Delete Note",
-      message: `Are you sure you want to delete "${truncateString(displayTitle, 20) || "this note"}"? This action cannot be undone.`,
-      itemName: truncateString(displayTitle, 20) || "Note",
+      title: "Delete Collection",
+      message: `Are you sure you want to delete "${truncateString(displayTitle, 20) || "this collection"}"? This action cannot be undone.`,
+      itemName: truncateString(displayTitle, 20) || "Collection",
       variant: "destructive",
       confirmLabel: "Delete",
       cancelLabel: "Cancel",
       onConfirm: async () => {
-        await deleteNote(id);
+        await deleteCollection(id);
       },
     });
   };
 
   const { addTab } = useSessionTabs();
   const handleClick = () => {
-    navigate(getRoute(ROUTES.NOTE, { noteId: id }));
+    navigate(getRoute(ROUTES.COLLECTION, { collectionId: id }));
     addTab({
       title: displayTitle,
-      pathname: getRoute(ROUTES.NOTE, { noteId: id }),
+      pathname: getRoute(ROUTES.COLLECTION, { collectionId: id }),
     });
   };
 
   return (
     <li
       className={cn(
-        "px-6 group hover:bg-muted cursor-pointer group/note-item transition-colors border-b border-b-muted group-last:border-b-0",
+        "px-6 group hover:bg-muted cursor-pointer group/collection-item transition-colors border-b border-b-muted group-last:border-b-0",
         isDropdownOpen && "bg-muted",
       )}
       onClick={handleClick}
@@ -86,19 +88,29 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
       <div className="flex justify-between items-center py-4">
         <div className="grid grid-cols-[28px_1fr] gap-1 gap-y-0.5 flex-1">
           <div className="flex items-center justify-start">
-            <FileText className="size-4 text-muted-foreground" />
+            <Hash
+              className="size-4 text-muted-foreground"
+              style={color ? { color } : undefined}
+            />
           </div>
           <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">
             {displayTitle}
           </h3>
+
           <p className="text-sm text-muted-foreground col-start-2 line-clamp-1 text-ellipsis">
-            {displayContent}
+            {!notesCount ? (
+              "No notes"
+            ) : (
+              <>
+                {notesCount} note{notesCount > 1 ? "s" : ""}
+              </>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div
             className={cn(
-              "text-xs group-hover/note-item:hidden fade-in duration-100",
+              "text-xs group-hover/collection-item:hidden fade-in duration-100",
               isDropdownOpen && "hidden",
             )}
           >
@@ -106,7 +118,7 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
           </div>
           <div
             className={cn(
-              "group-hover/note-item:block hidden",
+              "group-hover/collection-item:block hidden",
               isDropdownOpen && "block",
             )}
           >
@@ -129,7 +141,7 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
                 align="end"
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
-                  "group-hover/note-item:block hidden w-[120px]",
+                  "group-hover/collection-item:block hidden w-[120px]",
                   isDropdownOpen && "block",
                 )}
               >

@@ -13,7 +13,7 @@ export type GroupItem = { id: string; title: string };
 
 // Helper function to group tasks by group
 function groupTasksByGroup(
-  tasks: TKanbanTask[]
+  tasks: TKanbanTask[],
 ): Record<string, TKanbanTask[]> {
   return tasks?.reduce(
     (acc, task) => {
@@ -23,7 +23,7 @@ function groupTasksByGroup(
       acc[task.groupId].push(task);
       return acc;
     },
-    {} as Record<string, TKanbanTask[]>
+    {} as Record<string, TKanbanTask[]>,
   );
 }
 
@@ -52,7 +52,7 @@ export function KanbanTask({
     (group: string, newTasks: TKanbanTask[], oldTasks: TKanbanTask[]) => {
       // Find tasks that were added (moved from another list)
       const addedTaskIdx = newTasks.findIndex(
-        (task) => !oldTasks.some((t) => t.id === task.id)
+        (task) => !oldTasks.some((t) => t.id === task.id),
       );
       const addedTask = newTasks[addedTaskIdx];
 
@@ -99,7 +99,7 @@ export function KanbanTask({
 
           const newSortOrder = generateBetweenRank(
             prevSortOrder,
-            nextSortOrder
+            nextSortOrder,
           );
           onTaskUpdate(movedTask.id, {
             ...movedTask,
@@ -108,7 +108,7 @@ export function KanbanTask({
         }
       }
     },
-    [onTaskUpdate]
+    [onTaskUpdate],
   );
 
   // Handle task add
@@ -133,7 +133,7 @@ export function KanbanTask({
         sortOrder: newSortOrder,
       });
     },
-    [onTaskAdd, tasks]
+    [onTaskAdd, tasks],
   );
 
   // Handle list reorder (group columns)

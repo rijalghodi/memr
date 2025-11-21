@@ -2,6 +2,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 
 import { type Collection, db } from "@/lib/dexie";
+import { cleanUndefinedValue } from "@/lib/object";
 
 export type CreateCollectionReq = {
   title?: string;
@@ -27,7 +28,9 @@ export type UpsertCollectionReq = {
   syncedAt?: string;
 };
 
-export type CollectionRes = Collection;
+export type CollectionRes = Collection & {
+  notesCount?: number;
+};
 
 export const collectionApi = {
   create: async (data: CreateCollectionReq): Promise<CollectionRes> => {
@@ -58,7 +61,17 @@ export const collectionApi = {
           new Date(collection.syncedAt ?? new Date(0)).getTime() <
             new Date(collection.updatedAt).getTime(),
       )
-      .toArray();
+      .toArray(async (collections) =>
+        Promise.all(
+          collections.map(async (collection) => ({
+            ...collection,
+            notesCount: await db.notes
+              .where("collectionId")
+              .equals(collection.id)
+              .count(),
+          })),
+        ),
+      );
     if (sortBy) {
       collections.sort((a, b) => {
         return (
@@ -83,10 +96,11 @@ export const collectionApi = {
     if (!existing || existing.deletedAt) {
       throw new Error("Collection not found");
     }
+    const cleaned = cleanUndefinedValue(data);
 
     const updated: Collection = {
       ...existing,
-      ...data,
+      ...cleaned,
       updatedAt: new Date().toISOString(),
     };
     await db.collections.update(data.id, updated);
