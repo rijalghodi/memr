@@ -58,7 +58,7 @@ export const taskApi = {
 
   getAll: async (params?: {
     projectId?: string;
-    sortBy?: "updatedAt" | "viewedAt" | "createdAt";
+    sortBy?: "sortOrder";
     unsynced?: boolean;
   }): Promise<TaskRes[]> => {
     const projectId = params?.projectId;
@@ -70,11 +70,16 @@ export const taskApi = {
           !unsynced ||
           !task.syncedAt ||
           new Date(task.syncedAt ?? new Date(0)).getTime() <
-            new Date(task.updatedAt).getTime(),
+            new Date(task.updatedAt).getTime()
       )
       .toArray();
     if (projectId) {
       tasks = tasks.filter((task) => task.projectId === projectId);
+    }
+    if (params?.sortBy === "sortOrder") {
+      tasks = tasks.sort(
+        (a, b) => a.sortOrder?.localeCompare(b.sortOrder ?? "") ?? 0
+      );
     }
     return tasks;
   },
@@ -171,7 +176,7 @@ export const useCreateTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -179,7 +184,7 @@ export const useCreateTask = ({
 
 export const useGetTasks = (params?: {
   projectId?: string;
-  sortBy?: "updatedAt" | "viewedAt" | "createdAt";
+  sortBy?: "sortOrder";
   unsynced?: boolean;
 }) => {
   const { projectId, sortBy, unsynced } = params ?? {};
@@ -230,7 +235,7 @@ export const useUpdateTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -260,7 +265,7 @@ export const useDeleteTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };

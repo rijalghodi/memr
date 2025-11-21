@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDownUp, ListFilter, Loader } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { Task } from "@/lib/dexie";
 import {
@@ -15,18 +15,41 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
 import { TaskKanban } from "./task-kanban";
+import { GroupItem, KanbanTask, TKanbanTask } from "./kanban/kanban";
 
-type Props = {};
+const statusGroupItems: GroupItem[] = [
+  {
+    id: "0",
+    title: "To Do",
+  },
+  {
+    id: "1",
+    title: "In Progress",
+  },
+  {
+    id: "2",
+    title: "Done",
+  },
+  {
+    id: "-1",
+    title: "Cancelled",
+  },
+];
 
-type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
+export function TaskDashboard() {
+  const { data: dexieTasks, isLoading } = useGetTasks({ sortBy: "sortOrder" });
 
-export function TaskDashboard({}: Props) {
-  const [sortBy, setSortBy] = useState<SortByValue>("updatedAt");
-  const { data: dexieTasks, isLoading } = useGetTasks({ sortBy });
+  console.log("dexieTasks", dexieTasks);
 
-  const handleSortChange = (value: string) => {
-    setSortBy(value as SortByValue);
-  };
+  const tasks: TKanbanTask[] = useMemo(() => {
+    return dexieTasks.map((task) => ({
+      ...task,
+      groupId: task.status.toString(),
+    }));
+  }, [dexieTasks]);
+
+  // console.log("dexieTasks", dexieTasks);
+  // console.log("tasks", tasks);
 
   // Task handlers
   const { mutate: createTask } = useCreateTask({
@@ -47,32 +70,33 @@ export function TaskDashboard({}: Props) {
     },
   });
 
-  const handleTaskAdd = (
-    task: Omit<Task, "id" | "createdAt" | "updatedAt">,
-  ) => {
+  const handleTaskAdd = (groupId: string, task: TKanbanTask) => {
+    console.log("handleTaskAdd", groupId, task);
+    const status = Number(groupId);
     createTask({
       title: task.title,
       description: task.description,
-      status: task.status,
-      sortOrder: task.sortOrder,
+      status: status,
+      sortOrder: task.sortOrder?.toString(),
       dueDate: task.dueDate,
-      projectId: task.projectId,
     });
   };
 
-  const handleTaskUpdate = (id: string, task: Partial<Task>) => {
+  const handleTaskUpdate = (id: string, task: Partial<TKanbanTask>) => {
+    console.log("handleTaskUpdate", id, task);
+    const status = Number(task.groupId);
     updateTask({
       id,
       title: task.title,
       description: task.description,
-      status: task.status,
-      sortOrder: task.sortOrder,
+      status: status,
+      sortOrder: task.sortOrder?.toString(),
       dueDate: task.dueDate,
-      projectId: task.projectId,
     });
   };
 
   const handleTaskDelete = (id: string) => {
+    console.log("handleTaskDelete", id);
     deleteTask(id);
   };
 
@@ -90,7 +114,7 @@ export function TaskDashboard({}: Props) {
             </CollapsibleTrigger>
           </div>
         </div>
-        <CollapsibleContent>
+        {/* <CollapsibleContent>
           <div className="px-6 flex items-center pb-3">
             <DropdownFilter
               variant="secondary"
@@ -114,7 +138,7 @@ export function TaskDashboard({}: Props) {
               ]}
             />
           </div>
-        </CollapsibleContent>
+        </CollapsibleContent> */}
       </Collapsible>
 
       {/* Content */}
@@ -127,11 +151,12 @@ export function TaskDashboard({}: Props) {
             </span>
           </div>
         ) : (
-          <TaskKanban
-            tasks={dexieTasks}
-            onAddTask={handleTaskAdd}
-            onUpdateTask={handleTaskUpdate}
-            onDeleteTask={handleTaskDelete}
+          <KanbanTask
+            tasks={tasks}
+            onTaskAdd={handleTaskAdd}
+            onTaskUpdate={handleTaskUpdate}
+            onTaskDelete={handleTaskDelete}
+            groups={statusGroupItems}
           />
         )}
       </div>

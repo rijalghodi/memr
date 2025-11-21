@@ -4,7 +4,11 @@ import { useMemo } from "react";
 
 import { Task } from "@/lib/dexie";
 
-import { GroupItem, Kanban, type Task as KanbanTask } from "../kanban/kanban";
+import {
+  GroupItem,
+  TKanbanTask,
+  type TKanbanTask as TKanbanTask,
+} from "./kanban/kanban";
 
 type Props = {
   tasks: Task[];
@@ -12,8 +16,6 @@ type Props = {
   onUpdateTask: (id: string, task: Partial<Task>) => void;
   onDeleteTask: (id: string) => void;
 };
-
-type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
 // Status to group title mapping
 const STATUS_TO_GROUP: Record<number, string> = {
@@ -46,7 +48,7 @@ export function TaskKanban({
   onDeleteTask,
 }: Props) {
   // Convert dexie tasks to kanban tasks
-  const kanbanTasks = useMemo<KanbanTask[]>(() => {
+  const kanbanTasks = useMemo<TKanbanTask[]>(() => {
     return tasks.map((task) => ({
       id: task.id,
       group: STATUS_TO_GROUP[task.status] || "To Do",
@@ -64,7 +66,7 @@ export function TaskKanban({
 
   const handleTaskAdd = (
     group: string,
-    data: Pick<Task, "title" | "dueDate" | "description">,
+    data: Pick<Task, "title" | "dueDate" | "description">
   ) => {
     // const status = GROUP_TO_STATUS[group] ?? 0;
     console.log("group", group);
@@ -77,8 +79,8 @@ export function TaskKanban({
     });
   };
 
-  const handleTaskUpdate = (kanbanTask: KanbanTask) => {
-    const group = kanbanTask.group;
+  const handleTaskUpdate = (kanbanTask: TKanbanTask) => {
+    const group = kanbanTask.groupId;
     const status = GROUP_TO_STATUS[group] ?? 0;
     const dueDate = kanbanTask.dueDate;
     onUpdateTask(kanbanTask.id, {
@@ -90,13 +92,13 @@ export function TaskKanban({
     });
   };
 
-  const handleTaskDelete = (kanbanTask: KanbanTask) => {
+  const handleTaskDelete = (kanbanTask: TKanbanTask) => {
     onDeleteTask(kanbanTask.id);
   };
 
   return (
     <div data-slot="content" className="pb-6 px-6">
-      <Kanban
+      <TKanbanTask
         tasks={kanbanTasks}
         onTaskUpdate={handleTaskUpdate}
         onTaskAdd={handleTaskAdd}
