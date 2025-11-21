@@ -1,5 +1,3 @@
-import { Hash } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -10,6 +8,8 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 
+import { CollectionIcon } from "./collection-icon";
+
 type CollectionEmptyProps = {
   onAddCollection: () => void;
 };
@@ -19,7 +19,7 @@ export function CollectionEmpty({ onAddCollection }: CollectionEmptyProps) {
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <Hash />
+          <CollectionIcon />
         </EmptyMedia>
         <EmptyTitle>No Collections Yet</EmptyTitle>
         <EmptyDescription>
@@ -28,7 +28,9 @@ export function CollectionEmpty({ onAddCollection }: CollectionEmptyProps) {
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
-          <Button className="rounded-full">Create Collection</Button>
+          <Button className="rounded-full" onClick={onAddCollection}>
+            Create Collection
+          </Button>
         </div>
       </EmptyContent>
     </Empty>

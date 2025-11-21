@@ -15,7 +15,7 @@ import { NoteEditorPage } from "@/pages/note-editor";
 import { NotesPage } from "@/pages/notes";
 import { TasksPage } from "@/pages/tasks";
 
-import { CollectionNoteDashboard } from "./components/collections/collection-note-dashboard";
+import { CollectionNoteDashboard } from "./components/collections/collection-note/collection-note-dashboard";
 import { AuthGuard } from "./components/layouts/auth-guard";
 import { CollectionsPage } from "./pages/collections";
 
