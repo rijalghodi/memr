@@ -1,34 +1,11 @@
-"use client";
-
-import { Plus } from "lucide-react";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ReactSortable } from "react-sortablejs";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { TASK_TITLE_FALLBACK } from "@/lib/constant";
-import {
-  generateBetweenRank,
-  generateNBetweenKeys,
-} from "@/lib/fractional-idx";
-import { cn } from "@/lib/utils";
+import { generateBetweenRank } from "@/lib/fractional-idx";
 
-import {
-  Button,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../../ui";
-import { TaskAdd } from "./task-add";
-
-export type TKanbanTask = {
-  id: string;
-  groupId: string;
-  title?: string;
-  description?: string;
-  status?: number;
-  sortOrder?: string;
-  dueDate?: string;
-};
+import { List } from "./list";
+import { TKanbanTask } from "./type";
 
 // Group item for list reordering (ReactSortable requires objects with id)
 export type GroupItem = { id: string; title: string };
@@ -48,126 +25,6 @@ function groupTasksByGroup(
     {} as Record<string, TKanbanTask[]>
   );
 }
-
-// Card component
-const Card: React.FC<{ task: TKanbanTask }> = ({ task }) => (
-  <div className="bg-card border border-border rounded-sm px-3 py-3 space-y-1 hover:bg-muted transition-colors cursor-move">
-    <div className="text-sm font-medium text-foreground line-clamp-2 leading-none">
-      {task.title || TASK_TITLE_FALLBACK}
-    </div>
-    {task.description && (
-      <div className="text-xs text-muted-foreground line-clamp-1 leading-none">
-        {task.description}
-      </div>
-    )}
-  </div>
-);
-
-// List component
-const List: React.FC<{
-  groupId: string;
-  groupTitle: string;
-  tasks: TKanbanTask[];
-  onTaskDrop: (
-    group: string,
-    newTasks: TKanbanTask[],
-    oldTasks: TKanbanTask[]
-  ) => void;
-  onTaskAdd: (groupId: string, taskData: TKanbanTask) => void;
-}> = ({ groupId, groupTitle, tasks, onTaskDrop, onTaskAdd }) => {
-  // Sort tasks by sortOrder
-  const sortedTasks = useMemo(() => {
-    return [...tasks].sort((a, b) => {
-      const aOrder = a.sortOrder || "";
-      const bOrder = b.sortOrder || "";
-      return aOrder.localeCompare(bOrder);
-    });
-  }, [tasks]);
-
-  const previousTasksRef = useRef<TKanbanTask[]>(sortedTasks);
-  const [open, setOpen] = useState(false);
-
-  const handleSetList = useCallback(
-    (newTasks: TKanbanTask[]) => {
-      const oldTasks = previousTasksRef.current;
-      onTaskDrop(groupId, newTasks, oldTasks);
-      previousTasksRef.current = newTasks;
-    },
-    [groupId, onTaskDrop]
-  );
-
-  // Update ref when tasks change from external source
-  React.useEffect(() => {
-    previousTasksRef.current = sortedTasks;
-  }, [sortedTasks]);
-
-  return (
-    <div className="flex flex-col h-full w-full max-w-[280px] rounded-lg">
-      <Collapsible open={open} onOpenChange={setOpen} className="w-full">
-        <header className="space-y-1 px-2 py-2 cursor-move list-title">
-          <div className="flex items-center justify-between">
-            <div className="flex items-end gap-2">
-              <h2 className="font-semibold text-sm leading-none capitalize">
-                {groupTitle}
-              </h2>
-              <span className="text-xs text-muted-foreground leading-none">
-                {sortedTasks.length}
-              </span>
-            </div>
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className={cn("group relative", open && "z-1000")}
-              >
-                <Plus className="group-data-[state=open]:rotate-135 transition-transform" />
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          {/* Overlay */}
-          {open && (
-            <div
-              className="fixed inset-0 z-999"
-              onClick={() => setOpen(false)}
-            ></div>
-          )}
-          <CollapsibleContent className={cn("relative", open && "z-1000")}>
-            <TaskAdd
-              onSubmit={(data) => {
-                onTaskAdd(groupId, {
-                  ...data,
-                  groupId: groupId,
-                } as TKanbanTask);
-              }}
-            />
-          </CollapsibleContent>
-        </header>
-      </Collapsible>
-
-      <ScrollArea className="flex-1">
-        <div className={cn("p-2")}>
-          <ReactSortable
-            list={tasks}
-            setList={handleSetList}
-            group="kanban-tasks"
-            animation={200}
-            className={cn(
-              "space-y-2 min-h-[300px]",
-              sortedTasks.length === 0 && "bg-muted/50 rounded-md"
-            )}
-            ghostClass="opacity-50"
-            dragClass="cursor-grabbing"
-          >
-            {sortedTasks.map((task) => (
-              <Card key={task.id} task={task} />
-            ))}
-          </ReactSortable>
-        </div>
-        <ScrollBar orientation="vertical" />
-      </ScrollArea>
-    </div>
-  );
-};
 
 type KanbanTaskProps = {
   tasks: TKanbanTask[];
@@ -193,78 +50,145 @@ export function KanbanTask({
   // Handle task drop within same list or between lists
   const handleTaskDrop = useCallback(
     (group: string, newTasks: TKanbanTask[], oldTasks: TKanbanTask[]) => {
-      console.log("handleTaskDrop", group, newTasks, oldTasks);
-
-      // Sort old tasks by sortOrder to get proper ordering
-      const sortedOldTasks = [...oldTasks].sort((a, b) => {
-        const aOrder = a.sortOrder || "";
-        const bOrder = b.sortOrder || "";
-        return aOrder.localeCompare(bOrder);
-      });
-
-      // Find tasks that were added (moved from another list)
-      const addedTasks = newTasks.filter(
-        (task) => !oldTasks.some((t) => t.id === task.id)
+      console.log(
+        "handleTaskDrop",
+        group,
+        newTasks.map((t) => t.title + " " + t.sortOrder),
+        oldTasks.map((t) => t.title + " " + t.sortOrder)
       );
 
+      // Find tasks that were added (moved from another list)
+      const addedTaskIdx = newTasks.findIndex(
+        (task) => !oldTasks.some((t) => t.id === task.id)
+      );
+      const addedTask = newTasks[addedTaskIdx];
+
+      // console.log("handleTaskDrop addedTask", addedTask);
+
       // Update group and sortOrder for tasks that were moved to this list
-      if (addedTasks.length > 0) {
+      if (addedTask) {
         // Find the insertion point: where the first added task is positioned
-        const firstAddedIndex = newTasks.findIndex((task) =>
-          addedTasks.some((at) => at.id === task.id)
-        );
-        const lastAddedIndex = firstAddedIndex + addedTasks.length - 1;
+        // const firstAddedIndex = newTasks.findIndex((task) =>
+        //   addedTasks.some((at) => at.id === task.id)
+        // );
+        // const lastAddedIndex = firstAddedIndex + addedTasks.length - 1;
 
         // Get the previous task (before insertion point) and next task (after insertion point)
-        const prevTask =
-          firstAddedIndex > 0 ? newTasks[firstAddedIndex - 1] : null;
+        const prevTask = addedTaskIdx > 0 ? newTasks[addedTaskIdx - 1] : null;
         const nextTask =
-          lastAddedIndex < newTasks.length - 1
-            ? newTasks[lastAddedIndex + 1]
+          addedTaskIdx < newTasks.length - 1
+            ? newTasks[addedTaskIdx + 1]
             : null;
 
         // Generate sortOrders for all added tasks at once
         const prevSortOrder = prevTask?.sortOrder || undefined;
         const nextSortOrder = nextTask?.sortOrder || undefined;
-        const newSortOrders = generateNBetweenKeys(
-          prevSortOrder,
-          nextSortOrder,
-          addedTasks.length
-        );
+        const newSortOrder = generateBetweenRank(prevSortOrder, nextSortOrder);
 
         // Update each added task with its generated sortOrder
-        addedTasks.forEach((task, index) => {
-          onTaskUpdate(task.id, {
-            ...task,
-            groupId: group,
-            sortOrder: newSortOrders[index],
-          });
+        onTaskUpdate(addedTask.id, {
+          ...addedTask,
+          groupId: group,
+          sortOrder: newSortOrder,
         });
       }
 
-      // Update sortOrder for tasks that were reordered within this list
-      newTasks.forEach((task, index) => {
-        const oldIndex = sortedOldTasks.findIndex((t) => t.id === task.id);
-        if (oldIndex !== -1 && oldIndex !== index && task.groupId === group) {
-          const prevTask = index > 0 ? newTasks[index - 1] : null;
-          const nextTask =
-            index < newTasks.length - 1 ? newTasks[index + 1] : null;
+      // Sort old tasks by sortOrder to get proper ordering
+      // const sortedOldTasks = [...oldTasks].sort((a, b) => {
+      //   const aOrder = a.sortOrder || "";
+      //   const bOrder = b.sortOrder || "";
+      //   return aOrder.localeCompare(bOrder);
+      // });
 
-          // Generate sortOrder between previous and next task
+      // console.log(
+      //   "handleTaskDrop sortedOldTasks",
+      //   sortedOldTasks.map((t) => t.title + " " + t.sortOrder)
+      // );
+
+      // update only prev, next task
+      // find first moved task from oldTasks
+
+      if (!addedTask) {
+        console.log(
+          "handleTaskDrop oldTasks",
+          oldTasks.map((t) => t.title + "-" + t.sortOrder)
+        );
+        console.log(
+          "handleTaskDrop newTasks",
+          newTasks.map((t) => t.title + "-" + t.sortOrder)
+        );
+
+        const movedTaskIdx = newTasks.findIndex(
+          (t, idx) => t.id !== oldTasks[idx].id
+        );
+        const movedTask = newTasks[movedTaskIdx];
+        console.log(
+          "handleTaskDrop movedTask",
+          movedTask?.title + "-" + movedTask?.sortOrder
+        );
+
+        console.log("handleTaskDrop movedTaskIdx", movedTaskIdx);
+
+        if (movedTaskIdx !== -1) {
+          const movedTask = newTasks[movedTaskIdx];
+          const prevTask = movedTaskIdx > 0 ? newTasks[movedTaskIdx - 1] : null;
+          const nextTask =
+            movedTaskIdx < newTasks.length - 1
+              ? newTasks[movedTaskIdx + 1]
+              : null;
+
           const prevSortOrder = prevTask?.sortOrder || undefined;
           const nextSortOrder = nextTask?.sortOrder || undefined;
+
+          console.log(
+            "handleTaskDrop order",
+            prevTask?.title + "-" + prevTask?.sortOrder,
+            movedTask.title + "-" + movedTask.sortOrder,
+            nextTask?.title + "-" + nextTask?.sortOrder
+          );
 
           const newSortOrder = generateBetweenRank(
             prevSortOrder,
             nextSortOrder
           );
-
-          onTaskUpdate(task.id, {
-            ...task,
+          console.log("handleTaskDrop newSortOrder", newSortOrder);
+          onTaskUpdate(movedTask.id, {
+            ...movedTask,
             sortOrder: newSortOrder,
           });
         }
-      });
+      }
+
+      // Update sortOrder for tasks that were reordered within this list
+      // newTasks.forEach((task, index) => {
+      //   const oldIndex = oldTasks.findIndex((t) => t.id === task.id);
+      //   if (oldIndex !== -1 && oldIndex !== index && task.groupId === group) {
+      //     const prevTask = index > 0 ? newTasks[index - 1] : null;
+      //     const nextTask =
+      //       index < newTasks.length - 1 ? newTasks[index + 1] : null;
+
+      //     // Generate sortOrder between previous and next task
+      //     const prevSortOrder = prevTask?.sortOrder || undefined;
+      //     const nextSortOrder = nextTask?.sortOrder || undefined;
+
+      //     console.log(
+      //       "handleTaskDrop ordered task",
+      //       task.title + " " + task.sortOrder,
+      //       prevSortOrder,
+      //       nextSortOrder
+      //     );
+
+      //     const newSortOrder = generateBetweenRank(
+      //       prevSortOrder,
+      //       nextSortOrder
+      //     );
+
+      //     onTaskUpdate(task.id, {
+      //       ...task,
+      //       sortOrder: newSortOrder,
+      //     });
+      //   }
+      // });
     },
     [onTaskUpdate]
   );

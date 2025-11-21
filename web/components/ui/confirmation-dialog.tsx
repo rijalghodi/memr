@@ -1,6 +1,5 @@
 "use client";
 
-import { Info, Trash } from "lucide-react";
 import * as React from "react";
 
 import {
@@ -29,7 +28,7 @@ type ConfirmationContextType = {
 };
 
 const ConfirmationContext = React.createContext<ConfirmationContextType | null>(
-  null
+  null,
 );
 
 export function useConfirmation() {
@@ -48,7 +47,7 @@ export function ConfirmationProvider({
   const [isOpen, setIsOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [options, setOptions] = React.useState<ConfirmationOptions | null>(
-    null
+    null,
   );
 
   const confirm = React.useCallback((newOptions: ConfirmationOptions) => {
@@ -83,7 +82,7 @@ export function ConfirmationProvider({
     () => ({
       confirm,
     }),
-    [confirm]
+    [confirm],
   );
 
   const title = options?.title || "Confirm Action";

@@ -24,7 +24,7 @@ export function generateLastRank(): string {
  */
 export function generateBetweenRank(
   left: string | undefined,
-  right: string | undefined
+  right: string | undefined,
 ): string {
   // If both are undefined, generate first rank
   if (!left && !right) {
