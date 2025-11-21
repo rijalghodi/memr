@@ -1,4 +1,4 @@
-import { FileText, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +9,8 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+
+import { NoteIcon } from "./note-icon";
 
 type NoteEmptyProps = {
   onAddNote: () => void;
@@ -25,7 +27,7 @@ export function NoteEmpty({
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <FileText />
+          <NoteIcon />
         </EmptyMedia>
         <EmptyTitle>
           {isFiltered ? "No Notes Found" : "No Notes Yet"}

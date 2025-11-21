@@ -8,13 +8,13 @@ import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 
-import { NoteEmpty } from "../notes/note-empty";
-import { NoteItem } from "../notes/note-item";
-import { NoteLoading } from "../notes/note-loading";
-import { useSessionTabs } from "../session-tabs";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
-import { Button } from "../ui/button";
-import { DropdownFilter } from "../ui/drropdown-filter";
+import { NoteEmpty } from "../../notes/note-empty";
+import { NoteItem } from "../../notes/note-item";
+import { NoteLoading } from "../../notes/note-loading";
+import { useSessionTabs } from "../../session-tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../../ui";
+import { Button } from "../../ui/button";
+import { DropdownFilter } from "../../ui/drropdown-filter";
 
 type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
