@@ -10,7 +10,7 @@ import {
   SquarePen,
 } from "lucide-react";
 import { JSX, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import {
   Collapsible,
@@ -40,10 +40,10 @@ import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 import { useGetProjects } from "@/service/local/api-project";
 import { useGetSetting } from "@/service/local/api-setting";
 
+import { useBrowserNavigate } from "../browser-navigation";
 import { CollectionIcon } from "../collections/collection-icon";
 import { NoteIcon } from "../notes/note-icon";
 import { ProjectIcon } from "../projects/project-icon";
-import { useSessionTabs } from "../session-tabs";
 import {
   Avatar,
   AvatarFallback,
@@ -57,16 +57,11 @@ import {
 } from "../ui";
 
 export function AppSidebar() {
-  const navigate = useNavigate();
+  const { navigate } = useBrowserNavigate();
   // handle add button
-  const { addTab } = useSessionTabs();
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
-      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }));
-      addTab({
-        title: NOTE_TITLE_FALLBACK,
-        pathname: getRoute(ROUTES.NOTE, { noteId: data.id }),
-      });
+      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }), NOTE_TITLE_FALLBACK);
     },
   });
 
@@ -154,7 +149,7 @@ export function SidebarEntityMenus() {
           })) ?? [],
       },
     ],
-    [notes, collections, projects]
+    [notes, collections, projects],
   );
 
   return (

@@ -2,7 +2,6 @@
 
 import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
 import { getRandomColor } from "@/lib/random-color";
@@ -12,7 +11,7 @@ import {
   useGetCollections,
 } from "@/service/local/api-collection";
 
-import { useSessionTabs } from "../session-tabs";
+import { useBrowserNavigate } from "../browser-navigation";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
@@ -24,22 +23,19 @@ type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
 export function CollectionDashboard() {
   const [sortBy, setSortBy] = useState<SortByValue>("updatedAt");
-  const navigate = useNavigate();
+  const { navigate } = useBrowserNavigate();
   const { data: collections, isLoading } = useGetCollections({ sortBy });
 
   const handleSortChange = (value: string) => {
     setSortBy(value as SortByValue);
   };
 
-  // add collection
-  const { addTab } = useSessionTabs();
   const { mutate: createCollection } = collectionApiHook.useCreateCollection({
     onSuccess: (data) => {
-      navigate(getRoute(ROUTES.COLLECTION, { collectionId: data.id }));
-      addTab({
-        title: COLLECTION_TITLE_FALLBACK,
-        pathname: getRoute(ROUTES.COLLECTION, { collectionId: data.id }),
-      });
+      navigate(
+        getRoute(ROUTES.COLLECTION, { collectionId: data.id }),
+        COLLECTION_TITLE_FALLBACK,
+      );
     },
   });
 

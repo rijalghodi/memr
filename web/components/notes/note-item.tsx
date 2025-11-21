@@ -3,7 +3,6 @@
 import { format } from "date-fns";
 import { MoreHorizontal, Trash } from "lucide-react";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import {
   NOTE_CONTENT_EXCERPT_FALLBACK,
@@ -14,7 +13,7 @@ import { markdownToText, truncateString } from "@/lib/string";
 import { cn } from "@/lib/utils";
 import { useDeleteNote } from "@/service/local/api-note";
 
-import { useSessionTabs } from "../session-tabs";
+import { useBrowserNavigate } from "../browser-navigation";
 import { Button } from "../ui/button";
 import { useConfirmation } from "../ui/confirmation-dialog";
 import {
@@ -39,7 +38,7 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
     : NOTE_CONTENT_EXCERPT_FALLBACK;
   const displayTitle = title || NOTE_TITLE_FALLBACK;
 
-  const navigate = useNavigate();
+  const { navigate } = useBrowserNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { mutate: deleteNote, isLoading: isDeleting } = useDeleteNote({
     onSuccess: () => {
@@ -67,13 +66,8 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
     });
   };
 
-  const { addTab } = useSessionTabs();
   const handleClick = () => {
-    navigate(getRoute(ROUTES.NOTE, { noteId: id }));
-    addTab({
-      title: displayTitle,
-      pathname: getRoute(ROUTES.NOTE, { noteId: id }),
-    });
+    navigate(getRoute(ROUTES.NOTE, { noteId: id }), displayTitle);
   };
 
   return (

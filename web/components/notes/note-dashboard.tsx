@@ -2,13 +2,12 @@
 
 import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 
-import { useSessionTabs } from "../session-tabs";
+import { useBrowserNavigate } from "../browser-navigation";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
@@ -20,7 +19,7 @@ type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
 export function NoteDashboard() {
   const [sortBy, setSortBy] = useState<SortByValue | undefined>();
-  const navigate = useNavigate();
+  const { navigate } = useBrowserNavigate();
   const { data: notes, isLoading } = useGetNotes({ sortBy });
 
   const handleSortChange = (value: string) => {
@@ -28,14 +27,9 @@ export function NoteDashboard() {
   };
 
   // add noote
-  const { addTab } = useSessionTabs();
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
-      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }));
-      addTab({
-        title: NOTE_TITLE_FALLBACK,
-        pathname: getRoute(ROUTES.NOTE, { noteId: data.id }),
-      });
+      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }), NOTE_TITLE_FALLBACK);
     },
   });
 

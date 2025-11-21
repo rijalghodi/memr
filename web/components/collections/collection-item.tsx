@@ -3,7 +3,6 @@
 import { format } from "date-fns";
 import { MoreHorizontal, Trash } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
@@ -11,6 +10,7 @@ import { truncateString } from "@/lib/string";
 import { cn } from "@/lib/utils";
 import { useDeleteCollection } from "@/service/local/api-collection";
 
+import { useBrowserNavigate } from "../browser-navigation";
 import { useSessionTabs } from "../session-tabs";
 import { Button } from "../ui/button";
 import { useConfirmation } from "../ui/confirmation-dialog";
@@ -40,7 +40,7 @@ export function CollectionItem({
 }: Props) {
   const displayTitle = title || COLLECTION_TITLE_FALLBACK;
 
-  const navigate = useNavigate();
+  const { navigate } = useBrowserNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { mutate: deleteCollection, isLoading: isDeleting } =
     useDeleteCollection({
@@ -71,7 +71,7 @@ export function CollectionItem({
 
   const { addTab } = useSessionTabs();
   const handleClick = () => {
-    navigate(getRoute(ROUTES.COLLECTION, { collectionId: id }));
+    navigate(getRoute(ROUTES.COLLECTION, { collectionId: id }), displayTitle);
     addTab({
       title: displayTitle,
       pathname: getRoute(ROUTES.COLLECTION, { collectionId: id }),
@@ -89,7 +89,10 @@ export function CollectionItem({
       <div className="flex justify-between items-center py-4">
         <div className="grid grid-cols-[28px_1fr] gap-1 gap-y-0.5 flex-1">
           <div className="flex items-center justify-start">
-            <CollectionIcon className="size-4 text-muted-foreground" />
+            <CollectionIcon
+              className="size-5 text-muted-foreground"
+              style={{ color: color }}
+            />
           </div>
           <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">
             {displayTitle}

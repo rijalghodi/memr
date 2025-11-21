@@ -1,27 +1,50 @@
-import { ChevronLeft, ChevronRight, Home, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  X,
+} from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
+import { useBrowserNavigate } from "../browser-navigation";
 import { useSessionTabs } from "../session-tabs";
+import { Button } from "../ui";
 import { useConfirmation } from "../ui/confirmation-dialog";
 
 export function SessionTabs() {
-  const navigate = useNavigate();
   const { sessionTabs, activeTab, pathname, closeTab } = useSessionTabs();
   const isHomeActive = pathname === ROUTES.HOME;
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
+  const {
+    canGoBack,
+    canGoForward,
+    navigate: navigateTo,
+    goBack,
+    goForward,
+  } = useBrowserNavigate();
+
   const handleTabClick = (pathname: string) => {
-    navigate(pathname);
+    navigateTo(pathname);
+  };
+
+  const handleGoBack = () => {
+    goBack();
+  };
+
+  const handleGoForward = () => {
+    goForward();
   };
 
   const handleHomeClick = () => {
-    navigate(ROUTES.HOME);
+    navigateTo(ROUTES.HOME);
   };
 
   const handleCloseTab = (e: React.MouseEvent, id: string) => {
@@ -35,13 +58,13 @@ export function SessionTabs() {
     if (isActive) {
       if (tabIndex > 0) {
         // Navigate to previous tab
-        navigate(sessionTabs[tabIndex - 1].pathname);
+        navigateTo(sessionTabs[tabIndex - 1].pathname);
       } else if (sessionTabs.length > 1) {
         // Navigate to next tab (now at index 0)
-        navigate(sessionTabs[1].pathname);
+        navigateTo(sessionTabs[1].pathname);
       } else {
         // No more tabs, navigate to home
-        navigate(ROUTES.HOME);
+        navigateTo(ROUTES.HOME);
       }
     }
   };
@@ -96,7 +119,7 @@ export function SessionTabs() {
         sessionTabs.forEach((tab) => {
           closeTab(tab.id);
         });
-        navigate(ROUTES.HOME);
+        navigateTo(ROUTES.HOME);
       },
     });
   };
@@ -104,13 +127,36 @@ export function SessionTabs() {
   return (
     <nav className="h-10.5 flex-1 relative bg-muted flex">
       <ul className="flex-1 flex items-center h-full overflow-hidden relative">
+        <div className="flex items-center h-full">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="h-full rounded-none"
+            title="Previous Page"
+            onClick={handleGoBack}
+            disabled={!canGoBack}
+          >
+            <ArrowLeft />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="h-full rounded-none"
+            title="Next Page"
+            onClick={handleGoForward}
+            disabled={!canGoForward}
+          >
+            <ArrowRight />
+          </Button>
+        </div>
         <SessionTabItem
           active={isHomeActive}
           onClick={handleHomeClick}
-          className="bg-muted data-[active=true]:bg-muted left-0 z-10 h-full justify-center"
+          className="bg-muted data-[active=true]:bg-muted left-0 z-10 h-full justify-center min-w-10"
         >
-          <Home /> Home
+          <Home />
         </SessionTabItem>
+
         <div className="relative flex-1 flex h-full items-center overflow-hidden">
           {canScrollLeft && (
             <button

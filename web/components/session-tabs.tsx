@@ -41,7 +41,6 @@ type SessionTabsContextValue = {
   sessionTabs: SessionTab[];
   activeTab: SessionTab | null;
   pathname: string;
-  setActiveTab: (id: string) => void;
   addTab: (params: {
     title: string;
     pathname: string;
@@ -75,20 +74,6 @@ export function SessionTabsProvider({
   // Determine active tab based on current pathname
   const activeTab =
     sessionTabs.find((tab) => tab.pathname === pathname) || null;
-
-  const setActiveTab = useCallback(
-    (id: string) => {
-      // This function can be used to programmatically set active tab
-      // In practice, activeTab is determined by pathname, so this might
-      // be used for navigation purposes
-      const tab = sessionTabs.find((t) => t.id === id);
-      if (tab) {
-        // Navigation would be handled by the component using router
-        // This function exists for API completeness
-      }
-    },
-    [sessionTabs],
-  );
 
   const addTab = useCallback(
     ({
@@ -161,7 +146,6 @@ export function SessionTabsProvider({
         sessionTabs,
         activeTab,
         pathname,
-        setActiveTab,
         addTab,
         updateTabTitle,
         closeTab,

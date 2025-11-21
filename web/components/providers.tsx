@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import { BrowserNavigationProvider } from "./browser-navigation";
 import { AuthGuardProvider } from "./layouts/auth-guard";
 import { QueryProvider } from "./query-provider";
 import { SessionTabsProvider } from "./session-tabs";
@@ -14,8 +15,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ConfirmationProvider>
         <AuthGuardProvider>
           <SessionTabsProvider>
-            {children}
-            <Toaster />
+            <BrowserNavigationProvider>
+              {children}
+              <Toaster />
+            </BrowserNavigationProvider>
           </SessionTabsProvider>
         </AuthGuardProvider>
       </ConfirmationProvider>
