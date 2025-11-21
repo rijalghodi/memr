@@ -107,7 +107,7 @@ export function SessionTabs() {
         <SessionTabItem
           active={isHomeActive}
           onClick={handleHomeClick}
-          className="bg-muted data-[active=true]:bg-muted left-0 z-10 h-full"
+          className="bg-muted data-[active=true]:bg-muted left-0 z-10 h-full justify-center"
         >
           <Home /> Home
         </SessionTabItem>
