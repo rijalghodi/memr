@@ -1,8 +1,8 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 
-import { db, type Task } from "@/lib/dexie";
 import { asciiCompare } from "@/lib/ascii-compare";
+import { db, type Task } from "@/lib/dexie";
 
 export type CreateTaskReq = {
   projectId?: string;
@@ -71,7 +71,7 @@ export const taskApi = {
           !unsynced ||
           !task.syncedAt ||
           new Date(task.syncedAt ?? new Date(0)).getTime() <
-            new Date(task.updatedAt).getTime()
+            new Date(task.updatedAt).getTime(),
       )
       .toArray();
     if (projectId) {
@@ -80,7 +80,7 @@ export const taskApi = {
     if (params?.sortBy === "sortOrder" || params?.sortBy === undefined) {
       console.log("sort order");
       tasks = tasks.sort(
-        (a, b) => asciiCompare(a.sortOrder ?? "", b.sortOrder ?? "") ?? 0
+        (a, b) => asciiCompare(a.sortOrder ?? "", b.sortOrder ?? "") ?? 0,
       );
     }
     return tasks;
@@ -179,7 +179,7 @@ export const useCreateTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -238,7 +238,7 @@ export const useUpdateTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };
@@ -268,7 +268,7 @@ export const useDeleteTask = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError],
   );
 
   return { mutate, isLoading };

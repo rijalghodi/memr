@@ -70,7 +70,7 @@ describe("fractional-idx", () => {
         // Use simple string comparison (fractional indexing uses lexicographic order)
         // Note: generateKeyBetween(null, firstRank) returns "Zz" which is < "a0" in simple comparison
         expect(rank < rightRank || rank.localeCompare(rightRank) < 0).toBe(
-          true
+          true,
         );
       });
 

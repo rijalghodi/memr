@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ReactSortable } from "react-sortablejs";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -22,7 +22,7 @@ type ListProps = {
   onTaskDrop: (
     group: string,
     newTasks: TKanbanTask[],
-    oldTasks: TKanbanTask[]
+    oldTasks: TKanbanTask[],
   ) => void;
   onTaskAdd: (groupId: string, taskData: TKanbanTask) => void;
 };
@@ -52,7 +52,7 @@ export function List({
       onTaskDrop(groupId, newTasks, oldTasks);
       previousTasksRef.current = newTasks;
     },
-    [groupId, onTaskDrop]
+    [groupId, onTaskDrop],
   );
 
   // Update ref when tasks change from external source
@@ -112,7 +112,7 @@ export function List({
             animation={200}
             className={cn(
               "space-y-2 min-h-[300px]",
-              tasks.length === 0 && "bg-muted/50 rounded-md"
+              tasks.length === 0 && "bg-muted/50 rounded-md",
             )}
             ghostClass="opacity-50"
             dragClass="cursor-grabbing"
