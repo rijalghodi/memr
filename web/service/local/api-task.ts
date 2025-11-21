@@ -2,6 +2,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 
 import { db, type Task } from "@/lib/dexie";
+import { asciiCompare } from "@/lib/ascii-compare";
 
 export type CreateTaskReq = {
   projectId?: string;
@@ -76,9 +77,10 @@ export const taskApi = {
     if (projectId) {
       tasks = tasks.filter((task) => task.projectId === projectId);
     }
-    if (params?.sortBy === "sortOrder") {
+    if (params?.sortBy === "sortOrder" || params?.sortBy === undefined) {
+      console.log("sort order");
       tasks = tasks.sort(
-        (a, b) => a.sortOrder?.localeCompare(b.sortOrder ?? "") ?? 0
+        (a, b) => asciiCompare(a.sortOrder ?? "", b.sortOrder ?? "") ?? 0
       );
     }
     return tasks;
@@ -103,6 +105,7 @@ export const taskApi = {
       ...data,
       updatedAt: new Date().toISOString(),
     };
+    console.log("taskApi.update updated", updated);
     await db.tasks.update(data.id, updated);
     return updated;
   },

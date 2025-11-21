@@ -1,21 +1,22 @@
 "use client";
 
-import { ArrowDownUp, ListFilter, Loader } from "lucide-react";
+import { Asterisk, ListFilter, Loader } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import type { Task } from "@/lib/dexie";
+import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
+import { useGetProjects } from "@/service/local/api-project";
 import {
+  taskApi,
   useCreateTask,
   useDeleteTask,
   useGetTasks,
-  useUpdateTask,
 } from "@/service/local/api-task";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
-import { TaskKanban } from "./task-kanban";
-import { GroupItem, KanbanTask, TKanbanTask } from "./kanban/kanban";
+import { GroupItem, KanbanTask } from "./kanban/kanban";
+import { TKanbanTask } from "./kanban/type";
 
 const statusGroupItems: GroupItem[] = [
   {
@@ -37,9 +38,13 @@ const statusGroupItems: GroupItem[] = [
 ];
 
 export function TaskDashboard() {
-  const { data: dexieTasks, isLoading } = useGetTasks({ sortBy: "sortOrder" });
+  const [projectId, setProjectId] = useState<string>("");
+  const { data: dexieTasks, isLoading } = useGetTasks({
+    sortBy: "sortOrder",
+    projectId: projectId,
+  });
 
-  console.log("dexieTasks", dexieTasks);
+  // Implement debounce upsert tasks
 
   const tasks: TKanbanTask[] = useMemo(() => {
     return dexieTasks.map((task) => ({
@@ -48,7 +53,7 @@ export function TaskDashboard() {
     }));
   }, [dexieTasks]);
 
-  // console.log("dexieTasks", dexieTasks);
+  console.log("dexieTasks", dexieTasks);
   // console.log("tasks", tasks);
 
   // Task handlers
@@ -58,11 +63,11 @@ export function TaskDashboard() {
     },
   });
 
-  const { mutate: updateTask } = useUpdateTask({
-    onError: (error) => {
-      console.error("Failed to update task:", error);
-    },
-  });
+  // const { mutate: updateTask } = useUpdateTask({
+  //   onError: (error) => {
+  //     console.error("Failed to update task:", error);
+  //   },
+  // });
 
   const { mutate: deleteTask } = useDeleteTask({
     onError: (error) => {
@@ -77,7 +82,7 @@ export function TaskDashboard() {
       title: task.title,
       description: task.description,
       status: status,
-      sortOrder: task.sortOrder?.toString(),
+      sortOrder: task.sortOrder,
       dueDate: task.dueDate,
     });
   };
@@ -85,12 +90,12 @@ export function TaskDashboard() {
   const handleTaskUpdate = (id: string, task: Partial<TKanbanTask>) => {
     console.log("handleTaskUpdate", id, task);
     const status = Number(task.groupId);
-    updateTask({
+    taskApi.update({
       id,
       title: task.title,
       description: task.description,
       status: status,
-      sortOrder: task.sortOrder?.toString(),
+      sortOrder: task.sortOrder,
       dueDate: task.dueDate,
     });
   };
@@ -114,37 +119,17 @@ export function TaskDashboard() {
             </CollapsibleTrigger>
           </div>
         </div>
-        {/* <CollapsibleContent>
+        <CollapsibleContent>
           <div className="px-6 flex items-center pb-3">
-            <DropdownFilter
-              variant="secondary"
-              className="rounded-full px-4"
-              value={sortBy}
-              onValueChange={handleSortChange}
-              icon={<ArrowDownUp />}
-              options={[
-                {
-                  label: "Last Updated",
-                  value: "updatedAt",
-                },
-                {
-                  label: "Last Viewed",
-                  value: "viewedAt",
-                },
-                {
-                  label: "Created",
-                  value: "createdAt",
-                },
-              ]}
-            />
+            <ProjectFilter value={projectId} onValueChange={setProjectId} />
           </div>
-        </CollapsibleContent> */}
+        </CollapsibleContent>
       </Collapsible>
 
       {/* Content */}
-      <div data-slot="content" className="pb-6">
+      <div data-slot="content" className="pb-6 px-6">
         {isLoading ? (
-          <div className="p-6 h-[300px] text-center flex flex-col gap-4 items-center justify-center">
+          <div className="h-[300px] text-center flex flex-col gap-4 items-center justify-center">
             <Loader className="size-6 animate-spin text-primary" />
             <span className="text-sm text-muted-foreground">
               Loading tasks...
@@ -161,5 +146,35 @@ export function TaskDashboard() {
         )}
       </div>
     </div>
+  );
+}
+
+function ProjectFilter({
+  value,
+  onValueChange,
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+}) {
+  const { data: projects } = useGetProjects();
+  return (
+    <DropdownFilter
+      variant="secondary"
+      className="rounded-full px-4"
+      value={value}
+      onValueChange={onValueChange}
+      icon={<Asterisk />}
+      size="sm"
+      options={[
+        {
+          label: "All Projects",
+          value: "",
+        },
+        ...(projects ?? []).map((project) => ({
+          label: project.title || PROJECT_TITLE_FALLBACK,
+          value: project.id,
+        })),
+      ]}
+    />
   );
 }

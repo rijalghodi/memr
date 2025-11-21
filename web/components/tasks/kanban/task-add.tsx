@@ -3,11 +3,11 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-import { TKanbanTask } from "./kanban";
+import { TKanbanTask } from "./type";
 
 type Props = {
   onSubmit?: (
-    data: Pick<TKanbanTask, "title" | "dueDate" | "description">
+    data: Pick<TKanbanTask, "title" | "dueDate" | "description">,
   ) => void;
 };
 

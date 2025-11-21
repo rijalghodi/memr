@@ -16,7 +16,7 @@ type AuthGuardContextType = {
 };
 
 const AuthGuardContext = createContext<AuthGuardContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function useAuthGuard() {
@@ -43,7 +43,7 @@ export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
             width={100}
             height={100}
             className={cn(
-              "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32"
+              "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32",
             )}
           />
         </div>
@@ -112,7 +112,7 @@ export function AuthGuard({
             width={100}
             height={100}
             className={cn(
-              "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32"
+              "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32",
             )}
           />
         </div>
