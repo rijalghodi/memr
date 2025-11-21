@@ -1,6 +1,6 @@
 import { CollectionDashboard } from "@/components/collections/collection-dashboard";
 
-export function CollectionsPage() {
+export function CollectionsDashboardPage() {
   return (
     <>
       <CollectionDashboard />

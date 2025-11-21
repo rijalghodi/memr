@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
+import { getRandomColor } from "@/lib/random-color";
 import { getRoute, ROUTES } from "@/lib/routes";
 import {
   collectionApiHook,
@@ -45,6 +46,7 @@ export function CollectionDashboard() {
   const handleAddCollection = () => {
     createCollection({
       title: "",
+      color: getRandomColor(),
     });
   };
 

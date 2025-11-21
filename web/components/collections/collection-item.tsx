@@ -89,10 +89,7 @@ export function CollectionItem({
       <div className="flex justify-between items-center py-4">
         <div className="grid grid-cols-[28px_1fr] gap-1 gap-y-0.5 flex-1">
           <div className="flex items-center justify-start">
-            <CollectionIcon
-              className="size-4 text-muted-foreground"
-              style={color ? { color } : undefined}
-            />
+            <CollectionIcon className="size-4 text-muted-foreground" />
           </div>
           <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">
             {displayTitle}
