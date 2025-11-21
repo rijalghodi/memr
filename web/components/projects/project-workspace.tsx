@@ -1,6 +1,6 @@
 "use client";
 
-import { ListFilter, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import React, { useMemo } from "react";
 
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
@@ -14,8 +14,7 @@ import {
 
 import { GroupItem, KanbanTask } from "../tasks/kanban/kanban";
 import { TKanbanTask } from "../tasks/kanban/type";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
-import { Button } from "../ui/button";
+import { Collapsible, CollapsibleContent } from "../ui";
 import { ProjectIcon } from "./project-icon";
 
 const statusGroupItems: GroupItem[] = [
@@ -135,11 +134,11 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
               />
             </div>
             <div className="flex items-center gap-0">
-              <CollapsibleTrigger asChild>
+              {/* <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <ListFilter />
                 </Button>
-              </CollapsibleTrigger>
+              </CollapsibleTrigger> */}
             </div>
           </div>
           <CollapsibleContent>
