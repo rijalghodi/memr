@@ -27,7 +27,9 @@ export type UpsertProjectReq = {
   syncedAt?: string;
 };
 
-export type ProjectRes = Project;
+export type ProjectRes = Project & {
+  tasksCount?: number;
+};
 
 export const projectApi = {
   create: async (data: CreateProjectReq): Promise<ProjectRes> => {
@@ -56,9 +58,20 @@ export const projectApi = {
           !unsynced ||
           !project.syncedAt ||
           new Date(project.syncedAt ?? new Date(0)).getTime() <
-            new Date(project.updatedAt).getTime(),
+            new Date(project.updatedAt).getTime()
       )
-      .toArray();
+      .toArray(async (projects) =>
+        Promise.all(
+          projects.map(async (project) => ({
+            ...project,
+            tasksCount: await db.tasks
+              .where("projectId")
+              .equals(project.id)
+              .filter((task) => !task.deletedAt)
+              .count(),
+          }))
+        )
+      );
     if (sortBy) {
       projects.sort((a, b) => {
         return (
@@ -159,7 +172,7 @@ export const useCreateProject = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -217,7 +230,7 @@ export const useUpdateProject = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -247,7 +260,7 @@ export const useDeleteProject = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };

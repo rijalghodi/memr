@@ -121,6 +121,7 @@ export function SidebarEntityMenus() {
           notes?.slice(0, 5).map((note) => ({
             title: note.title || NOTE_TITLE_FALLBACK,
             href: getRoute(ROUTES.NOTE, { noteId: note.id }),
+            icon: <NoteIcon color="var(--muted-foreground)" />,
           })) ?? [],
       },
       {
@@ -132,6 +133,7 @@ export function SidebarEntityMenus() {
           collections?.slice(0, 5).map((collection) => ({
             title: collection.title || COLLECTION_TITLE_FALLBACK,
             href: getRoute(ROUTES.COLLECTION, { collectionId: collection.id }),
+            icon: <CollectionIcon style={{ color: collection.color }} />,
           })) ?? [],
       },
       {
@@ -143,10 +145,16 @@ export function SidebarEntityMenus() {
           projects?.slice(0, 5).map((project) => ({
             title: project.title || PROJECT_TITLE_FALLBACK,
             href: getRoute(ROUTES.PROJECT, { projectId: project.id }),
+            icon: (
+              <ProjectIcon
+                className="size-5"
+                style={{ color: project.color }}
+              />
+            ),
           })) ?? [],
       },
     ],
-    [notes, collections, projects],
+    [notes, collections, projects]
   );
 
   return (
@@ -179,7 +187,7 @@ export function SidebarEntityMenus() {
                           >
                             <SidebarMenuSubButton size="sm" asChild>
                               <Link to={subitem.href}>
-                                {item.icon}
+                                {subitem.icon}
                                 {subitem.title || NOTE_TITLE_FALLBACK}
                               </Link>
                             </SidebarMenuSubButton>
