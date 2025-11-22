@@ -27,7 +27,13 @@ export const FloatingToolbarExtension = Extension.create({
       new Plugin({
         props: {
           handleDOMEvents: {
-            selectionchange: () => {
+            selectionchange: (view) => {
+              console.log("selectionchange", view);
+              // check. the selection must not empty
+              const { state } = view;
+              const { selection } = state;
+              const { from, to } = selection;
+              if (from === to) return false;
               window.dispatchEvent(new CustomEvent("floating-toolbar-update"));
               return false;
             },
@@ -49,7 +55,7 @@ export const FloatingToolbar = ({ editor }: { editor: Editor | null }) => {
   const [isSelecting, setIsSelecting] = useState(false);
 
   const { refs, floatingStyles, update } = useFloating({
-    placement: "bottom",
+    placement: "bottom-start",
     middleware: [offset(10), flip(), shift()],
   });
 
@@ -250,11 +256,7 @@ export const FloatingToolbar = ({ editor }: { editor: Editor | null }) => {
   if (!editor || !open) return null;
 
   return (
-    <div
-      ref={refs.setFloating}
-      style={{ ...floatingStyles, display: open ? "block" : "none" }}
-      className="z-50"
-    >
+    <div ref={refs.setFloating} style={{ ...floatingStyles }} className="z-50">
       <TooltipProvider>
         <div className="w-full min-w-full mx-0 shadow-lg border rounded-md bg-background">
           <ToolbarProvider editor={editor}>

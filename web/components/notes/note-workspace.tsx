@@ -3,7 +3,9 @@
 import { Loader2 } from "lucide-react";
 
 import { RichTextEditor } from "@/components/tiptap/rich-text-editor";
-import { useGetNote } from "@/service/local/api-note";
+import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
+import { extractFirstLineFromContent } from "@/lib/string";
+import { noteApi, useGetNote } from "@/service/local/api-note";
 
 import { NoteDetailEmpty } from "./note-detail-empty";
 import { SelectCollection } from "./select-collection";
@@ -15,8 +17,6 @@ type Props = {
 export function NoteWorkspace({ noteId }: Props) {
   const { data: note, isLoading } = useGetNote(noteId);
 
-  // const { content, setContent } = useNoteContent(note, noteId, isLoading);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -24,6 +24,15 @@ export function NoteWorkspace({ noteId }: Props) {
       </div>
     );
   }
+
+  const handleContentChange = (content: string) => {
+    noteApi.update({
+      id: noteId,
+      content,
+    });
+    document.title =
+      extractFirstLineFromContent(content, 30) || NOTE_TITLE_FALLBACK;
+  };
 
   if (!note) return <NoteDetailEmpty />;
 
@@ -34,7 +43,7 @@ export function NoteWorkspace({ noteId }: Props) {
       </div>
 
       <div className="w-full transition-all duration-500 animate-in fade-in slide-in-from-bottom-3">
-        <RichTextEditor value={note.content} />
+        <RichTextEditor value={note.content} onChange={handleContentChange} />
       </div>
     </div>
   );
