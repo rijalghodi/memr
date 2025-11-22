@@ -16,6 +16,7 @@ import { GroupItem, KanbanTask } from "../tasks/kanban/kanban";
 import { TKanbanTask } from "../tasks/kanban/type";
 import { Collapsible, CollapsibleContent } from "../ui";
 import { ProjectIcon } from "./project-icon";
+import { TaskLoading } from "../tasks/task-loading";
 
 const statusGroupItems: GroupItem[] = [
   {
@@ -150,14 +151,9 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
       </Collapsible>
 
       {/* Content */}
-      <div data-slot="content" className="pb-6 px-6">
+      <div data-slot="content" className="flex-1 overflow-hidden h-full">
         {isLoading ? (
-          <div className="h-[300px] text-center flex flex-col gap-4 items-center justify-center">
-            <Loader className="size-6 animate-spin text-primary" />
-            <span className="text-sm text-muted-foreground">
-              Loading tasks...
-            </span>
-          </div>
+          <TaskLoading />
         ) : (
           <KanbanTask
             tasks={tasks}
