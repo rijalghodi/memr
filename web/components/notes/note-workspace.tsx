@@ -42,7 +42,7 @@ export function NoteWorkspace({ noteId }: Props) {
   const loadedNoteIdRef = useRef<string | undefined>(undefined);
   const [debouncedContent, setDebouncedContent] = useDebounce(
     content,
-    AUTOSAVE_INTERVAL,
+    AUTOSAVE_INTERVAL
   );
 
   // Reset content immediately when noteId changes
@@ -77,11 +77,6 @@ export function NoteWorkspace({ noteId }: Props) {
       debouncedContent !== undefined &&
       debouncedContent !== note?.content
     ) {
-      console.log(
-        "autosave -----------------------------------------------------",
-      );
-      console.log("autosave debounced content", debouncedContent);
-      console.log("autosave note?.content", note?.content);
       noteApi
         .update({
           id: noteId,
