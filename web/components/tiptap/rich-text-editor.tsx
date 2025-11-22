@@ -76,7 +76,7 @@ export function RichTextEditor({
     <div
       className={cn(
         "relative max-h-[calc(100dvh-6rem)] w-full overflow-y-scroll pb-[60px]",
-        className
+        className,
       )}
     >
       <FloatingToolbar editor={editor} />
