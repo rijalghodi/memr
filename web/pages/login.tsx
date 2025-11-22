@@ -46,14 +46,15 @@ export function LoginPage() {
 }
 
 export const loginWithGoogle = () => {
-  const params = new URLSearchParams({
-    client_id: import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID!,
-    redirect_uri: import.meta.env.VITE_GOOGLE_OAUTH_REDIRECT_URI!,
-    response_type: "code",
-    scope: "openid email profile",
-    access_type: "offline", // get refresh token
-    prompt: "consent", // ensures refresh token in local dev
-  });
+  // const params = new URLSearchParams({
+  //   client_id: import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID!,
+  //   redirect_uri: import.meta.env.VITE_GOOGLE_OAUTH_REDIRECT_URI!,
+  //   response_type: "code",
+  //   scope: "openid email profile",
+  //   access_type: "offline", // get refresh token
+  //   prompt: "consent", // ensures refresh token in local dev
+  // });
 
-  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+  // window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+  window.location.href = `${import.meta.env.VITE_API_BASE_URL}/v1/auth/google/login`;
 };

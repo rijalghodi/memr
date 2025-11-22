@@ -8,12 +8,15 @@ import (
 	"app/pkg/logger"
 	"app/pkg/util"
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/oauth2"
 )
 
 type AuthHandler struct {
@@ -31,6 +34,7 @@ func NewAuthHandler(authUsecase *usecase.AuthUsecase, userUsecase *usecase.UserU
 func (h *AuthHandler) RegisterRoutes(app *fiber.App) {
 	app.Get("/v1/auth/me", middleware.AuthGuard(), h.GetCurrentUser)
 	app.Post("/v1/auth/refresh-token", h.RefreshToken)
+	app.Get("/v1/auth/google/login", h.GoogleLogin)
 	app.Get("/v1/auth/google/callback", h.GoogleCallback)
 }
 
@@ -87,6 +91,47 @@ func (h *AuthHandler) GetCurrentUser(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(util.ToSuccessResponse(user))
 }
 
+// @Tags Auth
+// @Summary Initiate Google OAuth login
+// @Description Redirects to Google OAuth login page
+// @Accept json
+// @Produce json
+// @Success 302
+// @Router /v1/auth/google/login [get]
+func (h *AuthHandler) GoogleLogin(c *fiber.Ctx) error {
+	// Generate a random state for CSRF protection
+	stateBytes := make([]byte, 32)
+	if _, err := rand.Read(stateBytes); err != nil {
+		logger.Log.Error("Failed to generate state: %v", err)
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to generate state")
+	}
+	state := base64.URLEncoding.EncodeToString(stateBytes)
+
+	// Store state in cookie (httpOnly for security)
+	c.Cookie(&fiber.Cookie{
+		Name:     "oauth_state",
+		Value:    state,
+		HTTPOnly: true,
+		Secure:   true, // Set to true in production with HTTPS
+		SameSite: "Lax",
+		MaxAge:   600, // 10 minutes
+		Path:     "/",
+	})
+
+	// Get Google OAuth config
+	googleConfig := config.GoogleConfig()
+
+	// Generate OAuth URL with state and additional parameters for refresh token
+	// access_type=offline and prompt=consent ensure we get a refresh token
+	authURL := googleConfig.AuthCodeURL(state,
+		oauth2.SetAuthURLParam("access_type", "offline"),
+		oauth2.SetAuthURLParam("prompt", "consent"),
+	)
+
+	// Redirect to Google OAuth
+	return c.Redirect(authURL, fiber.StatusTemporaryRedirect)
+}
+
 func (h *AuthHandler) GoogleCallback(c *fiber.Ctx) error {
 	state := c.Query("state")
 	storedState := c.Cookies("oauth_state")
@@ -100,6 +145,7 @@ func (h *AuthHandler) GoogleCallback(c *fiber.Ctx) error {
 
 	token, err := googlecon.Exchange(context.Background(), code)
 	if err != nil {
+		logger.Log.Error("Failed to exchange code: %v", err)
 		return err
 	}
 
@@ -109,11 +155,13 @@ func (h *AuthHandler) GoogleCallback(c *fiber.Ctx) error {
 		nil,
 	)
 	if err != nil {
+		logger.Log.Error("Failed to get google user info: %v", err)
 		return err
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
+		logger.Log.Error("Failed to do request: %v", err)
 		return err
 	}
 	defer resp.Body.Close()
