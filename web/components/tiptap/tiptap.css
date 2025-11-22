@@ -99,7 +99,7 @@
 .ProseMirror {
   caret-color: var(--editor-text-default);
   outline: none;
-  padding: var(--editor-spacing-8) var(--editor-spacing-12);
+  padding: var(--editor-spacing-1) var(--editor-spacing-8);
   margin: 0 0;
   max-width: 76ch;
   font-family: var(--editor-font-sans);
@@ -125,7 +125,7 @@
 }
 
 .ProseMirror > .react-renderer {
-  margin: var(--editor-spacing-12) 0;
+  margin: 0 0;
   transition: all var(--editor-transition-normal);
 }
 
