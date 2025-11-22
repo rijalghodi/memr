@@ -37,6 +37,7 @@ func ToPaginatedData(items any, page, pageSize int, total int64) PaginatedData {
 		PageSize:   pageSize,
 		Total:      total,
 		TotalPages: totalPages,
+		Items:      items,
 	}
 }
 

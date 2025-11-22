@@ -23,7 +23,7 @@ func NewAgent(openaiClient *openai.OpenAIClient, toolExecutor *ToolExecutor) *Ag
 
 // ProcessMessage processes a user message and returns the assistant's response
 // It handles tool calling loops until a final response is generated
-func (a *Agent) ProcessMessage(ctx context.Context, userID string, systemPrompt string, messages []openai.ChatMessage) (string, error) {
+func (a *Agent) ProcessMessage(ctx context.Context, userID string, systemPrompt string, messages []openai.ChatMessage) (result *openai.ChatMessage, err error) {
 	tools := GetToolDefinitions()
 	maxIterations := 10
 	iteration := 0
@@ -37,12 +37,12 @@ func (a *Agent) ProcessMessage(ctx context.Context, userID string, systemPrompt 
 		response, err := a.openaiClient.CreateChatCompletion(ctx, systemPrompt, currentMessages, tools)
 		if err != nil {
 			logger.Log.Error("Failed to create chat completion", zap.Error(err))
-			return "", fmt.Errorf("failed to create chat completion: %w", err)
+			return nil, fmt.Errorf("failed to create chat completion: %w", err)
 		}
 
 		// If no tool calls, return the final message
 		if len(response.Message.ToolCalls) == 0 {
-			return response.Message.Content, nil
+			return &response.Message, nil
 		}
 
 		// Add assistant message with tool calls to conversation
@@ -90,9 +90,9 @@ func (a *Agent) ProcessMessage(ctx context.Context, userID string, systemPrompt 
 	if len(currentMessages) > 0 {
 		lastMsg := currentMessages[len(currentMessages)-1]
 		if lastMsg.Role == "assistant" {
-			return lastMsg.Content, nil
+			return &lastMsg, nil
 		}
 	}
 
-	return "", fmt.Errorf("max iterations reached without final response")
+	return nil, fmt.Errorf("max iterations reached without final response")
 }

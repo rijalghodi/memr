@@ -22,9 +22,11 @@ func NewChatHandler(chatUsecase *usecase.ChatUsecase) *ChatHandler {
 }
 
 func (h *ChatHandler) RegisterRoutes(app *fiber.App) {
-	app.Post("/v1/chat/start", middleware.AuthGuard(), h.StartChat)
-	app.Post("/v1/chat/send", middleware.AuthGuard(), h.SendMessage)
-	app.Get("/v1/chat/:chat_id/history", middleware.AuthGuard(), h.GetChatHistory)
+	chatGroup := app.Group("/v1/chats")
+	chatGroup.Post("", middleware.AuthGuard(), h.StartChat)
+	chatGroup.Get("", middleware.AuthGuard(), h.ListChats)
+	chatGroup.Post("/:chat_id/messages", middleware.AuthGuard(), h.SendMessage)
+	chatGroup.Get("/:chat_id/messages", middleware.AuthGuard(), h.GetChatHistory)
 }
 
 // @Tags Chat
@@ -35,7 +37,7 @@ func (h *ChatHandler) RegisterRoutes(app *fiber.App) {
 // @Security BearerAuth
 // @Success 200 {object} util.BaseResponse{data=contract.ChatStartRes}
 // @Failure 401 {object} util.BaseResponse
-// @Router /v1/chat/start [post]
+// @Router /v1/chats [post]
 func (h *ChatHandler) StartChat(c *fiber.Ctx) error {
 	claims, err := middleware.GetAuthClaims(c)
 	if err != nil {
@@ -53,6 +55,46 @@ func (h *ChatHandler) StartChat(c *fiber.Ctx) error {
 }
 
 // @Tags Chat
+// @Summary List chats
+// @Description Get a paginated list of chats for the authenticated user
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param page query int false "Page number (default: 1)" default(1)
+// @Param limit query int false "Items per page (default: 20)" default(20)
+// @Success 200 {object} util.BaseResponse{data=contract.ChatListRes}
+// @Failure 400 {object} util.BaseResponse
+// @Failure 401 {object} util.BaseResponse
+// @Router /v1/chats [get]
+func (h *ChatHandler) ListChats(c *fiber.Ctx) error {
+	claims, err := middleware.GetAuthClaims(c)
+	if err != nil {
+		logger.Log.Warn("Failed to get auth claims", zap.Error(err))
+		return fiber.NewError(fiber.StatusUnauthorized, "Please authenticate")
+	}
+
+	// Parse pagination parameters
+	page := c.QueryInt("page", 1)
+	limit := c.QueryInt("limit", 20)
+
+	// Validate pagination parameters
+	if page < 1 {
+		return fiber.NewError(fiber.StatusBadRequest, "page must be greater than 0")
+	}
+	if limit < 1 || limit > 100 {
+		return fiber.NewError(fiber.StatusBadRequest, "limit must be between 1 and 100")
+	}
+
+	chats, total, err := h.chatUsecase.ListChats(c.Context(), claims.ID, page, limit)
+	if err != nil {
+		logger.Log.Error("Failed to list chats", zap.Error(err))
+		return err
+	}
+
+	return c.Status(fiber.StatusOK).JSON(util.ToPaginatedResponse(chats, page, limit, total))
+}
+
+// @Tags Chat
 // @Summary Send a message
 // @Description Send a message to the chat and get assistant response
 // @Accept json
@@ -63,8 +105,13 @@ func (h *ChatHandler) StartChat(c *fiber.Ctx) error {
 // @Failure 400 {object} util.BaseResponse
 // @Failure 401 {object} util.BaseResponse
 // @Failure 404 {object} util.BaseResponse
-// @Router /v1/chat/send [post]
+// @Router /v1/chats/{chat_id}/messages [post]
 func (h *ChatHandler) SendMessage(c *fiber.Ctx) error {
+	chatID := c.Params("chat_id")
+	if chatID == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "chat_id is required")
+	}
+
 	var req contract.ChatSendReq
 	if err := c.BodyParser(&req); err != nil {
 		logger.Log.Warn("Failed to parse request body", zap.Error(err))
@@ -82,7 +129,7 @@ func (h *ChatHandler) SendMessage(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "Please authenticate")
 	}
 
-	res, err := h.chatUsecase.SendMessage(c.Context(), req.ChatID, claims.ID, req.Message)
+	res, err := h.chatUsecase.SendMessage(c.Context(), chatID, claims.ID, req.Message)
 	if err != nil {
 		logger.Log.Error("Failed to send message", zap.Error(err))
 		return err
@@ -101,7 +148,7 @@ func (h *ChatHandler) SendMessage(c *fiber.Ctx) error {
 // @Success 200 {object} util.BaseResponse{data=contract.ChatHistoryRes}
 // @Failure 401 {object} util.BaseResponse
 // @Failure 404 {object} util.BaseResponse
-// @Router /v1/chat/{chat_id}/history [get]
+// @Router /v1/chats/{chat_id}/messages [get]
 func (h *ChatHandler) GetChatHistory(c *fiber.Ctx) error {
 	chatID := c.Params("chat_id")
 	if chatID == "" {
@@ -122,4 +169,3 @@ func (h *ChatHandler) GetChatHistory(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(util.ToSuccessResponse(res))
 }
-
