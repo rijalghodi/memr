@@ -9,7 +9,6 @@ type ChatStartRes struct {
 }
 
 type ChatSendReq struct {
-	ChatID  string `json:"chatId" validate:"required,uuid"`
 	Message string `json:"message" validate:"required"`
 	// user_id will be extracted from JWT claims, not from request body
 }
@@ -35,4 +34,11 @@ type ToolCallRes struct {
 	Name      *string        `json:"name"`
 	Arguments map[string]any `json:"arguments"`
 	CreatedAt string         `json:"createdAt"`
+}
+
+type ChatRes struct {
+	ID           string `json:"id"`
+	FirstMessage string `json:"firstMessage"`
+	CreatedAt    string `json:"createdAt"`
+	UpdatedAt    string `json:"updatedAt"`
 }

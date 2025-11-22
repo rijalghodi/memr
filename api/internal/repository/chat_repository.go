@@ -4,6 +4,7 @@ import (
 	"app/internal/model"
 	"app/pkg/logger"
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -113,7 +114,9 @@ func (r *ChatRepository) GetChatHistory(ctx context.Context, chatID string) ([]m
 	var messages []model.Message
 	err := r.db.WithContext(ctx).
 		Where("chat_id = ?", chatID).
-		Preload("ToolCalls").
+		Preload("ToolCalls", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at ASC")
+		}).
 		Order("created_at ASC").
 		Find(&messages).Error
 
@@ -123,4 +126,71 @@ func (r *ChatRepository) GetChatHistory(ctx context.Context, chatID string) ([]m
 	}
 
 	return messages, nil
+}
+
+// ListChatsByUserID retrieves chats for a user with pagination, ordered by latest message created_at DESC
+func (r *ChatRepository) ListChatsByUserID(ctx context.Context, userID string, page, limit int) ([]model.Chat, int64, error) {
+	var total int64
+
+	// Count total chats
+	err := r.db.WithContext(ctx).
+		Model(&model.Chat{}).
+		Where("user_id = ?", userID).
+		Count(&total).Error
+	if err != nil {
+		logger.Log.Error("Failed to count chats", zap.Error(err), zap.String("userID", userID))
+		return nil, 0, err
+	}
+
+	// Calculate offset
+	offset := (page - 1) * limit
+
+	var chats []model.Chat
+
+	// Get chats ordered by latest message timestamp (or created_at if no messages)
+	// Use subquery to order by updated_at, then preload messages
+	err = r.db.WithContext(ctx).
+		Where("user_id = ?", userID).
+		Order(`
+			COALESCE(
+				(SELECT MAX(created_at) FROM messages WHERE chat_id = chats.id),
+				chats.created_at
+			) DESC
+		`).
+		Limit(limit).
+		Offset(offset).
+		Preload("Messages", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at ASC")
+		}).
+		Find(&chats).Error
+
+	if err != nil {
+		logger.Log.Error("Failed to list chats", zap.Error(err), zap.String("userID", userID))
+		return nil, 0, err
+	}
+
+	return chats, total, nil
+}
+
+// GetLatestMessageTimestamp gets the latest message timestamp for a chat
+func (r *ChatRepository) GetLatestMessageTimestamp(ctx context.Context, chatID string) (*time.Time, error) {
+	var latestTime time.Time
+	err := r.db.WithContext(ctx).
+		Model(&model.Message{}).
+		Where("chat_id = ?", chatID).
+		Select("MAX(created_at)").
+		Scan(&latestTime).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	if latestTime.IsZero() {
+		return nil, nil
+	}
+
+	return &latestTime, nil
 }
