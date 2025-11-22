@@ -13,7 +13,7 @@ type TaskUpdateProps = {
 
 export function TaskUpdate({ task, onTaskUpdate }: TaskUpdateProps) {
   const [title, setTitle] = useState(task.title || "");
-  const debouncedTitle = useDebounce(title, 300);
+  const [debouncedTitle] = useDebounce(title, 300);
   const isUserEditingRef = useRef(false);
 
   // Update title when task changes externally (only if user is not editing)

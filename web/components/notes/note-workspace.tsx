@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { Check, Loader2, X } from "lucide-react";
@@ -37,17 +38,21 @@ export function NoteWorkspace({ noteId }: Props) {
   const { data: note, isLoading } = useGetNote(noteId);
   const { updateTabTitle } = useSessionTabs();
 
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState<string | undefined>(undefined);
   const loadedNoteIdRef = useRef<string | undefined>(undefined);
-  const debouncedContent = useDebounce(content, AUTOSAVE_INTERVAL);
+  const [debouncedContent, setDebouncedContent] = useDebounce(
+    content,
+    AUTOSAVE_INTERVAL,
+  );
 
   // Reset content immediately when noteId changes
   useEffect(() => {
     if (noteId !== loadedNoteIdRef.current) {
-      setContent("");
+      setContent(undefined);
+      setDebouncedContent(undefined);
       loadedNoteIdRef.current = undefined;
     }
-  }, [noteId]);
+  }, [noteId, setDebouncedContent]);
 
   // Load note content when it's available and matches current noteId
   useEffect(() => {
@@ -58,18 +63,25 @@ export function NoteWorkspace({ noteId }: Props) {
       loadedNoteIdRef.current !== noteId &&
       noteId === note.id
     ) {
-      setContent(note.content || "");
+      setContent(note.content);
+      setDebouncedContent(note.content);
       loadedNoteIdRef.current = noteId;
     }
-  }, [note, noteId, isLoading]);
+  }, [note, noteId, isLoading, setDebouncedContent]);
 
   // Autosave debounced content (only for the currently loaded note)
   useEffect(() => {
     if (
+      !isLoading &&
       loadedNoteIdRef.current === noteId &&
       debouncedContent !== undefined &&
       debouncedContent !== note?.content
     ) {
+      console.log(
+        "autosave -----------------------------------------------------",
+      );
+      console.log("autosave debounced content", debouncedContent);
+      console.log("autosave note?.content", note?.content);
       noteApi
         .update({
           id: noteId,
@@ -82,7 +94,7 @@ export function NoteWorkspace({ noteId }: Props) {
           updateTabTitle(getRoute(ROUTES.NOTE, { noteId }), displayTitle);
         });
     }
-  }, [debouncedContent, updateTabTitle, noteId, note?.content]);
+  }, [debouncedContent, updateTabTitle, noteId, note?.content, isLoading]);
 
   if (isLoading) {
     return (

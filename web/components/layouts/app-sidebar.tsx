@@ -152,6 +152,8 @@ export function SidebarEntityMenus() {
     [notes, collections, projects],
   );
 
+  const { navigate } = useBrowserNavigate();
+
   return (
     <SidebarMenu className="gap-5">
       {items.map((item, idx) => {
@@ -180,11 +182,14 @@ export function SidebarEntityMenus() {
                           <SidebarMenuSubItem
                             key={`${idx}-entity-menu-sub-item`}
                           >
-                            <SidebarMenuSubButton size="sm" asChild>
-                              <Link to={subitem.href}>
-                                {subitem.icon}
-                                {subitem.title || NOTE_TITLE_FALLBACK}
-                              </Link>
+                            <SidebarMenuSubButton
+                              size="sm"
+                              onClick={() =>
+                                navigate(subitem.href, subitem.title)
+                              }
+                            >
+                              {subitem.icon}
+                              {subitem.title || NOTE_TITLE_FALLBACK}
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         );
@@ -196,12 +201,10 @@ export function SidebarEntityMenus() {
                       <SidebarMenuSubButton
                         size="sm"
                         className="font-semibold w-fit"
-                        asChild
+                        onClick={() => navigate(item.seeAllHref!, item.title)}
                       >
-                        <Link to={item.seeAllHref}>
-                          See All
-                          <ArrowRight />
-                        </Link>
+                        See All
+                        <ArrowRight />
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   )}
