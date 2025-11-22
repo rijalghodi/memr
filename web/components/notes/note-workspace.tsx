@@ -12,6 +12,7 @@ import {
   NOTE_TITLE_FALLBACK,
 } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
+import { extractFirstLineFromContent } from "@/lib/string";
 import { useGetCollections } from "@/service/local/api-collection";
 import { noteApi, useGetNote } from "@/service/local/api-note";
 
@@ -26,6 +27,7 @@ import {
   CommandList,
 } from "../ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { NoteDetailEmpty } from "./note-detail-empty";
 
 type Props = {
   noteId: string;
@@ -36,39 +38,51 @@ export function NoteWorkspace({ noteId }: Props) {
   const { updateTabTitle } = useSessionTabs();
 
   const [content, setContent] = useState("");
-  const contentLoaded = useRef(false);
-
+  const loadedNoteIdRef = useRef<string | undefined>(undefined);
   const debouncedContent = useDebounce(content, AUTOSAVE_INTERVAL);
 
-  // Load note content when it's available (only once per note)
+  // Reset content immediately when noteId changes
   useEffect(() => {
-    if (!isLoading && note && !contentLoaded.current) {
-      setContent(note.content || "");
-      contentLoaded.current = true;
+    if (noteId !== loadedNoteIdRef.current) {
+      setContent("");
+      loadedNoteIdRef.current = undefined;
     }
-  }, [note, isLoading]);
+  }, [noteId]);
 
-  // Update tab title when note or content changes
+  // Load note content when it's available and matches current noteId
   useEffect(() => {
-    if (!contentLoaded.current || !noteId) return;
+    if (
+      !isLoading &&
+      note &&
+      noteId &&
+      loadedNoteIdRef.current !== noteId &&
+      noteId === note.id
+    ) {
+      setContent(note.content || "");
+      loadedNoteIdRef.current = noteId;
+    }
+  }, [note, noteId, isLoading]);
 
-    const title = note?.title || NOTE_TITLE_FALLBACK;
-
-    updateTabTitle(getRoute(ROUTES.NOTE, { noteId }), title);
-  }, [content, noteId, updateTabTitle, contentLoaded, note?.title]);
-
-  // Autosave debounced content
+  // Autosave debounced content (only for the currently loaded note)
   useEffect(() => {
-    if (!contentLoaded.current || !noteId) return;
-
-    // Don't save if content hasn't changed from the loaded note
-    if (debouncedContent === note?.content) return;
-
-    noteApi.update({
-      id: noteId,
-      content: debouncedContent,
-    });
-  }, [debouncedContent, noteId, note?.content]);
+    if (
+      loadedNoteIdRef.current === noteId &&
+      debouncedContent !== undefined &&
+      debouncedContent !== note?.content
+    ) {
+      noteApi
+        .update({
+          id: noteId,
+          content: debouncedContent,
+        })
+        .then(() => {
+          const displayTitle =
+            extractFirstLineFromContent(debouncedContent, 30) ||
+            NOTE_TITLE_FALLBACK;
+          updateTabTitle(getRoute(ROUTES.NOTE, { noteId }), displayTitle);
+        });
+    }
+  }, [debouncedContent, updateTabTitle, noteId, note?.content]);
 
   if (isLoading) {
     return (
@@ -79,11 +93,7 @@ export function NoteWorkspace({ noteId }: Props) {
   }
 
   if (!note) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-sm text-muted-foreground">Note not found</p>
-      </div>
-    );
+    return <NoteDetailEmpty />;
   }
 
   return (

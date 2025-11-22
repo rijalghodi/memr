@@ -40,12 +40,16 @@ export function NoteEmpty({
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
-          <Button onClick={onAddNote}>
+          <Button onClick={onAddNote} className="rounded-full">
             <Plus />
             New Note
           </Button>
           {isFiltered && (
-            <Button variant="outline" onClick={onResetFilters}>
+            <Button
+              variant="outline"
+              onClick={onResetFilters}
+              className="rounded-full"
+            >
               Reset Filters
             </Button>
           )}
