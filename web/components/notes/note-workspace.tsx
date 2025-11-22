@@ -7,7 +7,6 @@ import { useGetNote } from "@/service/local/api-note";
 
 import { NoteDetailEmpty } from "./note-detail-empty";
 import { SelectCollection } from "./select-collection";
-import { useNoteContent } from "./use-note-content";
 
 type Props = {
   noteId: string;

@@ -3,6 +3,17 @@ import type { Node as PMNode } from "@tiptap/pm/model";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet, type EditorView } from "@tiptap/pm/view";
 
+export interface SearchAndReplaceStorage {
+  searchTerm: string;
+  replaceTerm: string;
+  results: Range[];
+  lastSearchTerm: string;
+  selectedResult: number;
+  lastSelectedResult: number;
+  caseSensitive: boolean;
+  lastCaseSensitiveState: boolean;
+}
+
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     search: {
@@ -15,7 +26,7 @@ declare module "@tiptap/core" {
        */
       setReplaceTerm: (replaceTerm: string) => ReturnType;
       /**
-       * @description Replace first instance of search result with given replace term.
+       * @description Replace selected instance of search result with given replace term.
        */
       replace: () => ReturnType;
       /**
@@ -36,6 +47,10 @@ declare module "@tiptap/core" {
       setCaseSensitive: (caseSensitive: boolean) => ReturnType;
     };
   }
+
+  interface Storage {
+    searchAndReplace: SearchAndReplaceStorage;
+  }
 }
 
 interface TextNodeWithPosition {
@@ -46,7 +61,7 @@ interface TextNodeWithPosition {
 const getRegex = (
   searchString: string,
   disableRegex: boolean,
-  caseSensitive: boolean
+  caseSensitive: boolean,
 ): RegExp => {
   const escapedString = disableRegex
     ? searchString.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")
@@ -64,7 +79,7 @@ function processSearches(
   searchTerm: RegExp,
   selectedResultIndex: number,
   searchResultClass: string,
-  selectedResultClass: string
+  selectedResultClass: string,
 ): ProcessedSearches {
   const decorations: Decoration[] = [];
   const results: Range[] = [];
@@ -82,7 +97,7 @@ function processSearches(
 
   for (const { text, pos } of textNodesWithPosition) {
     const matches = Array.from(text.matchAll(searchTerm)).filter(
-      ([matchText]) => matchText.trim()
+      ([matchText]) => matchText.trim(),
     );
 
     for (const match of matches) {
@@ -103,7 +118,7 @@ function processSearches(
       Decoration.inline(from, to, {
         class:
           selectedResultIndex === i ? selectedResultClass : searchResultClass,
-      })
+      }),
     );
   }
 
@@ -116,95 +131,80 @@ function processSearches(
 const replace = (
   replaceTerm: string,
   results: Range[],
-  { state, dispatch }: any
+  selectedResult: number,
+  { state, dispatch }: any,
 ) => {
-  const firstResult = results[0];
-
-  if (!firstResult) {
+  if (
+    !results.length ||
+    selectedResult < 0 ||
+    selectedResult >= results.length
+  ) {
     return;
   }
 
-  const { from, to } = firstResult;
+  const selectedRange = results[selectedResult];
+  if (!selectedRange) {
+    return;
+  }
+
+  const { from, to } = selectedRange;
 
   if (dispatch) {
     dispatch(state.tr.insertText(replaceTerm, from, to));
   }
 };
 
-const rebaseNextResult = (
-  replaceTerm: string,
-  index: number,
-  lastOffset: number,
-  results: Range[]
-): [number, Range[]] | null => {
-  const nextIndex = index + 1;
-
-  if (!results[nextIndex]) {
-    return null;
-  }
-
-  const currentResult = results[index];
-  if (!currentResult) {
-    return null;
-  }
-
-  const { from: currentFrom, to: currentTo } = currentResult;
-
-  const offset = currentTo - currentFrom - replaceTerm.length + lastOffset;
-
-  const { from, to } = results[nextIndex];
-
-  results[nextIndex] = {
-    to: to - offset,
-    from: from - offset,
-  };
-
-  return [offset, results];
-};
-
 const replaceAll = (
   replaceTerm: string,
   results: Range[],
-  { tr, dispatch }: { tr: any; dispatch: any }
+  { tr, dispatch }: { tr: any; dispatch: any },
 ) => {
-  if (!results.length) {
+  if (!results.length || !dispatch) {
     return;
   }
 
-  let offset = 0;
+  // Process replacements from end to beginning to avoid position shifting issues
+  // Or calculate cumulative offset from beginning to end
+  let cumulativeOffset = 0;
 
   for (let i = 0; i < results.length; i++) {
     const result = results[i];
     if (!result) continue;
-    const { from, to } = result;
-    tr.insertText(replaceTerm, from, to);
-    const rebaseResponse = rebaseNextResult(replaceTerm, i, offset, results);
 
-    if (rebaseResponse) {
-      offset = rebaseResponse[0];
-    }
+    const { from, to } = result;
+    const originalLength = to - from;
+    const newLength = replaceTerm.length;
+    const lengthDiff = newLength - originalLength;
+
+    // Apply the cumulative offset to the current positions
+    const adjustedFrom = from + cumulativeOffset;
+    const adjustedTo = to + cumulativeOffset;
+
+    tr.insertText(replaceTerm, adjustedFrom, adjustedTo);
+
+    // Update cumulative offset for next replacements
+    cumulativeOffset += lengthDiff;
   }
 
   dispatch(tr);
 };
 
 const selectNext = (editor: CoreEditor) => {
-  const { results } = editor.storage
-    .searchAndReplace as SearchAndReplaceStorage;
+  const storage = editor.storage.searchAndReplace as SearchAndReplaceStorage;
+  const { results } = storage;
 
   if (!results.length) {
     return;
   }
 
-  const { selectedResult } = editor.storage.searchAndReplace;
+  const currentIndex = storage.selectedResult;
 
-  if (selectedResult >= results.length - 1) {
-    editor.storage.searchAndReplace.selectedResult = 0;
-  } else {
-    editor.storage.searchAndReplace.selectedResult += 1;
-  }
+  // Wrap around to beginning if at the end
+  const nextIndex = currentIndex >= results.length - 1 ? 0 : currentIndex + 1;
 
-  const result = results[editor.storage.searchAndReplace.selectedResult];
+  storage.selectedResult = nextIndex;
+
+  const result = results[nextIndex];
   if (!result) return;
 
   const { from } = result;
@@ -212,61 +212,51 @@ const selectNext = (editor: CoreEditor) => {
   const view: EditorView | undefined = editor.view;
 
   if (view) {
-    view
-      .domAtPos(from)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      .node.scrollIntoView({ behavior: "smooth", block: "center" });
+    const domAtPos = view.domAtPos(from);
+    if (domAtPos.node && domAtPos.node instanceof Element) {
+      domAtPos.node.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }
 };
 
 const selectPrevious = (editor: CoreEditor) => {
-  const { results } = editor.storage.searchAndReplace;
+  const storage = editor.storage.searchAndReplace as SearchAndReplaceStorage;
+  const { results } = storage;
 
   if (!results.length) {
     return;
   }
 
-  const { selectedResult } = editor.storage.searchAndReplace;
+  const currentIndex = storage.selectedResult;
 
-  if (selectedResult <= 0) {
-    editor.storage.searchAndReplace.selectedResult = results.length - 1;
-  } else {
-    editor.storage.searchAndReplace.selectedResult -= 1;
-  }
+  // Wrap around to end if at the beginning
+  const prevIndex = currentIndex <= 0 ? results.length - 1 : currentIndex - 1;
 
-  const { from } = results[editor.storage.searchAndReplace.selectedResult];
+  storage.selectedResult = prevIndex;
+
+  const result = results[prevIndex];
+  if (!result) return;
+
+  const { from } = result;
 
   const view: EditorView | undefined = editor.view;
 
   if (view) {
-    view
-      .domAtPos(from)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      .node.scrollIntoView({ behavior: "smooth", block: "center" });
+    const domAtPos = view.domAtPos(from);
+    if (domAtPos.node && domAtPos.node instanceof Element) {
+      domAtPos.node.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }
 };
 
 export const searchAndReplacePluginKey = new PluginKey(
-  "searchAndReplacePlugin"
+  "searchAndReplacePlugin",
 );
 
 export interface SearchAndReplaceOptions {
   searchResultClass: string;
   selectedResultClass: string;
   disableRegex: boolean;
-}
-
-export interface SearchAndReplaceStorage {
-  searchTerm: string;
-  replaceTerm: string;
-  results: Range[];
-  lastSearchTerm: string;
-  selectedResult: number;
-  lastSelectedResult: number;
-  caseSensitive: boolean;
-  lastCaseSensitiveState: boolean;
 }
 
 export const SearchAndReplace = Extension.create<
@@ -315,9 +305,11 @@ export const SearchAndReplace = Extension.create<
       replace:
         () =>
         ({ editor, state, dispatch }) => {
-          const { replaceTerm, results } = editor.storage.searchAndReplace;
+          const storage = editor.storage
+            .searchAndReplace as SearchAndReplaceStorage;
+          const { replaceTerm, results, selectedResult } = storage;
 
-          replace(replaceTerm, results, { state, dispatch });
+          replace(replaceTerm, results, selectedResult, { state, dispatch });
 
           return false;
         },
@@ -410,14 +402,19 @@ export const SearchAndReplace = Extension.create<
               getRegex(searchTerm, disableRegex, caseSensitive),
               selectedResult,
               searchResultClass,
-              selectedResultClass
+              selectedResultClass,
             );
 
             editor.storage.searchAndReplace.results = results;
 
-            if (selectedResult > results.length) {
-              editor.storage.searchAndReplace.selectedResult = 1;
-              editor.commands.selectPreviousResult();
+            // Ensure selectedResult is within bounds
+            if (results.length === 0) {
+              editor.storage.searchAndReplace.selectedResult = 0;
+            } else if (selectedResult >= results.length) {
+              editor.storage.searchAndReplace.selectedResult =
+                results.length - 1;
+            } else if (selectedResult < 0) {
+              editor.storage.searchAndReplace.selectedResult = 0;
             }
 
             return decorationsToReturn;

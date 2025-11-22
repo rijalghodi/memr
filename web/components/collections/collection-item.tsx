@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 import { useDeleteCollection } from "@/service/local/api-collection";
 
 import { useBrowserNavigate } from "../browser-navigation";
-import { useSessionTabs } from "../session-tabs";
 import { Button } from "../ui/button";
 import { useConfirmation } from "../ui/confirmation-dialog";
 import {
@@ -69,13 +68,8 @@ export function CollectionItem({
     });
   };
 
-  const { addTab } = useSessionTabs();
   const handleClick = () => {
-    navigate(getRoute(ROUTES.COLLECTION, { collectionId: id }), displayTitle);
-    addTab({
-      title: displayTitle,
-      pathname: getRoute(ROUTES.COLLECTION, { collectionId: id }),
-    });
+    navigate(getRoute(ROUTES.COLLECTION, { collectionId: id }));
   };
 
   return (

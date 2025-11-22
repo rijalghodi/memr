@@ -59,7 +59,7 @@ export function CollectionWorkspace({
   };
 
   const handleTitleUpdate = (
-    e: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
   ) => {
     const newTitle = e.target.value;
     collectionApi.update({

@@ -61,7 +61,7 @@ export function AppSidebar() {
   // handle add button
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
-      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }), NOTE_TITLE_FALLBACK);
+      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }));
     },
   });
 
@@ -184,9 +184,7 @@ export function SidebarEntityMenus() {
                           >
                             <SidebarMenuSubButton
                               size="sm"
-                              onClick={() =>
-                                navigate(subitem.href, subitem.title)
-                              }
+                              onClick={() => navigate(subitem.href)}
                             >
                               {subitem.icon}
                               {subitem.title || NOTE_TITLE_FALLBACK}
@@ -201,7 +199,7 @@ export function SidebarEntityMenus() {
                       <SidebarMenuSubButton
                         size="sm"
                         className="font-semibold w-fit"
-                        onClick={() => navigate(item.seeAllHref!, item.title)}
+                        onClick={() => navigate(item.seeAllHref!)}
                       >
                         See All
                         <ArrowRight />

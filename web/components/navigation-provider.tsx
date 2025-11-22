@@ -64,7 +64,7 @@ export function NavigationProvider({
 
   // Session Tabs State
   const [sessionTabs, setSessionTabs] = useState<SessionTab[]>(() =>
-    loadTabsFromStorage()
+    loadTabsFromStorage(),
   );
 
   // Browser Navigation State
@@ -88,7 +88,7 @@ export function NavigationProvider({
     setSessionTabs((prevTabs) => {
       // Check if pathname already exists - replace it
       const existingIndex = prevTabs.findIndex(
-        (tab) => tab.pathname === pathname
+        (tab) => tab.pathname === pathname,
       );
 
       const newTab: SessionTab = {
@@ -139,7 +139,7 @@ export function NavigationProvider({
         updateCanNavigate();
       }
     },
-    [updateCanNavigate]
+    [updateCanNavigate],
   );
 
   const closeAllTabs = useCallback(() => {
@@ -171,7 +171,7 @@ export function NavigationProvider({
       navigate(pathname);
       updateCanNavigate();
     },
-    [navigate, updateCanNavigate, addTab]
+    [navigate, updateCanNavigate, addTab],
   );
 
   const handleGoBack = useCallback(() => {

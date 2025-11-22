@@ -3,7 +3,6 @@
 import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
 import { useState } from "react";
 
-import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
 import { getRandomColor } from "@/lib/random-color";
 import { getRoute, ROUTES } from "@/lib/routes";
 import {
@@ -32,10 +31,7 @@ export function CollectionDashboard() {
 
   const { mutate: createCollection } = collectionApiHook.useCreateCollection({
     onSuccess: (data) => {
-      navigate(
-        getRoute(ROUTES.COLLECTION, { collectionId: data.id }),
-        COLLECTION_TITLE_FALLBACK,
-      );
+      navigate(getRoute(ROUTES.COLLECTION, { collectionId: data.id }));
     },
   });
 
