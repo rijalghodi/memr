@@ -21,58 +21,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/auth/google": {
-            "post": {
-                "description": "Google OAuth authentication",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Google OAuth",
-                "parameters": [
-                    {
-                        "description": "Google OAuth request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/contract.GoogleOAuthReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/util.BaseResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/contract.GoogleOAuthRes"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/util.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/auth/me": {
             "get": {
                 "description": "Get current user information",
@@ -166,6 +114,182 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/chat/send": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Send a message to the chat and get assistant response",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "Send a message",
+                "parameters": [
+                    {
+                        "description": "Send message request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contract.ChatSendReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/util.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/contract.ChatSendRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/util.BaseResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/util.BaseResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/util.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/chat/start": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new chat session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "Start a new chat",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/util.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/contract.ChatStartRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/util.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/chat/{chat_id}/history": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the message history for a chat",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "Get chat history",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "chat_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/util.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/contract.ChatHistoryRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/util.BaseResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/util.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/sync": {
             "post": {
                 "security": [
@@ -234,7 +358,8 @@ const docTemplate = `{
         "contract.Change": {
             "type": "object",
             "required": [
-                "id"
+                "entityId",
+                "type"
             ],
             "properties": {
                 "collectionId": {
@@ -260,7 +385,7 @@ const docTemplate = `{
                 "dueDate": {
                     "type": "string"
                 },
-                "id": {
+                "entityId": {
                     "type": "string"
                 },
                 "projectId": {
@@ -277,57 +402,81 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "description": "\"task\" or \"project\" or \"note\" or \"collection\"",
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "task",
+                        "project",
+                        "note",
+                        "collection"
+                    ]
                 },
                 "updatedAt": {
                     "type": "string"
                 }
             }
         },
-        "contract.GoogleOAuthReq": {
+        "contract.ChatHistoryRes": {
+            "type": "object",
+            "properties": {
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/contract.MessageRes"
+                    }
+                }
+            }
+        },
+        "contract.ChatSendReq": {
             "type": "object",
             "required": [
-                "idToken"
+                "chatId",
+                "message"
             ],
             "properties": {
-                "idToken": {
+                "chatId": {
+                    "type": "string"
+                },
+                "message": {
                     "type": "string"
                 }
             }
         },
-        "contract.GoogleOAuthRes": {
+        "contract.ChatSendRes": {
             "type": "object",
             "properties": {
-                "accessToken": {
+                "assistantMessage": {
                     "type": "string"
-                },
-                "accessTokenExpiresAt": {
+                }
+            }
+        },
+        "contract.ChatStartRes": {
+            "type": "object",
+            "properties": {
+                "chatId": {
+                    "type": "string"
+                }
+            }
+        },
+        "contract.MessageRes": {
+            "type": "object",
+            "properties": {
+                "content": {
                     "type": "string"
                 },
                 "createdAt": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
-                "isVerified": {
-                    "type": "boolean"
-                },
-                "name": {
+                "role": {
                     "type": "string"
                 },
-                "refreshToken": {
-                    "type": "string"
-                },
-                "refreshTokenExpiresAt": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
+                "toolCalls": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/contract.ToolCallRes"
+                    }
                 }
             }
         },
@@ -379,6 +528,9 @@ const docTemplate = `{
         },
         "contract.SyncReq": {
             "type": "object",
+            "required": [
+                "lastSyncTime"
+            ],
             "properties": {
                 "changes": {
                     "type": "array",
@@ -401,6 +553,24 @@ const docTemplate = `{
                     }
                 },
                 "lastSyncTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "contract.ToolCallRes": {
+            "type": "object",
+            "properties": {
+                "arguments": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
