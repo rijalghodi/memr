@@ -35,7 +35,11 @@ export const AlignmentTooolbar = () => {
   };
 
   const isDisabled =
-    editor?.isActive("image") ?? editor?.isActive("video") ?? !editor ?? false;
+    (editor?.isActive("image") ??
+    editor?.isActive("video") ??
+    editor === undefined)
+      ? false
+      : false;
 
   const currentTextAlign = () => {
     if (editor?.isActive({ textAlign: "left" })) {

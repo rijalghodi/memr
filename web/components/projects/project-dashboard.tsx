@@ -3,7 +3,6 @@
 import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
 import { useState } from "react";
 
-import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
 import { getRandomColor } from "@/lib/random-color";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { projectApiHook, useGetProjects } from "@/service/local/api-project";
@@ -30,10 +29,7 @@ export function ProjectDashboard() {
   // add project
   const { mutate: createProject } = projectApiHook.useCreateProject({
     onSuccess: (data) => {
-      navigate(
-        getRoute(ROUTES.PROJECT, { projectId: data.id }),
-        PROJECT_TITLE_FALLBACK,
-      );
+      navigate(getRoute(ROUTES.PROJECT, { projectId: data.id }));
     },
   });
 

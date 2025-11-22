@@ -3,7 +3,6 @@
 import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
 import React, { useState } from "react";
 
-import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 
@@ -29,7 +28,7 @@ export function NoteDashboard() {
   // add noote
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
-      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }), NOTE_TITLE_FALLBACK);
+      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }));
     },
   });
 

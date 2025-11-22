@@ -67,7 +67,7 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
   };
 
   const handleClick = () => {
-    navigate(getRoute(ROUTES.NOTE, { noteId: id }), displayTitle);
+    navigate(getRoute(ROUTES.NOTE, { noteId: id }));
   };
 
   return (

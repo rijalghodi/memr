@@ -2,8 +2,8 @@
 
 import * as React from "react";
 
-import { NavigationProvider } from "./navigation-provider";
 import { AuthGuardProvider } from "./layouts/auth-guard";
+import { NavigationProvider } from "./navigation-provider";
 import { QueryProvider } from "./query-provider";
 import { ConfirmationProvider } from "./ui/confirmation-dialog";
 import { Toaster } from "./ui/sonner";

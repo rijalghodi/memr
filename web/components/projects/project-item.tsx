@@ -68,7 +68,7 @@ export function ProjectItem({
   };
 
   const handleClick = () => {
-    navigate(getRoute(ROUTES.PROJECT, { projectId: id }), displayTitle);
+    navigate(getRoute(ROUTES.PROJECT, { projectId: id }));
   };
 
   return (
