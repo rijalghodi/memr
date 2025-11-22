@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { ReactSortable } from "react-sortablejs";
 
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { findMovedIndex } from "@/lib/find-move";
 import { generateBetweenRank } from "@/lib/fractional-idx";
 
@@ -149,35 +148,33 @@ export function KanbanTask({
   }, [groups]);
 
   return (
-    <div id="kanban" className="h-full w-full flex flex-col">
-      <ScrollArea className="flex-1 w-full">
-        <div className="h-full">
-          <ReactSortable
-            list={groupOrderState}
-            setList={handleListReorder}
-            animation={200}
-            handle=".list-title"
-            direction="horizontal"
-            className="flex gap-0 h-full"
-          >
-            {groupOrderState.map((groupItem) => {
-              const groupTasks = tasksByGroup[groupItem.id] || [];
-              return (
-                <List
-                  key={groupItem.id}
-                  groupId={groupItem.id}
-                  groupTitle={groupItem.title}
-                  tasks={groupTasks}
-                  onTaskDrop={handleTaskDrop}
-                  onTaskAdd={handleTaskAdd}
-                  onTaskUpdate={onTaskUpdate}
-                />
-              );
-            })}
-          </ReactSortable>
-        </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+    <div id="kanban" className="h-full w-full flex flex-col overflow-hidden">
+      {/* <ScrollArea className="flex-1 w-full h-full bg-purple-200 overflow-x-auto"> */}
+      <ReactSortable
+        list={groupOrderState}
+        setList={handleListReorder}
+        animation={200}
+        handle=".list-title"
+        direction="horizontal"
+        className="flex gap-0 h-full flex-1 px-6 overflow-x-auto"
+      >
+        {groupOrderState.map((groupItem) => {
+          const groupTasks = tasksByGroup[groupItem.id] || [];
+          return (
+            <List
+              key={groupItem.id}
+              groupId={groupItem.id}
+              groupTitle={groupItem.title}
+              tasks={groupTasks}
+              onTaskDrop={handleTaskDrop}
+              onTaskAdd={handleTaskAdd}
+              onTaskUpdate={onTaskUpdate}
+            />
+          );
+        })}
+      </ReactSortable>
+      {/* <ScrollBar orientation="horizontal" />
+      </ScrollArea> */}
     </div>
   );
 }

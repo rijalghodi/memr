@@ -96,25 +96,24 @@ export function List({
         </header>
       </Collapsible>
 
-      <ScrollArea className="flex-1">
-        <div className={cn("px-2")}>
-          <ReactSortable
-            list={tasks}
-            setList={handleSetList}
-            group="kanban-tasks"
-            animation={200}
-            className={cn(
-              "space-y-2 min-h-[300px]",
-              tasks.length === 0 && "bg-muted/50 rounded-md",
-            )}
-            ghostClass="opacity-50"
-            dragClass="cursor-grabbing"
-          >
-            {tasks.map((task) => (
-              <Card key={task.id} task={task} onTaskUpdate={onTaskUpdate} />
-            ))}
-          </ReactSortable>
-        </div>
+      <ScrollArea className="flex-1 flex items-stretch overflow-y-auto">
+        <ReactSortable
+          list={tasks}
+          setList={handleSetList}
+          group="kanban-tasks"
+          animation={200}
+          className={cn(
+            "space-y-2 pb-2 px-2 h-full min-h-[400px]",
+            tasks.length === 0 && "bg-muted/50 rounded-md",
+          )}
+          ghostClass="opacity-50"
+          dragClass="cursor-grabbing"
+        >
+          {tasks.map((task) => (
+            <Card key={task.id} task={task} onTaskUpdate={onTaskUpdate} />
+          ))}
+        </ReactSortable>
+
         <ScrollBar orientation="vertical" />
       </ScrollArea>
     </div>
