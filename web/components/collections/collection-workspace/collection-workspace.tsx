@@ -4,7 +4,7 @@ import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
 import React, { useState } from "react";
 
 import { useBrowserNavigate } from "@/components/browser-navigation";
-import { COLLECTION_TITLE_FALLBACK, NOTE_TITLE_FALLBACK } from "@/lib/constant";
+import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
 import {
   collectionApi,
@@ -43,7 +43,7 @@ export function CollectionWorkspace({
   // add note
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
-      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }), NOTE_TITLE_FALLBACK);
+      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }));
     },
   });
 
