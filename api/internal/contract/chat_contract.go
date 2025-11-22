@@ -23,17 +23,16 @@ type ChatHistoryRes struct {
 }
 
 type MessageRes struct {
-	ID        string       `json:"id"`
-	Role      string       `json:"role"`
-	Content   *string      `json:"content"`
-	CreatedAt string       `json:"createdAt"`
+	ID        string        `json:"id"`
+	Role      string        `json:"role"`
+	Content   *string       `json:"content"`
+	CreatedAt string        `json:"createdAt"`
 	ToolCalls []ToolCallRes `json:"toolCalls,omitempty"`
 }
 
 type ToolCallRes struct {
-	ID        string          `json:"id"`
-	Name      *string         `json:"name"`
-	Arguments map[string]any  `json:"arguments"`
-	CreatedAt string          `json:"createdAt"`
+	ID        string         `json:"id"`
+	Name      *string        `json:"name"`
+	Arguments map[string]any `json:"arguments"`
+	CreatedAt string         `json:"createdAt"`
 }
-
