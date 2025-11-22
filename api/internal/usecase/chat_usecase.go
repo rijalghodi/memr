@@ -8,6 +8,9 @@ import (
 	"app/pkg/openai"
 	"context"
 	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,13 +18,15 @@ import (
 )
 
 type ChatUsecase struct {
+	userRepo     *repository.UserRepository
 	chatRepo     *repository.ChatRepository
 	agent        *agent.Agent
 	openaiClient *openai.OpenAIClient
 }
 
-func NewChatUsecase(chatRepo *repository.ChatRepository, agent *agent.Agent, openaiClient *openai.OpenAIClient) *ChatUsecase {
+func NewChatUsecase(userRepo *repository.UserRepository, chatRepo *repository.ChatRepository, agent *agent.Agent, openaiClient *openai.OpenAIClient) *ChatUsecase {
 	return &ChatUsecase{
+		userRepo:     userRepo,
 		chatRepo:     chatRepo,
 		agent:        agent,
 		openaiClient: openaiClient,
@@ -42,6 +47,15 @@ func (u *ChatUsecase) StartChat(ctx context.Context, userID string) (*contract.C
 
 func (u *ChatUsecase) SendMessage(ctx context.Context, chatID, userID, message string) (*contract.ChatSendRes, error) {
 	// Verify chat belongs to user
+	user, err := u.userRepo.GetUserByID(userID)
+	if err != nil {
+		logger.Log.Error("Failed to get user", zap.Error(err), zap.String("userID", userID))
+		return nil, err
+	}
+	if user == nil {
+		return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
+	}
+
 	chat, err := u.chatRepo.GetChatByID(ctx, chatID, userID)
 	if err != nil {
 		logger.Log.Error("Failed to get chat", zap.Error(err), zap.String("chatID", chatID))
@@ -109,8 +123,12 @@ func (u *ChatUsecase) SendMessage(ctx context.Context, chatID, userID, message s
 		openaiMessages = append(openaiMessages, openaiMsg)
 	}
 
-	// System prompt
-	systemPrompt := "You are a helpful assistant that can search notes and tasks. Use the available tools to help users find information."
+	// Load and template system prompt
+	systemPrompt, err := u.getSystemPrompt(user.Name, user.Email)
+	if err != nil {
+		logger.Log.Warn("Failed to load system prompt, using default", zap.Error(err))
+		systemPrompt = "You are a helpful assistant that can search notes and tasks. Use the available tools to help users find information."
+	}
 
 	// Process message with agent
 	assistantResponse, err := u.agent.ProcessMessage(ctx, userID, systemPrompt, openaiMessages)
@@ -128,7 +146,6 @@ func (u *ChatUsecase) SendMessage(ctx context.Context, chatID, userID, message s
 
 	// Note: Tool calls are stored during agent processing if needed
 	// For now, we'll store them separately if the agent returns tool calls
-	// This is a simplified version - in production, you'd want to store tool calls from the agent loop
 
 	return &contract.ChatSendRes{
 		AssistantMessage: assistantResponse.Content,
@@ -231,4 +248,43 @@ func (u *ChatUsecase) ListChats(ctx context.Context, userID string, page, limit 
 	}
 
 	return chatRes, total, nil
+}
+
+// getSystemPrompt loads the system prompt template and fills in user data
+func (u *ChatUsecase) getSystemPrompt(userName, userEmail string) (string, error) {
+	// Try multiple possible locations for the prompt file
+	// This handles both development and production scenarios
+	possiblePaths := []string{
+		"assets/chat-prompt.md",     // Relative to current working directory
+		"api/assets/chat-prompt.md", // Relative to current working directory (if in repo root)
+		filepath.Join(filepath.Dir(os.Args[0]), "assets/chat-prompt.md"), // Relative to executable
+	}
+
+	// Also try relative to current working directory
+	if wd, err := os.Getwd(); err == nil {
+		possiblePaths = append(possiblePaths,
+			filepath.Join(wd, "assets/chat-prompt.md"),
+			filepath.Join(wd, "api/assets/chat-prompt.md"),
+		)
+	}
+
+	var content []byte
+	var err error
+	for _, path := range possiblePaths {
+		content, err = os.ReadFile(path)
+		if err == nil {
+			break
+		}
+	}
+
+	if err != nil {
+		return "", err
+	}
+
+	// Replace Mustache template variables with user data
+	prompt := string(content)
+	prompt = strings.ReplaceAll(prompt, "{{user_name}}", userName)
+	prompt = strings.ReplaceAll(prompt, "{{user_email}}", userEmail)
+
+	return prompt, nil
 }

@@ -44,7 +44,7 @@ func InjectHTTPHandlers(ctx context.Context, app *fiber.App, db *gorm.DB) {
 	agentRepo := agent.NewAgentRepository(db)
 	toolExecutor := agent.NewToolExecutor(openaiClient, agentRepo)
 	chatAgent := agent.NewAgent(openaiClient, toolExecutor)
-	chatUsecase := usecase.NewChatUsecase(chatRepo, chatAgent, openaiClient)
+	chatUsecase := usecase.NewChatUsecase(userRepo, chatRepo, chatAgent, openaiClient)
 	chatHandler := handler.NewChatHandler(chatUsecase)
 	chatHandler.RegisterRoutes(app)
 }
