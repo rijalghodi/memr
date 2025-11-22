@@ -152,6 +152,148 @@ func (u *ChatUsecase) SendMessage(ctx context.Context, chatID, userID, message s
 	}, nil
 }
 
+// StreamWriter interface for writing SSE-formatted chunks
+type StreamWriter interface {
+	WriteChunk(chunk contract.ChatStreamChunk) error
+}
+
+// SendMessageStream sends a message and streams the response
+func (u *ChatUsecase) SendMessageStream(ctx context.Context, chatID, userID, message string, writer StreamWriter) error {
+	// Verify chat belongs to user
+	user, err := u.userRepo.GetUserByID(userID)
+	if err != nil {
+		logger.Log.Error("Failed to get user", zap.Error(err), zap.String("userID", userID))
+		return err
+	}
+	if user == nil {
+		return fiber.NewError(fiber.StatusNotFound, "User not found")
+	}
+
+	chat, err := u.chatRepo.GetChatByID(ctx, chatID, userID)
+	if err != nil {
+		logger.Log.Error("Failed to get chat", zap.Error(err), zap.String("chatID", chatID))
+		return err
+	}
+	if chat == nil {
+		return fiber.NewError(fiber.StatusNotFound, "Chat not found")
+	}
+
+	// Insert user message
+	_, err = u.chatRepo.CreateMessage(ctx, chatID, userID, "user", message)
+	if err != nil {
+		logger.Log.Error("Failed to create user message", zap.Error(err))
+		return err
+	}
+
+	// Load chat history
+	messages, err := u.chatRepo.GetChatHistory(ctx, chatID)
+	if err != nil {
+		logger.Log.Error("Failed to get chat history", zap.Error(err))
+		return err
+	}
+
+	// Convert to OpenAI message format
+	openaiMessages := make([]openai.ChatMessage, 0, len(messages))
+
+	for _, msg := range messages {
+		if msg.Role == "tool" {
+			openaiMessages = append(openaiMessages, openai.ChatMessage{
+				Role:    "tool",
+				Content: *msg.Content,
+			})
+			continue
+		}
+
+		openaiMsg := openai.ChatMessage{
+			Role: msg.Role,
+		}
+		if msg.Content != nil {
+			openaiMsg.Content = *msg.Content
+		}
+
+		// Handle tool calls for assistant messages
+		if msg.Role == "assistant" && len(msg.ToolCalls) > 0 {
+			toolCalls := make([]openai.ChatToolCall, 0, len(msg.ToolCalls))
+
+			for _, tc := range msg.ToolCalls {
+				var args map[string]interface{}
+				if err := json.Unmarshal(tc.GetArgumentsBytes(), &args); err != nil {
+					logger.Log.Warn("Failed to unmarshal tool call arguments", zap.Error(err))
+					continue
+				}
+				toolCalls = append(toolCalls, openai.ChatToolCall{
+					ID:   tc.ID,
+					Type: "function",
+					Function: openai.ChatFunctionCall{
+						Name:      *tc.Name,
+						Arguments: args,
+					},
+				})
+			}
+			openaiMsg.ToolCalls = toolCalls
+		}
+
+		openaiMessages = append(openaiMessages, openaiMsg)
+	}
+
+	// Load and template system prompt
+	systemPrompt, err := u.getSystemPrompt(user.Name, user.Email)
+	if err != nil {
+		logger.Log.Warn("Failed to load system prompt, using default", zap.Error(err))
+		systemPrompt = "You are a helpful assistant that can search notes and tasks. Use the available tools to help users find information."
+	}
+
+	// Process message with agent (streaming)
+	var finalContent string
+	assistantResponse, err := u.agent.ProcessMessageStream(ctx, userID, systemPrompt, openaiMessages, func(deltaContent string) error {
+		// Write delta chunk
+		chunk := contract.ChatStreamChunk{
+			Content: deltaContent,
+			Done:    false,
+		}
+		if err := writer.WriteChunk(chunk); err != nil {
+			return err
+		}
+		finalContent += deltaContent
+		return nil
+	})
+
+	if err != nil {
+		logger.Log.Error("Failed to process message", zap.Error(err))
+		// Send error chunk
+		errorChunk := contract.ChatStreamChunk{
+			Error: err.Error(),
+			Done:  true,
+		}
+		writer.WriteChunk(errorChunk)
+		return err
+	}
+
+	// Send final chunk
+	finalChunk := contract.ChatStreamChunk{
+		Content: "",
+		Done:    true,
+	}
+	if err := writer.WriteChunk(finalChunk); err != nil {
+		logger.Log.Warn("Failed to write final chunk", zap.Error(err))
+	}
+
+	// Store final message in database
+	if assistantResponse != nil {
+		contentToStore := finalContent
+		if contentToStore == "" && assistantResponse.Content != "" {
+			contentToStore = assistantResponse.Content
+		}
+		_, err = u.chatRepo.CreateMessage(ctx, chatID, userID, "assistant", contentToStore)
+		if err != nil {
+			logger.Log.Error("Failed to create assistant message", zap.Error(err))
+			// Don't return error here - message was already streamed
+		}
+	}
+
+	return nil
+}
+
 // GetChatHistory retrieves the chat history
 func (u *ChatUsecase) GetChatHistory(ctx context.Context, chatID, userID string) (*contract.ChatHistoryRes, error) {
 	// Verify chat belongs to user

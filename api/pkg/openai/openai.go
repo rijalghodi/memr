@@ -225,3 +225,120 @@ func (u *OpenAIClient) CreateChatCompletion(ctx context.Context, systemPrompt st
 
 	return result, nil
 }
+
+// StreamChunkCallback is called for each delta chunk received from OpenAI
+type StreamChunkCallback func(deltaContent string) error
+
+// CreateChatCompletionStream creates a streaming chat completion (no tool calls expected)
+// It calls the callback function for each delta chunk received
+func (u *OpenAIClient) CreateChatCompletionStream(ctx context.Context, systemPrompt string, messages []ChatMessage, onChunk StreamChunkCallback) (*ChatResponse, error) {
+	// Convert messages to OpenAI Chat Completions API format
+	chatMessages := make([]openai.ChatCompletionMessageParamUnion, 0, len(messages)+1)
+
+	// Add system message if provided
+	if systemPrompt != "" {
+		chatMessages = append(chatMessages, openai.SystemMessage(systemPrompt))
+	}
+
+	// Convert user/assistant/tool messages (no tool calls expected in streaming)
+	for _, msg := range messages {
+		if msg.ToolCallID != nil && msg.Role == "tool" {
+			// Tool response message
+			chatMessages = append(chatMessages, openai.ToolMessage(msg.Content, *msg.ToolCallID))
+		} else if msg.Role == "user" {
+			chatMessages = append(chatMessages, openai.UserMessage(msg.Content))
+		} else if msg.Role == "assistant" {
+			if len(msg.ToolCalls) > 0 {
+				// Convert tool calls to OpenAI format
+				toolCalls := make([]openai.ChatCompletionMessageToolCallUnionParam, 0, len(msg.ToolCalls))
+				for _, tc := range msg.ToolCalls {
+					argsBytes, err := json.Marshal(tc.Function.Arguments)
+					if err != nil {
+						return nil, fmt.Errorf("failed to marshal tool call arguments: %w", err)
+					}
+					toolCalls = append(toolCalls, openai.ChatCompletionMessageToolCallUnionParam{
+						OfFunction: &openai.ChatCompletionMessageFunctionToolCallParam{
+							ID:   tc.ID,
+							Type: constant.Function("function"),
+							Function: openai.ChatCompletionMessageFunctionToolCallFunctionParam{
+								Name:      tc.Function.Name,
+								Arguments: string(argsBytes),
+							},
+						},
+					})
+				}
+				// Create assistant message with tool calls
+				assistantMsg := openai.ChatCompletionAssistantMessageParam{
+					Role:      constant.Assistant("assistant"),
+					ToolCalls: toolCalls,
+				}
+				// Content is optional when tool_calls is present, but we include it if available
+				if msg.Content != "" {
+					assistantMsg.Content = openai.ChatCompletionAssistantMessageParamContentUnion{
+						OfString: param.NewOpt(msg.Content),
+					}
+				}
+				chatMessages = append(chatMessages, openai.ChatCompletionMessageParamUnion{
+					OfAssistant: &assistantMsg,
+				})
+			} else {
+				// Simple assistant message without tool calls
+				chatMessages = append(chatMessages, openai.AssistantMessage(msg.Content))
+			}
+		}
+	}
+
+	// Create chat completion request (NewStreaming handles stream=true internally)
+	params := openai.ChatCompletionNewParams{
+		Model:    openai.ChatModelGPT4oMini,
+		Messages: chatMessages,
+	}
+
+	// Create streaming request
+	stream := u.client.Chat.Completions.NewStreaming(ctx, params)
+	defer stream.Close()
+
+	var accumulatedContent string
+	var finishReason string
+
+	// Process stream chunks
+	for stream.Next() {
+		chunk := stream.Current()
+		if len(chunk.Choices) == 0 {
+			continue
+		}
+
+		choice := chunk.Choices[0]
+
+		// Handle delta content
+		if choice.Delta.Content != "" {
+			deltaContent := choice.Delta.Content
+			accumulatedContent += deltaContent
+
+			// Call callback with delta content
+			if onChunk != nil {
+				if err := onChunk(deltaContent); err != nil {
+					return nil, fmt.Errorf("callback error: %w", err)
+				}
+			}
+		}
+
+		// Check if stream is done
+		if choice.FinishReason != "" {
+			finishReason = choice.FinishReason
+			break
+		}
+	}
+
+	if err := stream.Err(); err != nil {
+		return nil, fmt.Errorf("stream error: %w", err)
+	}
+
+	return &ChatResponse{
+		FinishReason: finishReason,
+		Message: ChatMessage{
+			Role:    "assistant",
+			Content: accumulatedContent,
+		},
+	}, nil
+}

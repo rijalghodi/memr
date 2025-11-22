@@ -42,3 +42,9 @@ type ChatRes struct {
 	CreatedAt    string `json:"createdAt"`
 	UpdatedAt    string `json:"updatedAt"`
 }
+
+type ChatStreamChunk struct {
+	Content string `json:"content"` // Delta content
+	Done    bool   `json:"done"`    // Stream complete
+	Error   string `json:"error,omitempty"`
+}
