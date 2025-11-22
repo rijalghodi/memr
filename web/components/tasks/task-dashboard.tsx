@@ -109,24 +109,26 @@ export function TaskDashboard() {
   };
 
   return (
-    <div className="flex flex-col h-full py-6 space-y-3">
+    <div className="flex flex-col h-full py-6 gap-3">
       {/* Header */}
       <Collapsible key="note-filter-collapsible">
-        <div className="flex items-center justify-between px-6">
-          <h1 className="text-3xl font-semibold">Tasks</h1>
-          <div className="flex items-center gap-0">
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <ListFilter />
-              </Button>
-            </CollapsibleTrigger>
+        <div className="px-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-semibold">Tasks</h1>
+            <div className="flex items-center gap-0">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <ListFilter />
+                </Button>
+              </CollapsibleTrigger>
+            </div>
           </div>
+          <CollapsibleContent>
+            <div className="flex items-center">
+              <ProjectFilter value={projectId} onValueChange={setProjectId} />
+            </div>
+          </CollapsibleContent>
         </div>
-        <CollapsibleContent>
-          <div className="px-6 flex items-center pb-3">
-            <ProjectFilter value={projectId} onValueChange={setProjectId} />
-          </div>
-        </CollapsibleContent>
       </Collapsible>
 
       {/* Content */}
