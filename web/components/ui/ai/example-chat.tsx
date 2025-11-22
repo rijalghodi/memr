@@ -119,7 +119,7 @@ export const ExampleChat = () => {
   const [selectedModel, setSelectedModel] = useState(models[0].id);
   const [isTyping, setIsTyping] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
-    null
+    null,
   );
 
   const simulateTyping = useCallback(
@@ -127,7 +127,7 @@ export const ExampleChat = () => {
       messageId: string,
       content: string,
       reasoning?: string,
-      sources?: Array<{ title: string; url: string }>
+      sources?: Array<{ title: string; url: string }>,
     ) => {
       let currentIndex = 0;
       const typeInterval = setInterval(() => {
@@ -145,7 +145,7 @@ export const ExampleChat = () => {
               };
             }
             return msg;
-          })
+          }),
         );
 
         currentIndex += Math.random() > 0.1 ? 1 : 0; // Simulate variable typing speed
@@ -159,7 +159,7 @@ export const ExampleChat = () => {
 
       return () => clearInterval(typeInterval);
     },
-    []
+    [],
   );
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
@@ -202,11 +202,11 @@ export const ExampleChat = () => {
           assistantMessageId,
           responseData.content,
           responseData.reasoning,
-          responseData.sources
+          responseData.sources,
         );
       }, 800);
     },
-    [inputValue, isTyping, simulateTyping]
+    [inputValue, isTyping, simulateTyping],
   );
 
   const handleReset = useCallback(() => {

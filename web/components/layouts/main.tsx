@@ -1,11 +1,10 @@
 import { RefreshCcw } from "lucide-react";
 import React from "react";
 
+import { ChatWidget } from "../chat/chat-widget";
 import { useAutoSync } from "../sync/use-auto-sync";
 import { Button } from "../ui";
-import { ExampleChat } from "../ui/ai/example-chat";
 import { SessionTabs } from "./session-tabs";
-import { ChatWidget } from "../chat/chat-widget";
 type Props = {
   children: React.ReactNode;
 };

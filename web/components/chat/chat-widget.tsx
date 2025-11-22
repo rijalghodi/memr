@@ -164,7 +164,7 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            })
+            }),
           );
 
           if (chunk.done) {
@@ -185,15 +185,15 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            })
+            }),
           );
         },
         () => {
           setIsTyping(false);
-        }
+        },
       );
     },
-    [inputValue, isTyping, currentChatId]
+    [inputValue, isTyping, currentChatId],
   );
 
   // const handleReset = useCallback(() => {

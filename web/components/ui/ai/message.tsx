@@ -31,7 +31,7 @@ export const Message = ({ className, from, ...props }: MessageProps) => (
       "data-[role=user]:justify-end data-[role=assistant]:justify-start",
       // from === "user" ? "is-user" : "is-assistant flex-row-reverse justify-end",
       // "[&>div]:max-w-[80%]",
-      className
+      className,
     )}
     data-role={from}
     {...props}
@@ -50,7 +50,7 @@ export const MessageContent = ({
       "flex flex-col gap-2 overflow-hidden rounded-xl px-4 py-3 text-foreground text-sm",
       'group-data-[role="user"]:bg-accent group-data-[role="user"]:text-foreground group-data-[role="user"]:rounded-br-none group-data-[role="user"]:max-w-[80%]',
       'group-data-[role="assistant"]:px-1 group-data-[role="assistant"]:py-1 group-data-[role="assistant"]:text-foreground',
-      className
+      className,
     )}
     {...props}
   >
