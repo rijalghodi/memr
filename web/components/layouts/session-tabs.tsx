@@ -6,10 +6,18 @@ import {
   Home,
   X,
 } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { ROUTES } from "@/lib/routes";
+import {
+  COLLECTION_TITLE_FALLBACK,
+  NOTE_TITLE_FALLBACK,
+  PROJECT_TITLE_FALLBACK,
+} from "@/lib/constant";
+import { extractRoute, ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { useGetCollection } from "@/service/local/api-collection";
+import { useGetNote } from "@/service/local/api-note";
+import { useGetProject } from "@/service/local/api-project";
 
 import { useBrowserNavigate } from "../browser-navigation";
 import { useSessionTabs } from "../session-tabs";
@@ -17,8 +25,17 @@ import { Button } from "../ui";
 import { useConfirmation } from "../ui/confirmation-dialog";
 
 export function SessionTabs() {
-  const { sessionTabs, activeTab, pathname, closeTab } = useSessionTabs();
-  const isHomeActive = pathname === ROUTES.HOME;
+  const {
+    sessionTabs: rawSessionTabs,
+    activeTab,
+    pathname,
+    closeTab,
+    closeAllTabs,
+  } = useSessionTabs();
+  const sessionTabs = rawSessionTabs.filter(
+    (tab) => tab.pathname !== ROUTES.HOME
+  );
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -30,10 +47,6 @@ export function SessionTabs() {
     goBack,
     goForward,
   } = useBrowserNavigate();
-
-  const handleTabClick = (pathname: string) => {
-    navigateTo(pathname);
-  };
 
   const handleGoBack = () => {
     goBack();
@@ -47,26 +60,14 @@ export function SessionTabs() {
     navigateTo(ROUTES.HOME);
   };
 
-  const handleCloseTab = (e: React.MouseEvent, id: string) => {
+  const handleCloseTab = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const tabIndex = sessionTabs.findIndex((tab) => tab.id === id);
-    const isActive = activeTab?.id === id;
+    const tabIndex = sessionTabs.findIndex((tab) => tab.pathname === pathname);
+    const isActive = activeTab?.pathname === pathname;
 
-    closeTab(id);
+    closeTab(pathname);
 
     // If closing active tab, navigate to previous tab (or next if no previous)
-    if (isActive) {
-      if (tabIndex > 0) {
-        // Navigate to previous tab
-        navigateTo(sessionTabs[tabIndex - 1].pathname);
-      } else if (sessionTabs.length > 1) {
-        // Navigate to next tab (now at index 0)
-        navigateTo(sessionTabs[1].pathname);
-      } else {
-        // No more tabs, navigate to home
-        navigateTo(ROUTES.HOME);
-      }
-    }
   };
 
   const checkScrollability = () => {
@@ -116,9 +117,7 @@ export function SessionTabs() {
       confirmLabel: "Yes, Continue",
       cancelLabel: "Cancel",
       onConfirm: () => {
-        sessionTabs.forEach((tab) => {
-          closeTab(tab.id);
-        });
+        closeAllTabs();
         navigateTo(ROUTES.HOME);
       },
     });
@@ -149,13 +148,16 @@ export function SessionTabs() {
             <ArrowRight />
           </Button>
         </div>
-        <SessionTabItem
-          active={isHomeActive}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="bg-muted border-b border-transparent data-[active=true]:border-primary left-0 z-10 h-full justify-center min-w-10 rounded-none"
+          title="Home"
+          data-active={pathname === ROUTES.HOME}
           onClick={handleHomeClick}
-          className="bg-muted data-[active=true]:bg-muted left-0 z-10 h-full justify-center min-w-10"
         >
           <Home />
-        </SessionTabItem>
+        </Button>
 
         <div className="relative flex-1 flex h-full items-center overflow-hidden">
           {canScrollLeft && (
@@ -173,14 +175,7 @@ export function SessionTabs() {
             className="flex-1 flex items-center overflow-x-auto scrollbar-hide h-full"
           >
             {sessionTabs.map((tab) => (
-              <SessionTabItem
-                key={tab.id}
-                active={activeTab?.id === tab.id}
-                onClick={() => handleTabClick(tab.pathname)}
-                onClose={(e) => handleCloseTab(e, tab.id)}
-              >
-                <span className="w-full truncate">{tab.title}</span>
-              </SessionTabItem>
+              <SessionTabItem key={tab.pathname} pathname={tab.pathname} />
             ))}
           </div>
           {canScrollRight && (
@@ -208,19 +203,65 @@ export function SessionTabs() {
   );
 }
 
+const ROUTE_TITLES: Record<string, string> = {
+  [ROUTES.HOME]: "Home",
+  [ROUTES.NOTES]: "Notes",
+  [ROUTES.COLLECTIONS]: "Collections",
+  [ROUTES.PROJECTS]: "Projects",
+  [ROUTES.TASKS]: "Tasks",
+};
+
 function SessionTabItem({
-  children,
-  active,
-  onClick,
-  onClose,
+  pathname,
+  icon,
   className,
 }: {
-  children: React.ReactNode;
-  active?: boolean;
-  onClick?: () => void;
-  onClose?: (e: React.MouseEvent) => void;
+  pathname: string;
+  icon?: React.ReactNode;
   className?: string;
 }) {
+  const { activeTab, closeTab } = useSessionTabs();
+  const { navigate } = useBrowserNavigate();
+  const route = extractRoute(pathname);
+
+  const active = activeTab?.pathname === pathname;
+
+  // Only fetch data for parameterized routes
+  const noteData = useGetNote(
+    route.path === ROUTES.NOTE ? route.params.noteId : undefined
+  );
+  const collectionData = useGetCollection(
+    route.path === ROUTES.COLLECTION ? route.params.collectionId : undefined
+  );
+  const projectData = useGetProject(
+    route.path === ROUTES.PROJECT ? route.params.projectId : undefined
+  );
+
+  const title = useMemo(() => {
+    // Static route titles
+    if (route.path in ROUTE_TITLES) {
+      return ROUTE_TITLES[route.path];
+    }
+
+    // Dynamic route titles
+    if (route.path === ROUTES.NOTE) {
+      return noteData.data?.title || NOTE_TITLE_FALLBACK;
+    }
+    if (route.path === ROUTES.COLLECTION) {
+      return collectionData.data?.title || COLLECTION_TITLE_FALLBACK;
+    }
+    if (route.path === ROUTES.PROJECT) {
+      return projectData.data?.title || PROJECT_TITLE_FALLBACK;
+    }
+
+    return "";
+  }, [
+    route.path,
+    noteData.data?.title,
+    collectionData.data?.title,
+    projectData.data?.title,
+  ]);
+
   return (
     <li
       className={cn(
@@ -228,26 +269,27 @@ function SessionTabItem({
         "text-xs font-medium [&>svg]:size-3.5 text-foreground/90 border-b border-b-transparent",
         "data-[active=true]:bg-background data-[active=true]:border-b-primary data-[active=true]:text-primary transition-all duration-100",
         "max-w-48 min-w-24",
-        className,
+        className
       )}
       data-active={active}
-      onClick={onClick}
+      onClick={() => navigate(pathname)}
     >
-      {children}
-
-      {onClose && (
-        <button
-          onClick={onClose}
-          className={cn(
-            "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-100",
-            "h-full pr-2 pl-0.5 flex items-center justify-center",
-            "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground",
-          )}
-          aria-label="Close tab"
-        >
-          <X className="size-3.5" />
-        </button>
-      )}
+      {icon}
+      <span className="w-full truncate">{title}</span>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          closeTab(pathname);
+        }}
+        className={cn(
+          "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-100",
+          "h-full pr-2 pl-0.5 flex items-center justify-center",
+          "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground"
+        )}
+        aria-label="Close tab"
+      >
+        <X className="size-3.5" />
+      </button>
     </li>
   );
 }

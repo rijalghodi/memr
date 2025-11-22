@@ -2,10 +2,9 @@
 
 import * as React from "react";
 
-import { BrowserNavigationProvider } from "./browser-navigation";
+import { NavigationProvider } from "./navigation-provider";
 import { AuthGuardProvider } from "./layouts/auth-guard";
 import { QueryProvider } from "./query-provider";
-import { SessionTabsProvider } from "./session-tabs";
 import { ConfirmationProvider } from "./ui/confirmation-dialog";
 import { Toaster } from "./ui/sonner";
 
@@ -14,12 +13,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryProvider>
       <ConfirmationProvider>
         <AuthGuardProvider>
-          <SessionTabsProvider>
-            <BrowserNavigationProvider>
-              {children}
-              <Toaster />
-            </BrowserNavigationProvider>
-          </SessionTabsProvider>
+          <NavigationProvider>
+            {children}
+            <Toaster />
+          </NavigationProvider>
         </AuthGuardProvider>
       </ConfirmationProvider>
       {/* <NextThemesProvider
