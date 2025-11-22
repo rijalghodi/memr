@@ -1,25 +1,22 @@
 import "./globals.css";
-import "@milkdown/crepe/theme/common/style.css";
-import "@milkdown/crepe/theme/frame.css";
-import "./milkdown-override.css";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Providers } from "@/components/providers";
 import { ROUTES } from "@/lib/routes";
+import { CollectionsDashboardPage } from "@/pages/collections";
+import { CollectionWorkspacePage } from "@/pages/collections_collectionId";
 import { GoogleSuccessPage } from "@/pages/google-success";
 import { HomePage } from "@/pages/home";
 import { LoginPage } from "@/pages/login";
-import { NoteEditorPage } from "@/pages/note-editor";
 import { NotesPage } from "@/pages/notes";
+import { NoteEditorPage } from "@/pages/notes_noteId";
+import { ProjectsDashboardPage } from "@/pages/projects";
+import { ProjectWorkspacePage } from "@/pages/projects_projectId";
 import { TasksPage } from "@/pages/tasks";
 
 import { AuthGuard } from "./components/layouts/auth-guard";
-import { CollectionWorkspacePage } from "./pages/collection-workspace";
-import { CollectionsDashboardPage } from "./pages/collections";
-import { ProjectWorkspacePage } from "./pages/project-workspace";
-import { ProjectsDashboardPage } from "./pages/projects";
 
 function App() {
   return (

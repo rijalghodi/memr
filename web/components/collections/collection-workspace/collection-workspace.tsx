@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 import { useBrowserNavigate } from "@/components/browser-navigation";
 import { COLLECTION_TITLE_FALLBACK, NOTE_TITLE_FALLBACK } from "@/lib/constant";
@@ -31,8 +31,6 @@ export function CollectionWorkspace({
   const { navigate } = useBrowserNavigate();
   const { data: collection } = useGetCollection(collectionId);
 
-  const collectionTitle = useMemo(() => collection?.title || "", [collection]);
-
   const { data: notes, isLoading: isLoadingNotes } = useGetNotes({
     sortBy,
     collectionId,
@@ -42,7 +40,7 @@ export function CollectionWorkspace({
     setSortBy(value as SortByValue);
   };
 
-  // add noote
+  // add note
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
       navigate(getRoute(ROUTES.NOTE, { noteId: data.id }), NOTE_TITLE_FALLBACK);
@@ -60,18 +58,15 @@ export function CollectionWorkspace({
     setSortBy(undefined);
   };
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTitleUpdate = (
+    e: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>
+  ) => {
+    const newTitle = e.target.value;
     collectionApi.update({
       id: collectionId,
-      title: e.target.value,
+      title: newTitle,
     });
-  };
-
-  const handleTitleBlur = () => {
-    collectionApi.update({
-      id: collectionId,
-      title: collectionTitle,
-    });
+    document.title = newTitle;
   };
 
   const isFiltered = sortBy !== undefined;
@@ -90,9 +85,9 @@ export function CollectionWorkspace({
               <input
                 className="text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md"
                 placeholder={COLLECTION_TITLE_FALLBACK}
-                value={collectionTitle}
-                onChange={handleTitleChange}
-                onBlur={handleTitleBlur}
+                value={collection?.title || ""}
+                onChange={handleTitleUpdate}
+                onBlur={handleTitleUpdate}
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
