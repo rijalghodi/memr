@@ -3,8 +3,9 @@ import React from "react";
 
 import { useAutoSync } from "../sync/use-auto-sync";
 import { Button } from "../ui";
-import { ExampleChat } from "./example-chat";
+import { ExampleChat } from "../ui/ai/example-chat";
 import { SessionTabs } from "./session-tabs";
+import { ChatWidget } from "../chat/chat-widget";
 type Props = {
   children: React.ReactNode;
 };
@@ -30,7 +31,7 @@ export function Main({ children }: Props) {
           />
         </Button>
       </div>
-      <div className="flex w-full h-full gap-0 flex-1">
+      <div className="flex w-full h-full gap-1 flex-1">
         <div className="bg-background rounded-t-2xl flex-1 overflow-hidden shadow-lg">
           <SessionTabs />
           <div className="overflow-y-auto h-[calc(100vh-5.5rem)]">
@@ -39,7 +40,7 @@ export function Main({ children }: Props) {
         </div>
 
         <div className="bg-background rounded-t-2xl w-full min-w-[300px] max-w-[400px]">
-          <ExampleChat />
+          <ChatWidget />
         </div>
       </div>
     </div>
