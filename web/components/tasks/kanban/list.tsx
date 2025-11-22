@@ -22,7 +22,7 @@ type ListProps = {
   onTaskDrop: (
     group: string,
     newTasks: TKanbanTask[],
-    oldTasks: TKanbanTask[]
+    oldTasks: TKanbanTask[],
   ) => void;
   onTaskAdd: (groupId: string, taskData: TKanbanTask) => void;
   onTaskUpdate?: (id: string, data: Partial<TKanbanTask>) => void;
@@ -45,7 +45,7 @@ export function List({
       onTaskDrop(groupId, newTasks, oldTasks);
       previousTasksRef.current = newTasks;
     },
-    [groupId, onTaskDrop]
+    [groupId, onTaskDrop],
   );
 
   // Update ref when tasks change from external source
@@ -104,7 +104,7 @@ export function List({
           animation={200}
           className={cn(
             "space-y-2 pb-2 px-2 h-full min-h-[400px]",
-            tasks.length === 0 && "bg-muted/50 rounded-md"
+            tasks.length === 0 && "bg-muted/50 rounded-md",
           )}
           ghostClass="opacity-50"
           dragClass="cursor-grabbing"

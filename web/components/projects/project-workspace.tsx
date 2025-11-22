@@ -1,6 +1,5 @@
 "use client";
 
-import { Loader } from "lucide-react";
 import React, { useMemo } from "react";
 
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
@@ -14,9 +13,9 @@ import {
 
 import { GroupItem, KanbanTask } from "../tasks/kanban/kanban";
 import { TKanbanTask } from "../tasks/kanban/type";
+import { TaskLoading } from "../tasks/task-loading";
 import { Collapsible, CollapsibleContent } from "../ui";
 import { ProjectIcon } from "./project-icon";
-import { TaskLoading } from "../tasks/task-loading";
 
 const statusGroupItems: GroupItem[] = [
   {
