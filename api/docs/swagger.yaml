@@ -18,7 +18,7 @@ definitions:
         type: string
       dueDate:
         type: string
-      id:
+      entityId:
         type: string
       projectId:
         description: Task-only
@@ -30,42 +30,59 @@ definitions:
       title:
         type: string
       type:
-        description: '"task" or "project" or "note" or "collection"'
+        enum:
+        - task
+        - project
+        - note
+        - collection
         type: string
       updatedAt:
         type: string
     required:
-    - id
+    - entityId
+    - type
     type: object
-  contract.GoogleOAuthReq:
+  contract.ChatHistoryRes:
     properties:
-      idToken:
+      messages:
+        items:
+          $ref: '#/definitions/contract.MessageRes'
+        type: array
+    type: object
+  contract.ChatSendReq:
+    properties:
+      chatId:
+        type: string
+      message:
         type: string
     required:
-    - idToken
+    - chatId
+    - message
     type: object
-  contract.GoogleOAuthRes:
+  contract.ChatSendRes:
     properties:
-      accessToken:
+      assistantMessage:
         type: string
-      accessTokenExpiresAt:
+    type: object
+  contract.ChatStartRes:
+    properties:
+      chatId:
+        type: string
+    type: object
+  contract.MessageRes:
+    properties:
+      content:
         type: string
       createdAt:
         type: string
-      email:
-        type: string
       id:
         type: string
-      isVerified:
-        type: boolean
-      name:
+      role:
         type: string
-      refreshToken:
-        type: string
-      refreshTokenExpiresAt:
-        type: string
-      updatedAt:
-        type: string
+      toolCalls:
+        items:
+          $ref: '#/definitions/contract.ToolCallRes'
+        type: array
     type: object
   contract.RefreshTokenReq:
     properties:
@@ -105,6 +122,8 @@ definitions:
         type: array
       lastSyncTime:
         type: string
+    required:
+    - lastSyncTime
     type: object
   contract.SyncRes:
     properties:
@@ -113,6 +132,18 @@ definitions:
           $ref: '#/definitions/contract.Change'
         type: array
       lastSyncTime:
+        type: string
+    type: object
+  contract.ToolCallRes:
+    properties:
+      arguments:
+        additionalProperties: {}
+        type: object
+      createdAt:
+        type: string
+      id:
+        type: string
+      name:
         type: string
     type: object
   contract.UserRes:
@@ -151,37 +182,6 @@ info:
   title: Memr API
   version: 1.0.0
 paths:
-  /v1/auth/google:
-    post:
-      consumes:
-      - application/json
-      description: Google OAuth authentication
-      parameters:
-      - description: Google OAuth request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/contract.GoogleOAuthReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/util.BaseResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/contract.GoogleOAuthRes'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/util.BaseResponse'
-      summary: Google OAuth
-      tags:
-      - Auth
   /v1/auth/me:
     get:
       consumes:
@@ -237,6 +237,109 @@ paths:
       summary: Refresh token
       tags:
       - Auth
+  /v1/chat/{chat_id}/history:
+    get:
+      consumes:
+      - application/json
+      description: Get the message history for a chat
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chat_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/contract.ChatHistoryRes'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Get chat history
+      tags:
+      - Chat
+  /v1/chat/send:
+    post:
+      consumes:
+      - application/json
+      description: Send a message to the chat and get assistant response
+      parameters:
+      - description: Send message request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/contract.ChatSendReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/contract.ChatSendRes'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Send a message
+      tags:
+      - Chat
+  /v1/chat/start:
+    post:
+      consumes:
+      - application/json
+      description: Create a new chat session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/contract.ChatStartRes'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Start a new chat
+      tags:
+      - Chat
   /v1/sync:
     post:
       consumes:

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"app/internal/agent"
 	"app/internal/config"
 	"app/internal/handler"
 	"app/internal/repository"
@@ -37,4 +38,13 @@ func InjectHTTPHandlers(ctx context.Context, app *fiber.App, db *gorm.DB) {
 	syncUsecase := usecase.NewSyncUsecase(syncRepo)
 	syncHandler := handler.NewSyncHandler(syncUsecase)
 	syncHandler.RegisterRoutes(app)
+
+	// Chat setup
+	chatRepo := repository.NewChatRepository(db)
+	agentRepo := agent.NewAgentRepository(db)
+	toolExecutor := agent.NewToolExecutor(openaiClient, agentRepo)
+	chatAgent := agent.NewAgent(openaiClient, toolExecutor)
+	chatUsecase := usecase.NewChatUsecase(chatRepo, chatAgent, openaiClient)
+	chatHandler := handler.NewChatHandler(chatUsecase)
+	chatHandler.RegisterRoutes(app)
 }
