@@ -36,19 +36,6 @@ Keep answers short, clear, and helpful. Use tools whenever information must come
 
 ---
 
-## Output Format
-
-Your final answer may include inline references like:
-
-```
-[note=UUID]
-[task=UUID]
-```
-
-No other formats are allowed.
-
----
-
 ## Example
 
 User: Did I ever write about learning a new career?

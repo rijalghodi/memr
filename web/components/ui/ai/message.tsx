@@ -1,11 +1,9 @@
 import type { UIMessage } from "ai";
 import type { ComponentProps, HTMLAttributes } from "react";
-import React, { isValidElement } from "react";
+import React from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-
-import { MarkdownViewer } from "./markdown-viewer";
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
   from: UIMessage["role"];
@@ -30,18 +28,6 @@ export const MessageContent = ({
   className,
   ...props
 }: MessageContentProps) => {
-  // Convert children to string if it's not already
-  const content =
-    typeof children === "string"
-      ? children
-      : typeof children === "number"
-        ? String(children)
-        : isValidElement(children) &&
-            typeof (children.props as { children?: unknown })?.children ===
-              "string"
-          ? (children.props as { children: string }).children
-          : "";
-
   return (
     <div
       className={cn(
@@ -52,7 +38,7 @@ export const MessageContent = ({
       )}
       {...props}
     >
-      <MarkdownViewer content={content} />
+      {children}
     </div>
   );
 };
