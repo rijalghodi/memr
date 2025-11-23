@@ -153,7 +153,7 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            }),
+            })
           );
 
           if (chunk.done) {
@@ -174,15 +174,15 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            }),
+            })
           );
         },
         () => {
           setIsTyping(false);
-        },
+        }
       );
     },
-    [inputValue, isTyping, currentChatId],
+    [inputValue, isTyping, currentChatId]
   );
 
   const handleNewChat = useCallback(() => {
@@ -233,13 +233,13 @@ export const ChatWidget = () => {
 
       {/* Conversation Area */}
       <Conversation className="flex-1">
-        <ConversationContent className="space-y-0">
+        <ConversationContent className="space-y-0 h-full">
           {isLoadingHistory ? (
             <div className="flex items-center justify-center h-full">
               <Loader size={20} />
             </div>
           ) : messages.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
+            <div className="flex items-center justify-center h-full flex-1 text-muted-foreground">
               {currentChatId
                 ? "Start a conversation..."
                 : "Create a new chat to get started"}
@@ -261,24 +261,6 @@ export const ChatWidget = () => {
                     )}
                   </MessageContent>
                 </Message>
-
-                {/* Sources */}
-                {/* {message.sources && message.sources.length > 0 && (
-                <div className="ml-4">
-                  <Sources>
-                    <SourcesTrigger count={message.sources.length} />
-                    <SourcesContent>
-                      {message.sources.map((source, index) => (
-                        <Source
-                          key={index}
-                          href={source.url}
-                          title={source.title}
-                        />
-                      ))}
-                    </SourcesContent>
-                  </Sources>
-                </div>
-              )} */}
               </div>
             ))
           )}
