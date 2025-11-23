@@ -31,6 +31,9 @@ WORKDIR /app
 # Copy binary
 COPY --from=build /app/main .
 
+# Copy assets folder
+COPY --from=build /app/assets ./assets
+
 EXPOSE 8000
 
 CMD ["./main", "http"]
