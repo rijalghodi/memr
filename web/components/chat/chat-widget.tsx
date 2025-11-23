@@ -87,10 +87,10 @@ export const ChatWidget = () => {
   const updateAssistantMessage = useCallback(
     (messageId: string, updater: (msg: ChatMessage) => ChatMessage) => {
       setMessages((prev) =>
-        prev.map((msg) => (msg.id === messageId ? updater(msg) : msg))
+        prev.map((msg) => (msg.id === messageId ? updater(msg) : msg)),
       );
     },
-    []
+    [],
   );
 
   const handleSendMessage = useCallback(
@@ -153,10 +153,10 @@ export const ChatWidget = () => {
           }));
           finishStreaming();
         },
-        finishStreaming
+        finishStreaming,
       );
     },
-    [currentChatId, updateAssistantMessage]
+    [currentChatId, updateAssistantMessage],
   );
 
   const handleSubmit = useCallback(
@@ -165,7 +165,7 @@ export const ChatWidget = () => {
       if (!inputValue.trim() || isTyping) return;
       handleSendMessage(inputValue.trim());
     },
-    [inputValue, isTyping, handleSendMessage]
+    [inputValue, isTyping, handleSendMessage],
   );
 
   const handleResetChat = useCallback(() => {

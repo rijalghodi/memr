@@ -54,7 +54,7 @@ export function List({
   }, [tasks]);
 
   return (
-    <div className="flex flex-col h-full w-full max-w-[280px] rounded-lg">
+    <div className="flex flex-col h-full w-full min-w-[240px] max-w-[360px] rounded-lg">
       <Collapsible open={open} onOpenChange={setOpen} className="w-full">
         <header className="px-2 space-y-1 py-2 cursor-move list-title">
           <div className="flex items-center justify-between">
