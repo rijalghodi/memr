@@ -31,11 +31,6 @@ WORKDIR /app
 # Copy binary
 COPY --from=build /app/main .
 
-# DO NOT copy .env from inside image; pass env via docker run
-# (safe, avoids leaking secrets)
-# If you must copy config, do this:
-# COPY .env ./
-
 EXPOSE 8000
 
-CMD ["./main"]
+CMD ["./main", "http"]
