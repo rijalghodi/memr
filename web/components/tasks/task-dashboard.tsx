@@ -1,16 +1,11 @@
 "use client";
 
 import { ListFilter } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
 import { useGetProjects } from "@/service/local/api-project";
-import {
-  taskApi,
-  useCreateTask,
-  useDeleteTask,
-  useGetTasks,
-} from "@/service/local/api-task";
+import { taskApi, useGetTasks } from "@/service/local/api-task";
 
 import { ProjectIcon } from "../projects/project-icon";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
@@ -53,38 +48,14 @@ export function TaskDashboard() {
     }));
   }, [dexieTasks]);
 
-  const [localTasks, setLocalTasks] = useState<TKanbanTask[]>([]);
-
-  // Convert dexie tasks to local tasks
-  useEffect(() => {
-    setLocalTasks(tasks);
-  }, [tasks]);
-
-  // Task handlers
-  const { mutate: createTask } = useCreateTask({
-    onError: (error) => {
-      console.error("Failed to create task:", error);
-    },
-  });
-
-  const { mutate: deleteTask } = useDeleteTask({
-    onError: (error) => {
-      console.error("Failed to delete task:", error);
-    },
-  });
-
   const handleTaskAdd = (groupId: string, task: TKanbanTask) => {
-    setLocalTasks((prev) => [...prev, task]);
-    createTask({
+    taskApi.create({
       ...task,
       status: task.status ?? (groupId ? Number(groupId) : undefined),
     });
   };
 
   const handleTaskUpdate = (id: string, task: Partial<TKanbanTask>) => {
-    setLocalTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...task } : t))
-    );
     taskApi.update({
       ...task,
       id,
@@ -94,7 +65,7 @@ export function TaskDashboard() {
 
   const handleTaskDelete = (id: string) => {
     console.log("handleTaskDelete", id);
-    deleteTask(id);
+    taskApi.delete(id);
   };
 
   return (
@@ -126,7 +97,7 @@ export function TaskDashboard() {
           <TaskLoading />
         ) : (
           <TaskKanban
-            tasks={localTasks}
+            tasks={tasks}
             onTaskAdd={handleTaskAdd}
             onTaskUpdate={handleTaskUpdate}
             onTaskDelete={handleTaskDelete}
