@@ -1,10 +1,10 @@
 "use client";
 
-import { format } from "date-fns";
 import { MoreHorizontal, Trash } from "lucide-react";
 import { useState } from "react";
 
 import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
+import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { truncateString } from "@/lib/string";
 import { cn } from "@/lib/utils";
@@ -109,7 +109,7 @@ export function CollectionItem({
               isDropdownOpen && "hidden",
             )}
           >
-            {format(new Date(updatedAt), "EEE dd/MM/yy")}
+            {formatDate(new Date(updatedAt))}
           </div>
           <div
             className={cn(

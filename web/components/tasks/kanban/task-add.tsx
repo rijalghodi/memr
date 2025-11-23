@@ -1,3 +1,4 @@
+import { isToday } from "date-fns";
 import { ArrowUp } from "lucide-react";
 import { useState } from "react";
 
@@ -59,7 +60,9 @@ export function TaskAdd({ onSubmit }: Props) {
           <TaskDatePicker
             value={data.dueDate}
             onChange={(date) => setData({ ...data, dueDate: date })}
-            isOverdue={(date) => date && new Date(date) < new Date()}
+            isOverdue={(date) =>
+              date && !isToday(new Date(date)) && new Date(date) < new Date()
+            }
           />
           <TaskProjectSelector
             value={data.projectId}
