@@ -1,6 +1,4 @@
-"use client";
-
-import { formatDate, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { History, Plus } from "lucide-react";
 import {
   type FormEventHandler,
@@ -27,15 +25,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { chatApi, chatApiHook } from "@/service/api-chat";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui";
 import { Loader } from "../ui/ai/loader";
+import { ChatHistory } from "./chat-history";
 
 type ChatMessage = {
   id: string;
@@ -66,9 +58,6 @@ export const ChatWidget = () => {
         console.error("Failed to create chat:", error);
       },
     });
-
-  const { data: chatsData, isLoading: isLoadingChats } =
-    chatApiHook.useListChats(1, 20);
 
   const { data: historyData, isLoading: isLoadingHistory } =
     chatApiHook.useGetChatHistory(currentChatId);
@@ -196,25 +185,6 @@ export const ChatWidget = () => {
     [inputValue, isTyping, currentChatId],
   );
 
-  // const handleReset = useCallback(() => {
-  //   setMessages([
-  //     {
-  //       id: crypto.randomUUID(),
-  //       content:
-  //         "Hello! I'm your AI assistant. I can help you with coding questions, explain concepts, and provide guidance on web development topics. What would you like to know?",
-  //       role: "assistant",
-  //       timestamp: new Date(),
-  //       sources: [
-  //         { title: "Getting Started Guide", url: "#" },
-  //         { title: "API Documentation", url: "#" },
-  //       ],
-  //     },
-  //   ]);
-  //   setInputValue("");
-  //   setIsTyping(false);
-  //   setStreamingMessageId(null);
-  // }, []);
-
   const handleNewChat = useCallback(() => {
     startChat();
   }, [startChat]);
@@ -252,34 +222,10 @@ export const ChatWidget = () => {
               align="end"
               className="w-[240px] rounded-xl"
             >
-              <DropdownMenuLabel className="text-xs font-medium px-4 py-2">
-                Previous Chats
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {isLoadingChats ? (
-                <div className="px-4 py-2 text-sm text-muted-foreground">
-                  Loading...
-                </div>
-              ) : chatsData?.data?.items && chatsData.data.items.length > 0 ? (
-                chatsData.data.items.map((chat) => (
-                  <DropdownMenuItem
-                    key={chat.id}
-                    className="flex flex-col items-start gap-0.5 px-4 py-2 cursor-pointer"
-                    onClick={() => handleSelectChat(chat.id)}
-                  >
-                    <span className="text-sm text-foreground line-clamp-1">
-                      {chat.firstMessage || "New Chat"}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDate(parseISO(chat.updatedAt), "MM/dd/yyyy HH:mm")}
-                    </span>
-                  </DropdownMenuItem>
-                ))
-              ) : (
-                <div className="px-4 py-2 text-sm text-muted-foreground">
-                  No previous chats
-                </div>
-              )}
+              <ChatHistory
+                onSelectChat={handleSelectChat}
+                selectedChatId={currentChatId}
+              />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
