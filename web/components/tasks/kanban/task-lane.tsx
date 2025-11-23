@@ -26,6 +26,7 @@ type Props = {
   ) => void;
   onTaskAdd: (groupId: string, taskData: TKanbanTask) => void;
   onTaskUpdate?: (id: string, data: Partial<TKanbanTask>) => void;
+  onTaskDelete?: (id: string) => void;
 };
 
 export function TaskLane({
@@ -35,6 +36,7 @@ export function TaskLane({
   onTaskDrop,
   onTaskAdd,
   onTaskUpdate,
+  onTaskDelete,
 }: Props) {
   const previousTasksRef = useRef<TKanbanTask[]>(tasks);
   const [open, setOpen] = useState(false);
@@ -110,7 +112,12 @@ export function TaskLane({
           dragClass="cursor-grabbing"
         >
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onTaskUpdate={onTaskUpdate} />
+            <TaskCard
+              key={task.id}
+              task={task}
+              onTaskUpdate={onTaskUpdate}
+              onTaskDelete={onTaskDelete}
+            />
           ))}
         </ReactSortable>
 

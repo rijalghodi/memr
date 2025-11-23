@@ -1,27 +1,29 @@
-import { Checkbox } from "@/components/ui";
+import { MoreVertical, Trash } from "lucide-react";
+
+import {
+  Button,
+  Checkbox,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui";
 import { TASK_TITLE_FALLBACK } from "@/lib/constant";
 import { cn } from "@/lib/utils";
 
 import { TaskDatePicker } from "./task-date-picker";
 import { TaskProjectSelector } from "./task-project-selector";
 import type { TKanbanTask } from "./type";
+
 type Props = {
   task: TKanbanTask;
   onTaskUpdate?: (id: string, data: Partial<TKanbanTask>) => void;
+  onTaskDelete?: (id: string) => void;
 };
 
-export function TaskCard({ task, onTaskUpdate }: Props) {
-  // const [open, setOpen] = useState(false);
-
-  // const handlers = useClickOrDrag({
-  //   onClick: () => {},
-  //   onDrag: () => {
-  //     setOpen(false);
-  //   },
-  // });
-
+export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
   return (
-    <div className="bg-card border border-border rounded-sm px-3 py-3 space-y-1 hover:bg-muted transition-colors cursor-move shadow-sm">
+    <div className="group/task-card relative bg-card border border-border rounded-sm px-3 py-3 space-y-1 hover:bg-muted transition-colors cursor-move shadow-sm">
       <div className="flex items-start gap-2">
         <Checkbox
           checked={task.status === 2}
@@ -77,6 +79,32 @@ export function TaskCard({ task, onTaskUpdate }: Props) {
             }
           />
         )}
+
+        <div className="opacity-0 group-hover/task-card:opacity-100 transition-opacity duration-300 absolute right-2 top-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="secondary"
+                size="icon"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTaskDelete?.(task.id);
+                }}
+              >
+                <Trash />
+                Delete task
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   );

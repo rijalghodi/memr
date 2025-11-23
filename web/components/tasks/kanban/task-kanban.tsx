@@ -40,7 +40,7 @@ export function TaskKanban({
   tasks,
   onTaskUpdate,
   onTaskAdd,
-  onTaskDelete: _onTaskDelete,
+  onTaskDelete,
   groups,
 }: Props) {
   // Group tasks by group
@@ -168,6 +168,7 @@ export function TaskKanban({
                 onTaskDrop={handleTaskDrop}
                 onTaskAdd={handleTaskAdd}
                 onTaskUpdate={onTaskUpdate}
+                onTaskDelete={onTaskDelete}
               />
             );
           })}
