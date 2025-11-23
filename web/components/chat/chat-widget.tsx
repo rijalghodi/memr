@@ -165,7 +165,7 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            }),
+            })
           );
 
           if (chunk.done) {
@@ -186,15 +186,15 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            }),
+            })
           );
         },
         () => {
           setIsTyping(false);
-        },
+        }
       );
     },
-    [currentChatId, startChatAsync],
+    [currentChatId, startChatAsync]
   );
 
   const handleSubmit = useCallback(
@@ -203,7 +203,7 @@ export const ChatWidget = () => {
       if (!inputValue.trim() || isTyping) return;
       await handleSendMessage(inputValue.trim());
     },
-    [inputValue, isTyping, handleSendMessage],
+    [inputValue, isTyping, handleSendMessage]
   );
 
   const handleResetChat = useCallback(() => {
@@ -248,7 +248,7 @@ export const ChatWidget = () => {
             <DropdownMenuContent
               side="bottom"
               align="end"
-              className="w-[240px] rounded-xl"
+              className="w-[240px] max-h-[360px] rounded-lg"
             >
               <ChatHistory
                 onSelectChat={handleSelectPreviousChat}
