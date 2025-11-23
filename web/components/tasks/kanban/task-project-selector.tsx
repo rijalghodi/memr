@@ -46,7 +46,7 @@ export const TaskProjectSelector = ({
           </span>
         ),
         value: project.id,
-      }))
+      })),
     );
     return opts;
   }, [value, projects]);

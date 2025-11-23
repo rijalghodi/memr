@@ -1,3 +1,4 @@
+import { isToday } from "date-fns";
 import { CalendarIcon, FolderIcon, MoreVertical, Trash } from "lucide-react";
 import { useState } from "react";
 
@@ -29,8 +30,6 @@ type Props = {
 };
 
 export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
-  // const [dueDateOpen, setDueDateOpen] = useState(false);
-  // const [projectOpen, setProjectOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   return (
     <div className="has-[*[data-state=open]]:bg-muted group/task-card relative bg-card border border-border rounded-sm px-3 py-3 space-y-1 hover:bg-muted transition-colors cursor-move shadow-sm">
@@ -78,7 +77,10 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
         {task.dueDate && (
           <TaskDatePicker
             isOverdue={(date) =>
-              date && new Date(date) < new Date() && task.status !== 2
+              date &&
+              !isToday(new Date(date)) &&
+              new Date(date) < new Date() &&
+              task.status !== 2
             }
             value={new Date(task.dueDate)}
             onChange={(date) =>

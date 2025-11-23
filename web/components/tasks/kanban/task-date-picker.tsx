@@ -1,9 +1,9 @@
-import { formatDate } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
+import { formatDate } from "@/lib/date";
 
 type Props = {
   isOverdue?: (date: Date) => boolean;
@@ -40,7 +40,7 @@ export function TaskDatePicker({
               data-overdue={isOverdue?.(date)}
               className="text-primary data-[overdue=true]:text-destructive font-normal"
             >
-              {formatDate(date, "MMM d, yyyy")}
+              {formatDate(date)}
             </span>
           ) : (
             <CalendarIcon />

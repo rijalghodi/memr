@@ -1,6 +1,5 @@
 "use client";
 
-import { format } from "date-fns";
 import { MoreHorizontal, Trash } from "lucide-react";
 import React, { useState } from "react";
 
@@ -8,6 +7,7 @@ import {
   NOTE_CONTENT_EXCERPT_FALLBACK,
   NOTE_TITLE_FALLBACK,
 } from "@/lib/constant";
+import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { markdownToText, truncateString } from "@/lib/string";
 import { cn } from "@/lib/utils";
@@ -97,7 +97,7 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
               isDropdownOpen && "hidden",
             )}
           >
-            {format(new Date(updatedAt), "EEE dd/MM/yy")}
+            {formatDate(new Date(updatedAt))}
           </div>
           <div
             className={cn(

@@ -1,6 +1,5 @@
 "use client";
 
-import { format } from "date-fns";
 import {
   ArrowRight,
   ChevronDown,
@@ -34,6 +33,7 @@ import {
   NOTE_TITLE_FALLBACK,
   PROJECT_TITLE_FALLBACK,
 } from "@/lib/constant";
+import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { useGetCollections } from "@/service/local/api-collection";
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
@@ -233,7 +233,7 @@ export function ProfileButton() {
           <span>John Doe</span>
         </SidebarMenuButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[240px] rounded-lg p-3" align="start">
+      <DropdownMenuContent className="w-[240px] rounded-lg" align="start">
         <DropdownMenuLabel className="flex items-center gap-2">
           <Avatar className="size-6">
             <AvatarImage src="https://github.com/shadcn.png" />
@@ -247,16 +247,18 @@ export function ProfileButton() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs font-normal">
-          Last synced at:{" "}
-          {lastSyncTime
-            ? format(new Date(lastSyncTime), "dd/MM/yyyy HH:mm")
-            : "Never"}
-        </DropdownMenuLabel>
         <DropdownMenuItem className="cursor-pointer" variant="destructive">
           <LogOutIcon />
           Logout
         </DropdownMenuItem>
+        <DropdownMenuLabel className="text-xs font-normal pt-2 pb-3">
+          Last synced:{" "}
+          {lastSyncTime
+            ? formatDate(new Date(lastSyncTime), undefined, {
+                includeTime: true,
+              })
+            : "Never"}
+        </DropdownMenuLabel>
       </DropdownMenuContent>
     </DropdownMenu>
   );

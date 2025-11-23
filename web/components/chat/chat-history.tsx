@@ -1,12 +1,7 @@
-import {
-  differenceInDays,
-  formatDate,
-  isFuture,
-  isToday,
-  parseISO,
-} from "date-fns";
+import { differenceInDays, isFuture, isToday, parseISO } from "date-fns";
 import { useMemo } from "react";
 
+import { formatDate } from "@/lib/date";
 import { chatApiHook, type ChatRes } from "@/service/api-chat";
 
 import {
@@ -138,12 +133,9 @@ export function ChatHistory({
                     </p>
                     {group.name != GROUP_NAMES.INVALID && (
                       <p className="text-xs text-muted-foreground">
-                        {formatDate(
-                          parseISO(chat.updatedAt),
-                          group.name == GROUP_NAMES.TODAY
-                            ? "HH:mm"
-                            : "dd MMM yyyy",
-                        )}
+                        {formatDate(new Date(chat.updatedAt), undefined, {
+                          includeTime: true,
+                        })}
                       </p>
                     )}
                   </div>
