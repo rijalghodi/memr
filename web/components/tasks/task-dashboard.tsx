@@ -1,6 +1,6 @@
 "use client";
 
-import { Asterisk, ListFilter } from "lucide-react";
+import { ListFilter } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
@@ -12,6 +12,7 @@ import {
   useGetTasks,
 } from "@/service/local/api-task";
 
+import { ProjectIcon } from "../projects/project-icon";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
@@ -109,12 +110,12 @@ export function TaskDashboard() {
   };
 
   return (
-    <div className="flex flex-col h-full py-6 gap-3">
+    <div className="flex flex-col h-full">
       {/* Header */}
       <Collapsible key="note-filter-collapsible">
-        <div className="px-6 space-y-3">
+        <div className="px-6 pt-4 pb-2">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-semibold">Tasks</h1>
+            <h1 className="text-2xl font-semibold">Tasks</h1>
             <div className="flex items-center gap-0">
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -124,7 +125,7 @@ export function TaskDashboard() {
             </div>
           </div>
           <CollapsibleContent>
-            <div className="flex items-center">
+            <div className="flex items-center py-2">
               <ProjectFilter value={projectId} onValueChange={setProjectId} />
             </div>
           </CollapsibleContent>
@@ -132,7 +133,7 @@ export function TaskDashboard() {
       </Collapsible>
 
       {/* Content */}
-      <div data-slot="content" className="flex-1 overflow-hidden h-full">
+      <div data-slot="content" className="flex-1 min-h-0">
         {isLoading ? (
           <TaskLoading />
         ) : (
@@ -163,7 +164,7 @@ function ProjectFilter({
       className="rounded-full px-4"
       value={value}
       onValueChange={onValueChange}
-      icon={<Asterisk />}
+      icon={<ProjectIcon />}
       size="sm"
       options={[
         {

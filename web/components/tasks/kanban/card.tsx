@@ -30,8 +30,8 @@ export function Card({ task, onTaskUpdate }: CardProps) {
           {...handlers}
           className="bg-card border border-border rounded-sm px-3 py-3 space-y-1 hover:bg-muted transition-colors cursor-move shadow-sm"
         >
-          <div className="text-sm font-medium text-foreground line-clamp-2 font-mono">
-            {task.title || TASK_TITLE_FALLBACK} {task.sortOrder}
+          <div className="text-sm font-medium text-foreground line-clamp-2">
+            {task.title || TASK_TITLE_FALLBACK}
           </div>
           {task.description && (
             <div className="text-xs text-muted-foreground line-clamp-1 leading-none">

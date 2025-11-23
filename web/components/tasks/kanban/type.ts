@@ -6,4 +6,5 @@ export type TKanbanTask = {
   status?: number;
   sortOrder?: string;
   dueDate?: string;
+  projectId?: string;
 };

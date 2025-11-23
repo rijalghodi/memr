@@ -13,16 +13,20 @@ import {
   DropdownMenuTrigger,
 } from "./";
 
-export type DropdownFilterProps<T extends string> = {
-  value?: T;
-  options?: { label: string; value: T }[];
-  onValueChange?: (value: T) => void;
+export type DropdownFilterProps = {
+  value?: string;
+  options?: { label: string | React.ReactNode; value: string }[];
+  onValueChange?: (value: string) => void;
   size?: "sm" | "default";
   variant?: "ghost" | "default" | "outline" | "secondary" | "destructive";
   className?: string;
   icon?: React.ReactNode;
+  children?: (
+    value: string,
+    label: string | React.ReactNode,
+  ) => React.ReactNode;
 };
-export function DropdownFilter<T extends string>({
+export function DropdownFilter({
   value,
   options,
   onValueChange,
@@ -30,21 +34,29 @@ export function DropdownFilter<T extends string>({
   variant = "ghost",
   className,
   icon,
-}: DropdownFilterProps<T>) {
+  children,
+}: DropdownFilterProps) {
   const isMobile = useIsMobile();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant={variant}
-          size={isMobile ? "sm" : size}
-          className={className}
-        >
-          {icon}
-          {options?.find((option) => option.value === value)?.label}
-          <ChevronDown />
-        </Button>
+        {children ? (
+          children(
+            value ?? "",
+            options?.find((option) => option.value === value)?.label ?? "",
+          )
+        ) : (
+          <Button
+            variant={variant}
+            size={isMobile ? "sm" : size}
+            className={className}
+          >
+            {icon}
+            {options?.find((option) => option.value === value)?.label}
+            <ChevronDown />
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40">
         <DropdownMenuRadioGroup
