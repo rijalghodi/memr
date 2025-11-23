@@ -16,6 +16,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/openai/openai-go/v3 v3.8.1
 	github.com/pgvector/pgvector-go v0.3.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rubenv/sql-migrate v1.8.0
 	github.com/swaggo/swag v1.16.6
 	go.uber.org/zap v1.27.0

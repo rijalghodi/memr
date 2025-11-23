@@ -19,8 +19,9 @@ type Environment struct {
 }
 
 type App struct {
-	Host string `env:"APP_HOST"`
-	Port int    `env:"APP_PORT"`
+	Host    string `env:"APP_HOST"`
+	Port    int    `env:"APP_PORT"`
+	BaseURL string `env:"APP_BASE_URL"`
 }
 
 type Logger struct {

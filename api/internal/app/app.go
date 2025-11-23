@@ -3,6 +3,7 @@ package app
 import (
 	_ "app/docs"
 	"app/internal/config"
+	"app/internal/cron"
 	"app/internal/middleware"
 	"app/pkg/logger"
 	"app/pkg/postgres"
@@ -45,6 +46,9 @@ func Run() error {
 		logger.Log.Error("Failed to setup routes", zap.Error(err))
 		return err
 	}
+
+	// Start cron jobs
+	_ = cron.NewHelloCron(ctx)
 
 	address := fmt.Sprintf("%s:%d", config.Env.App.Host, config.Env.App.Port)
 
