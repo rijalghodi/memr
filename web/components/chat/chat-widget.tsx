@@ -1,13 +1,6 @@
 import { parseISO } from "date-fns";
 import { History, Plus } from "lucide-react";
-import {
-  type FormEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Conversation,
@@ -26,8 +19,14 @@ import { Button } from "@/components/ui/button";
 import { chatApi, chatApiHook } from "@/service/api-chat";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui";
+import { MarkdownViewer } from "../ui/ai/markdown-viewer";
 import { Spinner } from "../ui/spinner";
 import { ChatHistory } from "./chat-history";
+
+const INITIAL_MESSAGES = [
+  "What should I follow up on from this week?",
+  "Give me a summary of my week.",
+];
 
 type ChatMessage = {
   id: string;
@@ -46,7 +45,7 @@ export const ChatWidget = () => {
   const [isTyping, setIsTyping] = useState(false);
 
   // API hooks
-  const { mutate: startChat, isPending: isCreatingChat } =
+  const { mutateAsync: startChatAsync, isPending: isCreatingChat } =
     chatApiHook.useStartChat({
       onSuccess: (data) => {
         if (data.data?.chatId) {
@@ -105,13 +104,9 @@ export const ChatWidget = () => {
     }
   }, [currentChatId, historyMessages]);
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
-    (event) => {
-      event.preventDefault();
-
-      if (!inputValue.trim() || isTyping || !currentChatId) return;
-
-      const messageContent = inputValue.trim();
+  const handleSendMessage = useCallback(
+    async (message: string) => {
+      const messageContent = message.trim();
 
       // Optimistic update: Add user message immediately
       const userMessage: ChatMessage = {
@@ -137,9 +132,24 @@ export const ChatWidget = () => {
 
       setMessages((prev) => [...prev, assistantMessage]);
 
+      // Ensure we have a chatId before proceeding
+      let chatId = currentChatId;
+      if (!chatId) {
+        const data = await startChatAsync();
+        if (data.data?.chatId) {
+          chatId = data.data.chatId;
+          setCurrentChatId(chatId);
+        } else {
+          // Failed to create chat, abort
+          return;
+        }
+      }
+
+      if (!chatId) return;
+
       // Start streaming
       chatApi.sendMessageStream(
-        currentChatId,
+        chatId,
         messageContent,
         (chunk) => {
           // Update assistant message with streamed content
@@ -153,7 +163,7 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            }),
+            })
           );
 
           if (chunk.done) {
@@ -174,22 +184,34 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            }),
+            })
           );
         },
         () => {
           setIsTyping(false);
-        },
+        }
       );
     },
-    [inputValue, isTyping, currentChatId],
+    [currentChatId, startChatAsync]
   );
 
-  const handleNewChat = useCallback(() => {
-    startChat();
-  }, [startChat]);
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!inputValue.trim() || isTyping) return;
+      await handleSendMessage(inputValue.trim());
+    },
+    [inputValue, isTyping, handleSendMessage]
+  );
 
-  const handleSelectChat = useCallback((chatId: string) => {
+  const handleResetChat = useCallback(() => {
+    setMessages([]);
+    setCurrentChatId(null);
+    setInputValue("");
+    setIsTyping(false);
+  }, []);
+
+  const handleSelectPreviousChat = useCallback((chatId: string) => {
     setCurrentChatId(chatId);
   }, []);
 
@@ -206,7 +228,7 @@ export const ChatWidget = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={handleNewChat}
+            onClick={handleResetChat}
             disabled={isCreatingChat}
           >
             <Plus />
@@ -223,7 +245,7 @@ export const ChatWidget = () => {
               className="w-[240px] rounded-xl"
             >
               <ChatHistory
-                onSelectChat={handleSelectChat}
+                onSelectChat={handleSelectPreviousChat}
                 selectedChatId={currentChatId}
               />
             </DropdownMenuContent>
@@ -239,17 +261,27 @@ export const ChatWidget = () => {
               <Spinner size={20} />
             </div>
           ) : messages.length === 0 ? (
-            <div className="flex items-center justify-center h-full flex-1 text-muted-foreground">
-              {currentChatId
-                ? "Start a conversation..."
-                : "Create a new chat to get started"}
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center space-y-4">
+                <p className="text-lg font-semibold">Ask me anything</p>
+                {INITIAL_MESSAGES.map((message) => (
+                  <Button
+                    key={message}
+                    variant="secondary"
+                    className="rounded-full"
+                    onClick={() => handleSendMessage(message)}
+                  >
+                    {message}
+                  </Button>
+                ))}
+              </div>
             </div>
           ) : (
             messages.map((message) => (
               <div key={message.id} className="space-y-3">
                 <Message from={message.role}>
                   <MessageContent>
-                    {message.isStreaming && message.content === "" ? (
+                    {message.isStreaming && !message.content.trim() ? (
                       <div className="flex items-center gap-2">
                         <Spinner size={14} />
                         <span className="text-muted-foreground text-sm">
@@ -257,7 +289,7 @@ export const ChatWidget = () => {
                         </span>
                       </div>
                     ) : (
-                      message.content
+                      <MarkdownViewer content={message.content} />
                     )}
                   </MessageContent>
                 </Message>
@@ -275,7 +307,7 @@ export const ChatWidget = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Ask Memr anything..."
-            disabled={isTyping || !currentChatId}
+            disabled={isTyping}
           />
           <PromptInputToolbar>
             <PromptInputTools>
