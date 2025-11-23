@@ -1,21 +1,20 @@
 import { useState } from "react";
 
+import { Checkbox } from "@/components/ui";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { useClickOrDrag } from "@/hooks/use-click-or-drag";
 import { TASK_TITLE_FALLBACK } from "@/lib/constant";
-import { useGetProject } from "@/service/local/api-project";
 
 import { TaskDatePicker } from "./task-date-picker";
 import { TaskProjectSelector } from "./task-project-selector";
 import { TaskUpdate } from "./task-update";
 import type { TKanbanTask } from "./type";
-type CardProps = {
+type Props = {
   task: TKanbanTask;
   onTaskUpdate?: (id: string, data: Partial<TKanbanTask>) => void;
 };
 
-// Card component
-export function Card({ task, onTaskUpdate }: CardProps) {
+export function TaskCard({ task, onTaskUpdate }: Props) {
   const [open, setOpen] = useState(false);
 
   const handlers = useClickOrDrag({
@@ -25,8 +24,6 @@ export function Card({ task, onTaskUpdate }: CardProps) {
     },
   });
 
-  const { data: project } = useGetProject(task.projectId);
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -34,8 +31,21 @@ export function Card({ task, onTaskUpdate }: CardProps) {
           {...handlers}
           className="bg-card border border-border rounded-sm px-3 py-3 space-y-1 hover:bg-muted transition-colors cursor-move shadow-sm"
         >
-          <div className="text-sm font-medium text-foreground line-clamp-2">
-            {task.title || TASK_TITLE_FALLBACK}
+          <div className="flex items-center gap-2">
+            <Checkbox
+              checked={task.status === 2}
+              onCheckedChange={(checked) =>
+                onTaskUpdate?.(task.id, { status: checked ? 2 : 0 })
+              }
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className="border-muted-foreground"
+            />
+
+            <span className="text-sm font-medium text-foreground line-clamp-2">
+              {task.title || TASK_TITLE_FALLBACK}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             {task.dueDate && (

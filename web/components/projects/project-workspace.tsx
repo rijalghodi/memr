@@ -11,7 +11,7 @@ import {
   useGetTasks,
 } from "@/service/local/api-task";
 
-import { GroupItem, KanbanTask } from "../tasks/kanban/kanban";
+import { GroupItem, TaskKanban } from "../tasks/kanban/task-kanban";
 import { TKanbanTask } from "../tasks/kanban/type";
 import { TaskLoading } from "../tasks/task-loading";
 import { Collapsible, CollapsibleContent } from "../ui";
@@ -66,26 +66,17 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
   });
 
   const handleTaskAdd = (groupId: string, task: TKanbanTask) => {
-    const status = groupId ? Number(groupId) : undefined;
     createTask({
-      projectId: projectId,
-      title: task.title,
-      description: task.description,
-      status: status,
-      sortOrder: task.sortOrder,
-      dueDate: task.dueDate,
+      ...task,
+      status: task.status ?? (groupId ? Number(groupId) : undefined),
     });
   };
 
   const handleTaskUpdate = (id: string, task: Partial<TKanbanTask>) => {
-    const status = task.groupId ? Number(task.groupId) : undefined;
     taskApi.update({
+      ...task,
       id,
-      title: task.title,
-      description: task.description,
-      status: status,
-      sortOrder: task.sortOrder,
-      dueDate: task.dueDate,
+      status: task.status ?? (task.groupId ? Number(task.groupId) : undefined),
     });
   };
 
@@ -154,7 +145,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
         {isLoading ? (
           <TaskLoading />
         ) : (
-          <KanbanTask
+          <TaskKanban
             tasks={tasks}
             onTaskAdd={handleTaskAdd}
             onTaskUpdate={handleTaskUpdate}

@@ -16,7 +16,7 @@ import { ProjectIcon } from "../projects/project-icon";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
-import { GroupItem, KanbanTask } from "./kanban/kanban";
+import { GroupItem, TaskKanban } from "./kanban/task-kanban";
 import { TKanbanTask } from "./kanban/type";
 import { TaskLoading } from "./task-loading";
 
@@ -72,23 +72,17 @@ export function TaskDashboard() {
   });
 
   const handleTaskAdd = (groupId: string, task: TKanbanTask) => {
-    console.log("handleTaskAdd", groupId, task);
-    const status = groupId ? Number(groupId) : undefined;
-    console.log("handleTaskAdd status", status);
     createTask({
       ...task,
-      status: status,
+      status: task.status ?? (groupId ? Number(groupId) : undefined),
     });
   };
 
   const handleTaskUpdate = (id: string, task: Partial<TKanbanTask>) => {
-    console.log("handleTaskUpdate", id, task);
-    const status = task.groupId ? Number(task.groupId) : undefined;
-    console.log("handleTaskUpdate status", status);
     taskApi.update({
       ...task,
       id,
-      status: status,
+      status: task.status ?? (task.groupId ? Number(task.groupId) : undefined),
     });
   };
 
@@ -125,7 +119,7 @@ export function TaskDashboard() {
         {isLoading ? (
           <TaskLoading />
         ) : (
-          <KanbanTask
+          <TaskKanban
             tasks={tasks}
             onTaskAdd={handleTaskAdd}
             onTaskUpdate={handleTaskUpdate}

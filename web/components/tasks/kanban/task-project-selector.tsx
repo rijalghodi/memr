@@ -1,3 +1,6 @@
+import { X } from "lucide-react";
+import { useMemo } from "react";
+
 import { ProjectIcon } from "@/components/projects/project-icon";
 import { Button } from "@/components/ui/button";
 import { DropdownFilter } from "@/components/ui/drropdown-filter";
@@ -19,6 +22,35 @@ export const TaskProjectSelector = ({
 }: Props) => {
   const { data: projects, isLoading } = useGetProjects();
 
+  const options = useMemo(() => {
+    const opts = [];
+    if (value) {
+      opts.push({
+        label: (
+          <span className="flex items-center gap-1">
+            <X className="size-4 text-muted-foreground" />
+            <span className="text-ellipsis line-clamp-1">Remove</span>
+          </span>
+        ),
+        value: "",
+      });
+    }
+    opts.push(
+      ...(projects ?? []).map((project) => ({
+        label: (
+          <span className="flex items-center gap-1">
+            <ProjectIcon className="size-4" style={{ color: project.color }} />
+            <span className="text-ellipsis line-clamp-1">
+              {project.title || PROJECT_TITLE_FALLBACK}
+            </span>
+          </span>
+        ),
+        value: project.id,
+      })),
+    );
+    return opts;
+  }, [value, projects]);
+
   return (
     <DropdownFilter
       value={value}
@@ -26,32 +58,9 @@ export const TaskProjectSelector = ({
       className={className}
       disabled={disabled}
       loading={isLoading}
-      options={[
-        {
-          label: (
-            <span className="flex items-center gap-1">
-              <ProjectIcon
-                className="size-3"
-                style={{ color: "var(--muted-foreground)" }}
-              />
-              <span>No Project</span>
-            </span>
-          ),
-          value: "",
-        },
-        ...(projects ?? []).map((project) => ({
-          label: (
-            <span className="flex items-center gap-1">
-              <ProjectIcon
-                className="size-3"
-                style={{ color: project.color }}
-              />
-              <span>{project.title || PROJECT_TITLE_FALLBACK}</span>
-            </span>
-          ),
-          value: project.id,
-        })),
-      ]}
+      side="bottom"
+      align="start"
+      options={options}
     >
       {(value, label) => (
         <Button variant="ghost" size="sm-compact">

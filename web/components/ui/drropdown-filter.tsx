@@ -28,6 +28,8 @@ export type DropdownFilterProps = {
     value: string,
     label: string | React.ReactNode,
   ) => React.ReactNode;
+  side?: "top" | "bottom" | "left" | "right";
+  align?: "start" | "center" | "end";
 };
 export function DropdownFilter({
   disabled,
@@ -40,6 +42,8 @@ export function DropdownFilter({
   className,
   icon,
   children,
+  side = "bottom",
+  align = "start",
 }: DropdownFilterProps) {
   const isMobile = useIsMobile();
 
@@ -63,7 +67,7 @@ export function DropdownFilter({
           </Button>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40">
+      <DropdownMenuContent className="w-44" side={side} align={align}>
         {loading ? (
           <div className="flex items-center justify-center p-4">
             <Spinner />
