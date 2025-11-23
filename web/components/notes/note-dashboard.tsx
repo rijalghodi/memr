@@ -10,6 +10,7 @@ import { useBrowserNavigate } from "../browser-navigation";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
+import { ScrollArea } from "../ui/scroll-area";
 import { NoteEmpty } from "./note-empty";
 import { NoteItem } from "./note-item";
 import { NoteLoading } from "./note-loading";
@@ -45,7 +46,7 @@ export function NoteDashboard() {
   const isFiltered = sortBy !== undefined;
 
   return (
-    <div className="pt-6 space-y-4">
+    <div className="pt-6 space-y-4 h-full flex flex-col">
       {/* Header */}
       <Collapsible key="note-filter-collapsible">
         <div className="px-6 space-y-3">
@@ -91,7 +92,7 @@ export function NoteDashboard() {
       </Collapsible>
 
       {/* Content */}
-      <div data-slot="content" className="pb-6">
+      <ScrollArea className="pb-6 flex-1 min-h-0">
         {isLoading ? (
           <NoteLoading />
         ) : notes.length === 0 ? (
@@ -107,7 +108,7 @@ export function NoteDashboard() {
             ))}
           </ul>
         )}
-      </div>
+      </ScrollArea>
     </div>
   );
 }
