@@ -1,11 +1,10 @@
-"use client";
-
 import { createContext, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { toast } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import logo from "@/public/logo.png";
 import { authApiHook } from "@/service/api-auth";
 
 type AuthGuardContextType = {
@@ -98,7 +97,7 @@ export function AuthGuardLoader() {
     <>
       <div className="flex justify-center items-center h-screen w-screen">
         <img
-          src="/logo.png"
+          src={logo}
           alt="Logo"
           width={100}
           height={100}
