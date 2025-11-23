@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { chatApi, chatApiHook } from "@/service/api-chat";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui";
-import { Loader } from "../ui/ai/loader";
+import { Spinner } from "../ui/spinner";
 import { ChatHistory } from "./chat-history";
 
 type ChatMessage = {
@@ -153,7 +153,7 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            })
+            }),
           );
 
           if (chunk.done) {
@@ -174,15 +174,15 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            })
+            }),
           );
         },
         () => {
           setIsTyping(false);
-        }
+        },
       );
     },
-    [inputValue, isTyping, currentChatId]
+    [inputValue, isTyping, currentChatId],
   );
 
   const handleNewChat = useCallback(() => {
@@ -236,7 +236,7 @@ export const ChatWidget = () => {
         <ConversationContent className="space-y-0 h-full">
           {isLoadingHistory ? (
             <div className="flex items-center justify-center h-full">
-              <Loader size={20} />
+              <Spinner size={20} />
             </div>
           ) : messages.length === 0 ? (
             <div className="flex items-center justify-center h-full flex-1 text-muted-foreground">
@@ -251,7 +251,7 @@ export const ChatWidget = () => {
                   <MessageContent>
                     {message.isStreaming && message.content === "" ? (
                       <div className="flex items-center gap-2">
-                        <Loader size={14} />
+                        <Spinner size={14} />
                         <span className="text-muted-foreground text-sm">
                           Thinking...
                         </span>

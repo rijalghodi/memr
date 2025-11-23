@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/ai/source";
 import { Button } from "@/components/ui/button";
 
-import { Loader } from "./loader";
+import { Spinner } from "../spinner";
 
 type ChatMessage = {
   id: string;
@@ -262,7 +262,7 @@ export const ExampleChat = () => {
                 <MessageContent>
                   {message.isStreaming && message.content === "" ? (
                     <div className="flex items-center gap-2">
-                      <Loader size={14} />
+                      <Spinner size={14} />
                       <span className="text-muted-foreground text-sm">
                         Thinking...
                       </span>
