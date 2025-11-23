@@ -1,4 +1,4 @@
-import { CalendarIcon, MoreVertical, Trash } from "lucide-react";
+import { CalendarIcon, FolderIcon, MoreVertical, Trash } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -17,6 +17,7 @@ import { DatePickerContent } from "@/components/ui/date-picker";
 import { TASK_TITLE_FALLBACK } from "@/lib/constant";
 import { cn } from "@/lib/utils";
 
+import { ProjectPickerContent } from "./project-picker-content";
 import { TaskDatePicker } from "./task-date-picker";
 import { TaskProjectSelector } from "./task-project-selector";
 import type { TKanbanTask } from "./type";
@@ -28,7 +29,9 @@ type Props = {
 };
 
 export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
-  const [dueDateOpen, setDueDateOpen] = useState(false);
+  // const [dueDateOpen, setDueDateOpen] = useState(false);
+  // const [projectOpen, setProjectOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   return (
     <div className="has-[*[data-state=open]]:bg-muted group/task-card relative bg-card border border-border rounded-sm px-3 py-3 space-y-1 hover:bg-muted transition-colors cursor-move shadow-sm">
       <div className="flex items-start gap-2">
@@ -97,7 +100,7 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
           />
         )}
 
-        <DropdownMenu>
+        <DropdownMenu open={moreOpen} onOpenChange={setMoreOpen}>
           <DropdownMenuTrigger
             asChild
             className="absolute right-2 top-2 opacity-0 group-hover/task-card:opacity-100 data-[state=open]:opacity-100 transition-opacity duration-300"
@@ -111,7 +114,7 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuSub open={dueDateOpen} onOpenChange={setDueDateOpen}>
+            <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <CalendarIcon />
                 Set Due Date
@@ -125,7 +128,26 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
                         dueDate: date?.toISOString(),
                       })
                     }
-                    onClose={() => setDueDateOpen(false)}
+                    onClose={() => setMoreOpen(false)}
+                  />
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <FolderIcon />
+                Set Project
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <ProjectPickerContent
+                    value={task.projectId}
+                    onSelect={(projectId) =>
+                      onTaskUpdate?.(task.id, {
+                        projectId: projectId ?? undefined,
+                      })
+                    }
+                    onClose={() => setMoreOpen(false)}
                   />
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
