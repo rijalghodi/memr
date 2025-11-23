@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { findMovedIndex } from "@/lib/find-move";
 import { generateBetweenRank } from "@/lib/fractional-idx";
 
-import { List } from "./list";
+import { TaskLane } from "./task-lane";
 import { TKanbanTask } from "./type";
 
 // Group item for list reordering (ReactSortable requires objects with id)
@@ -27,7 +27,7 @@ function groupTasksByGroup(
   );
 }
 
-type KanbanTaskProps = {
+type Props = {
   tasks: TKanbanTask[];
   onTaskUpdate: (id: string, data: Partial<TKanbanTask>) => void;
   onTaskAdd: (groupId: string, data: TKanbanTask) => void;
@@ -36,13 +36,13 @@ type KanbanTaskProps = {
 };
 
 // Main Kanban component
-export function KanbanTask({
+export function TaskKanban({
   tasks,
   onTaskUpdate,
   onTaskAdd,
   onTaskDelete: _onTaskDelete,
   groups,
-}: KanbanTaskProps) {
+}: Props) {
   // Group tasks by group
   const tasksByGroup = useMemo(() => {
     return groupTasksByGroup(tasks);
@@ -162,7 +162,7 @@ export function KanbanTask({
           {groupOrderState.map((groupItem) => {
             const groupTasks = tasksByGroup[groupItem.id] || [];
             return (
-              <List
+              <TaskLane
                 key={groupItem.id}
                 groupId={groupItem.id}
                 groupTitle={groupItem.title}

@@ -11,11 +11,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../../ui";
-import { Card } from "./card";
 import { TaskAdd } from "./task-add";
+import { TaskCard } from "./task-card";
 import { TKanbanTask } from "./type";
 
-type ListProps = {
+type Props = {
   groupId: string;
   groupTitle: string;
   tasks: TKanbanTask[];
@@ -28,14 +28,14 @@ type ListProps = {
   onTaskUpdate?: (id: string, data: Partial<TKanbanTask>) => void;
 };
 
-export function List({
+export function TaskLane({
   groupId,
   groupTitle,
   tasks,
   onTaskDrop,
   onTaskAdd,
   onTaskUpdate,
-}: ListProps) {
+}: Props) {
   const previousTasksRef = useRef<TKanbanTask[]>(tasks);
   const [open, setOpen] = useState(false);
 
@@ -110,7 +110,7 @@ export function List({
           dragClass="cursor-grabbing"
         >
           {tasks.map((task) => (
-            <Card key={task.id} task={task} onTaskUpdate={onTaskUpdate} />
+            <TaskCard key={task.id} task={task} onTaskUpdate={onTaskUpdate} />
           ))}
         </ReactSortable>
 
