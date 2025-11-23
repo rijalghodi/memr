@@ -72,7 +72,6 @@ export function TaskKanban({
 
         // Update each added task with its generated sortOrder
         onTaskUpdate(addedTask.id, {
-          ...addedTask,
           groupId: group,
           sortOrder: newSortOrder,
         });
@@ -102,7 +101,6 @@ export function TaskKanban({
             nextSortOrder,
           );
           onTaskUpdate(movedTask.id, {
-            ...movedTask,
             sortOrder: newSortOrder,
           });
         }

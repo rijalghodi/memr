@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { Checkbox } from "@/components/ui";
 import { PopoverContent } from "@/components/ui/popover";
 import { TASK_TITLE_FALLBACK } from "@/lib/constant";
 
@@ -78,17 +79,29 @@ export function TaskUpdate({ task, onTaskUpdate }: TaskUpdateProps) {
       onOpenAutoFocus={(e) => e.preventDefault()}
     >
       <div className="space-y-4">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => {
-            isUserEditingRef.current = true;
-            handleTitleChange(e.target.value);
-          }}
-          className="text-sm font-medium text-foreground bg-transparent border-0 outline-none focus:outline-none focus:ring-0 p-0 w-full"
-          placeholder={TASK_TITLE_FALLBACK}
-          autoFocus
-        />
+        <div className="flex items-center gap-2">
+          <Checkbox
+            checked={task.status === 2}
+            onCheckedChange={(checked) =>
+              onTaskUpdate?.(task.id, { status: checked ? 2 : 0 })
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            className="border-muted-foreground"
+          />
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => {
+              isUserEditingRef.current = true;
+              handleTitleChange(e.target.value);
+            }}
+            className="text-sm font-medium text-foreground bg-transparent border-0 outline-none focus:outline-none focus:ring-0 p-0 w-full"
+            placeholder={TASK_TITLE_FALLBACK}
+            autoFocus
+          />
+        </div>
 
         <div className="flex items-center gap-2">
           <TaskDatePicker value={dueDate} onChange={handleDueDateChange} />
