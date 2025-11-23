@@ -1,12 +1,11 @@
-import { formatDate } from "date-fns";
-import { ArrowUp, CalendarIcon } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 
-import { ProjectSelector } from "./project-selector";
+import { TaskDatePicker } from "./task-date-picker";
+import { TaskProjectSelector } from "./task-project-selector";
 import { TKanbanTask } from "./type";
 
 type Props = {
@@ -29,6 +28,7 @@ export function TaskAdd({ onSubmit }: Props) {
       className="relative z-1 flex flex-col border rounded-md p-2 pb-1.5 focus-within:border-primary w-full"
       onSubmit={(e) => {
         e.preventDefault();
+        console.log("handle submit", data);
         if (onSubmit) {
           onSubmit({
             title: data.title,
@@ -55,26 +55,14 @@ export function TaskAdd({ onSubmit }: Props) {
       />
 
       <div className="flex items-center justify-between mt-2">
-        <div className="flex space-x-0 items-center">
-          <DatePicker
-            date={data.dueDate}
-            onSelect={(date) => setData({ ...data, dueDate: date })}
-          >
-            {(date) =>
-              date ? (
-                <button className="text-xs font-medium text-primary px-1 h-7 leading-none rounded-sm hover:bg-accent">
-                  {formatDate(date, "MMM d, yyyy")}
-                </button>
-              ) : (
-                <Button size="icon-sm" variant="ghost" className="rounded-full">
-                  <CalendarIcon className="size-3.5" />
-                </Button>
-              )
-            }
-          </DatePicker>
-          <ProjectSelector
-            selectedProjectId={data.projectId}
-            onSelect={(projectId) => setData({ ...data, projectId })}
+        <div className="flex space-x-2 items-center">
+          <TaskDatePicker
+            value={data.dueDate}
+            onChange={(date) => setData({ ...data, dueDate: date })}
+          />
+          <TaskProjectSelector
+            value={data.projectId}
+            onChange={(projectId) => setData({ ...data, projectId })}
           />
         </div>
         <div>

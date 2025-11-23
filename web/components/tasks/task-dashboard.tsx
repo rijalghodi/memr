@@ -65,12 +65,6 @@ export function TaskDashboard() {
     },
   });
 
-  // const { mutate: updateTask } = useUpdateTask({
-  //   onError: (error) => {
-  //     console.error("Failed to update task:", error);
-  //   },
-  // });
-
   const { mutate: deleteTask } = useDeleteTask({
     onError: (error) => {
       console.error("Failed to delete task:", error);
@@ -82,11 +76,8 @@ export function TaskDashboard() {
     const status = groupId ? Number(groupId) : undefined;
     console.log("handleTaskAdd status", status);
     createTask({
-      title: task.title,
-      description: task.description,
+      ...task,
       status: status,
-      sortOrder: task.sortOrder,
-      dueDate: task.dueDate,
     });
   };
 
@@ -95,12 +86,9 @@ export function TaskDashboard() {
     const status = task.groupId ? Number(task.groupId) : undefined;
     console.log("handleTaskUpdate status", status);
     taskApi.update({
+      ...task,
       id,
-      title: task.title,
-      description: task.description,
       status: status,
-      sortOrder: task.sortOrder,
-      dueDate: task.dueDate,
     });
   };
 

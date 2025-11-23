@@ -12,8 +12,11 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "./";
+import { Spinner } from "./spinner";
 
 export type DropdownFilterProps = {
+  disabled?: boolean;
+  loading?: boolean;
   value?: string;
   options?: { label: string | React.ReactNode; value: string }[];
   onValueChange?: (value: string) => void;
@@ -27,6 +30,8 @@ export type DropdownFilterProps = {
   ) => React.ReactNode;
 };
 export function DropdownFilter({
+  disabled,
+  loading,
   value,
   options,
   onValueChange,
@@ -40,7 +45,7 @@ export function DropdownFilter({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild disabled={disabled}>
         {children ? (
           children(
             value ?? "",
@@ -59,16 +64,22 @@ export function DropdownFilter({
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40">
-        <DropdownMenuRadioGroup
-          value={value}
-          onValueChange={onValueChange as any}
-        >
-          {options?.map((option) => (
-            <DropdownMenuRadioItem key={option.value} value={option.value}>
-              {option.label}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
+        {loading ? (
+          <div className="flex items-center justify-center p-4">
+            <Spinner />
+          </div>
+        ) : (
+          <DropdownMenuRadioGroup
+            value={value}
+            onValueChange={onValueChange as any}
+          >
+            {options?.map((option) => (
+              <DropdownMenuRadioItem key={option.value} value={option.value}>
+                {option.label}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -3,10 +3,12 @@ import { useState } from "react";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { useClickOrDrag } from "@/hooks/use-click-or-drag";
 import { TASK_TITLE_FALLBACK } from "@/lib/constant";
+import { useGetProject } from "@/service/local/api-project";
 
+import { TaskDatePicker } from "./task-date-picker";
+import { TaskProjectSelector } from "./task-project-selector";
 import { TaskUpdate } from "./task-update";
 import type { TKanbanTask } from "./type";
-
 type CardProps = {
   task: TKanbanTask;
   onTaskUpdate?: (id: string, data: Partial<TKanbanTask>) => void;
@@ -23,6 +25,8 @@ export function Card({ task, onTaskUpdate }: CardProps) {
     },
   });
 
+  const { data: project } = useGetProject(task.projectId);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -33,11 +37,29 @@ export function Card({ task, onTaskUpdate }: CardProps) {
           <div className="text-sm font-medium text-foreground line-clamp-2">
             {task.title || TASK_TITLE_FALLBACK}
           </div>
-          {task.description && (
-            <div className="text-xs text-muted-foreground line-clamp-1 leading-none">
-              {task.description}
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {task.dueDate && (
+              <TaskDatePicker
+                value={new Date(task.dueDate)}
+                onChange={(date) =>
+                  onTaskUpdate?.(task.id, {
+                    dueDate: date?.toISOString(),
+                  })
+                }
+              />
+            )}
+
+            {task.projectId && (
+              <TaskProjectSelector
+                value={task.projectId}
+                onChange={(projectId) =>
+                  onTaskUpdate?.(task.id, {
+                    projectId: projectId,
+                  })
+                }
+              />
+            )}
+          </div>
         </div>
       </PopoverTrigger>
       <TaskUpdate task={task} onTaskUpdate={onTaskUpdate} />

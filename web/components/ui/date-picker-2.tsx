@@ -108,7 +108,7 @@ export const DatePicker = ({
         )}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <div className="flex items-center justify-between p-2 pb-0">
+        {/* <div className="flex items-center justify-between p-2 pb-0">
           <Button
             variant="ghost"
             size="icon"
@@ -145,13 +145,55 @@ export const DatePicker = ({
           >
             <Moon />
           </Button>
+        </div> */}
+        <div className="flex w-full">
+          <div className="flex flex-col items-stretch p-2 pb-0 w-full">
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Today"
+              className="h-11 w-full"
+              onClick={() => handleShortcutClick("today")}
+            >
+              <Sun /> Today
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Tomorrow"
+              className="h-11 w-full"
+              onClick={() => handleShortcutClick("tomorrow")}
+            >
+              <Sunrise /> Tomorrow
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Next Week"
+              className="h-11 w-full"
+              onClick={() => handleShortcutClick("nextWeek")}
+            >
+              <CalendarPlus /> Next Week
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Next Month"
+              className="h-11 w-full"
+              onClick={() => handleShortcutClick("nextMonth")}
+            >
+              <Moon /> Next Month
+            </Button>
+          </div>
+          <div>
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleCalendarSelect}
+              initialFocus
+            />
+          </div>
         </div>
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={handleCalendarSelect}
-          initialFocus
-        />
         <div className="flex items-center justify-between gap-2 p-2 pb-4 pt-0">
           <Button
             variant="outline"
