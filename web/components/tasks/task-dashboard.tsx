@@ -1,7 +1,7 @@
 "use client";
 
 import { ListFilter } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
 import { useGetProjects } from "@/service/local/api-project";
@@ -46,8 +46,6 @@ export function TaskDashboard() {
     projectId: projectId,
   });
 
-  // Implement debounce upsert tasks
-
   const tasks: TKanbanTask[] = useMemo(() => {
     return dexieTasks.map((task) => ({
       ...task,
@@ -55,8 +53,12 @@ export function TaskDashboard() {
     }));
   }, [dexieTasks]);
 
-  console.log("dexieTasks", dexieTasks);
-  // console.log("tasks", tasks);
+  const [localTasks, setLocalTasks] = useState<TKanbanTask[]>([]);
+
+  // Convert dexie tasks to local tasks
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
 
   // Task handlers
   const { mutate: createTask } = useCreateTask({
@@ -72,6 +74,7 @@ export function TaskDashboard() {
   });
 
   const handleTaskAdd = (groupId: string, task: TKanbanTask) => {
+    setLocalTasks((prev) => [...prev, task]);
     createTask({
       ...task,
       status: task.status ?? (groupId ? Number(groupId) : undefined),
@@ -79,6 +82,9 @@ export function TaskDashboard() {
   };
 
   const handleTaskUpdate = (id: string, task: Partial<TKanbanTask>) => {
+    setLocalTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...task } : t))
+    );
     taskApi.update({
       ...task,
       id,
@@ -120,7 +126,7 @@ export function TaskDashboard() {
           <TaskLoading />
         ) : (
           <TaskKanban
-            tasks={tasks}
+            tasks={localTasks}
             onTaskAdd={handleTaskAdd}
             onTaskUpdate={handleTaskUpdate}
             onTaskDelete={handleTaskDelete}
