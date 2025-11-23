@@ -45,33 +45,15 @@ export const ChatWidget = () => {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  // API hooks
-  const { isPending: isCreatingChat } = chatApiHook.useStartChat({
-    onSuccess: (data) => {
-      if (data.data?.id) {
-        setCurrentChatId(data.data.id);
-        // Don't clear messages here - let handleSendMessage manage the state
-      }
-    },
-    onError: (error) => {
-      console.error("Failed to create chat:", error);
-    },
-  });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const loadedChatIdRef = useRef<string | null>(null);
+  const isSendingMessageRef = useRef(false);
 
   const { data: historyData, isLoading: isLoadingHistory } =
     chatApiHook.useGetChatHistory(currentChatId);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  // Track if we've loaded history for current chat
-  const loadedChatIdRef = useRef<string | null>(null);
-  const lastHistoryMessagesRef = useRef<ChatMessage[]>([]);
-  // Track if we're currently sending a message to prevent history from overwriting
-  const isSendingMessageRef = useRef<boolean>(false);
 
-  // Transform message history from API to component format
   const historyMessages = useMemo(() => {
-    if (!historyData?.data?.messages || !currentChatId) {
-      return [];
-    }
+    if (!historyData?.data?.messages || !currentChatId) return [];
     return historyData.data.messages.map((msg) => ({
       id: msg.id,
       content: msg.content || "",
@@ -81,61 +63,50 @@ export const ChatWidget = () => {
     }));
   }, [historyData, currentChatId]);
 
-  // Load history messages only when chatId changes and history is loaded
-  // This is a valid use case: syncing external API data to component state
-  // We need local state to merge with optimistic updates from streaming
   useEffect(() => {
     if (!currentChatId) {
       if (loadedChatIdRef.current !== null) {
         loadedChatIdRef.current = null;
-        lastHistoryMessagesRef.current = [];
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setMessages([]);
       }
       return;
     }
 
-    // Don't overwrite messages if we're currently sending a message
-    if (isSendingMessageRef.current) {
-      return;
-    }
+    if (isSendingMessageRef.current) return;
 
-    // Only load history if chatId changed and we have history data
     if (
       currentChatId !== loadedChatIdRef.current &&
       historyMessages.length > 0
     ) {
       setMessages(historyMessages);
-      lastHistoryMessagesRef.current = historyMessages;
       loadedChatIdRef.current = currentChatId;
     }
   }, [currentChatId, historyMessages]);
 
+  const updateAssistantMessage = useCallback(
+    (messageId: string, updater: (msg: ChatMessage) => ChatMessage) => {
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === messageId ? updater(msg) : msg))
+      );
+    },
+    []
+  );
+
   const handleSendMessage = useCallback(
     async (message: string) => {
-      // Ensure we have a chatId before proceeding
       let chatId = currentChatId;
       if (!chatId) {
         const data = await chatApi.startChat();
-        if (data.data?.id) {
-          chatId = data.data.id;
-          setCurrentChatId(chatId);
-          // Mark this chat as loaded to prevent history from overwriting optimistic messages
-          loadedChatIdRef.current = chatId;
-        } else {
-          // Failed to create chat, abort
-          return;
-        }
+        if (!data.data?.id) return;
+        chatId = data.data.id;
+        setCurrentChatId(chatId);
+        loadedChatIdRef.current = chatId;
       }
 
-      if (!chatId) return;
-
       const messageContent = message.trim();
-
-      // Mark that we're sending a message to prevent history from overwriting
       isSendingMessageRef.current = true;
 
-      // Optimistic update: Add user message immediately
       const userMessage: ChatMessage = {
         id: crypto.randomUUID(),
         content: messageContent,
@@ -143,11 +114,6 @@ export const ChatWidget = () => {
         timestamp: new Date(),
       };
 
-      setMessages((prev) => [...prev, userMessage]);
-      setInputValue("");
-      setIsTyping(true);
-
-      // Create placeholder assistant message
       const assistantMessageId = crypto.randomUUID();
       const assistantMessage: ChatMessage = {
         id: assistantMessageId,
@@ -157,64 +123,47 @@ export const ChatWidget = () => {
         isStreaming: true,
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, userMessage, assistantMessage]);
+      setInputValue("");
+      setIsTyping(true);
 
-      // Start streaming
+      const finishStreaming = () => {
+        setIsTyping(false);
+        isSendingMessageRef.current = false;
+      };
+
       chatApi.sendMessageStream(
         chatId,
         messageContent,
         (chunk) => {
-          // Update assistant message with streamed content
-          setMessages((prev) =>
-            prev.map((msg) => {
-              if (msg.id === assistantMessageId) {
-                return {
-                  ...msg,
-                  content: msg.content + chunk.content,
-                  isStreaming: !chunk.done,
-                };
-              }
-              return msg;
-            })
-          );
+          updateAssistantMessage(assistantMessageId, (msg) => ({
+            ...msg,
+            content: msg.content + chunk.content,
+            isStreaming: !chunk.done,
+          }));
 
-          if (chunk.done) {
-            setIsTyping(false);
-            isSendingMessageRef.current = false;
-          }
+          if (chunk.done) finishStreaming();
         },
         (error) => {
           console.error("Streaming error:", error);
-          setIsTyping(false);
-          isSendingMessageRef.current = false;
-          // Update message with error or remove it
-          setMessages((prev) =>
-            prev.map((msg) => {
-              if (msg.id === assistantMessageId) {
-                return {
-                  ...msg,
-                  content: msg.content || "Error: Failed to get response",
-                  isStreaming: false,
-                };
-              }
-              return msg;
-            })
-          );
+          updateAssistantMessage(assistantMessageId, (msg) => ({
+            ...msg,
+            content: msg.content || "Error: Failed to get response",
+            isStreaming: false,
+          }));
+          finishStreaming();
         },
-        () => {
-          setIsTyping(false);
-          isSendingMessageRef.current = false;
-        }
+        finishStreaming
       );
     },
-    [currentChatId]
+    [currentChatId, updateAssistantMessage]
   );
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
+    (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!inputValue.trim() || isTyping) return;
-      await handleSendMessage(inputValue.trim());
+      handleSendMessage(inputValue.trim());
     },
     [inputValue, isTyping, handleSendMessage]
   );
@@ -224,10 +173,6 @@ export const ChatWidget = () => {
     setCurrentChatId(null);
     setInputValue("");
     setIsTyping(false);
-  }, []);
-
-  const handleSelectPreviousChat = useCallback((chatId: string) => {
-    setCurrentChatId(chatId);
   }, []);
 
   useEffect(() => {
@@ -244,12 +189,7 @@ export const ChatWidget = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleResetChat}
-            disabled={isCreatingChat}
-          >
+          <Button variant="ghost" size="icon" onClick={handleResetChat}>
             <Plus />
           </Button>
           <DropdownMenu>
@@ -264,7 +204,7 @@ export const ChatWidget = () => {
               className="w-[240px] max-h-[360px] rounded-lg"
             >
               <ChatHistory
-                onSelectChat={handleSelectPreviousChat}
+                onSelectChat={setCurrentChatId}
                 selectedChatId={currentChatId}
               />
             </DropdownMenuContent>
@@ -332,31 +272,7 @@ export const ChatWidget = () => {
             disabled={isTyping}
           />
           <PromptInputToolbar>
-            <PromptInputTools>
-              {/* <PromptInputButton disabled={isTyping}>
-                <PaperclipIcon size={16} />
-              </PromptInputButton>
-              <PromptInputButton disabled={isTyping}>
-                <MicIcon size={16} />
-                <span>Voice</span>
-              </PromptInputButton>
-              <PromptInputModelSelect
-                value={selectedModel}
-                onValueChange={setSelectedModel}
-                disabled={isTyping}
-              >
-                <PromptInputModelSelectTrigger>
-                  <PromptInputModelSelectValue />
-                </PromptInputModelSelectTrigger>
-                <PromptInputModelSelectContent>
-                  {models.map((model) => (
-                    <PromptInputModelSelectItem key={model.id} value={model.id}>
-                      {model.name}
-                    </PromptInputModelSelectItem>
-                  ))}
-                </PromptInputModelSelectContent>
-              </PromptInputModelSelect> */}
-            </PromptInputTools>
+            <PromptInputTools />
             <PromptInputSubmit
               disabled={!inputValue.trim() || isTyping}
               status={isTyping ? "streaming" : "ready"}
