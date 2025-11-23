@@ -50,7 +50,7 @@ export function TaskCard({ task, onTaskUpdate }: Props) {
           }}
           className={cn(
             "w-full text-sm font-medium text-foreground/90 border-none p-0.5 shadow-none rounded-xs outline-none ring-0",
-            "focus:bg-accent"
+            "focus:bg-accent",
           )}
           placeholder={TASK_TITLE_FALLBACK}
         />
