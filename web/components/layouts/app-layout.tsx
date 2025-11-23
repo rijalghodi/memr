@@ -9,14 +9,16 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 export function AppLayout() {
   return (
     <AuthGuard>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset className="bg-sidebar">
-          <Main>
-            <Outlet />
-          </Main>
-        </SidebarInset>
-      </SidebarProvider>
+      <div className="h-screen w-screen">
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset className="h-screen bg-sidebar">
+            <Main>
+              <Outlet />
+            </Main>
+          </SidebarInset>
+        </SidebarProvider>
+      </div>
     </AuthGuard>
   );
 }

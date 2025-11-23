@@ -62,9 +62,8 @@ export const PromptInputTextarea = ({
   return (
     <Textarea
       className={cn(
-        "w-full resize-none rounded-none border-none p-3 shadow-none outline-none ring-0",
-        "field-sizing-content max-h-[6lh] bg-transparent dark:bg-transparent",
-        "focus-visible:ring-0",
+        "w-full resize-none rounded-none border-none p-3 pb-0 shadow-none outline-none ring-0",
+        "field-sizing-content bg-transparent dark:bg-transparent focus-visible:ring-0",
         className,
       )}
       name="message"
@@ -73,6 +72,8 @@ export const PromptInputTextarea = ({
       }}
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
+      rows={1}
+      maxRows={6}
       {...props}
     />
   );

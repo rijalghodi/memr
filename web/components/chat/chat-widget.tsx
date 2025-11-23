@@ -24,8 +24,9 @@ import { Spinner } from "../ui/spinner";
 import { ChatHistory } from "./chat-history";
 
 const INITIAL_MESSAGES = [
-  "What should I follow up on from this week?",
-  "Give me a summary of my week.",
+  "What notes I wrote this week?",
+  "Give me a summary of my week",
+  "What are my tasks for today?",
 ];
 
 type ChatMessage = {
@@ -60,7 +61,7 @@ export const ChatWidget = () => {
 
   const { data: historyData, isLoading: isLoadingHistory } =
     chatApiHook.useGetChatHistory(currentChatId);
-
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   // Track if we've loaded history for current chat
   const loadedChatIdRef = useRef<string | null>(null);
   const lastHistoryMessagesRef = useRef<ChatMessage[]>([]);
@@ -145,6 +146,7 @@ export const ChatWidget = () => {
         }
       }
 
+      console.log("chatId", chatId);
       if (!chatId) return;
 
       // Start streaming
@@ -163,7 +165,7 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            })
+            }),
           );
 
           if (chunk.done) {
@@ -184,15 +186,15 @@ export const ChatWidget = () => {
                 };
               }
               return msg;
-            })
+            }),
           );
         },
         () => {
           setIsTyping(false);
-        }
+        },
       );
     },
-    [currentChatId, startChatAsync]
+    [currentChatId, startChatAsync],
   );
 
   const handleSubmit = useCallback(
@@ -201,7 +203,7 @@ export const ChatWidget = () => {
       if (!inputValue.trim() || isTyping) return;
       await handleSendMessage(inputValue.trim());
     },
-    [inputValue, isTyping, handleSendMessage]
+    [inputValue, isTyping, handleSendMessage],
   );
 
   const handleResetChat = useCallback(() => {
@@ -214,6 +216,10 @@ export const ChatWidget = () => {
   const handleSelectPreviousChat = useCallback((chatId: string) => {
     setCurrentChatId(chatId);
   }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden rounded-xl border bg-background shadow-sm">
@@ -264,16 +270,18 @@ export const ChatWidget = () => {
             <div className="flex items-center justify-center h-full">
               <div className="text-center space-y-4">
                 <p className="text-lg font-semibold">Ask me anything</p>
-                {INITIAL_MESSAGES.map((message) => (
-                  <Button
-                    key={message}
-                    variant="secondary"
-                    className="rounded-full"
-                    onClick={() => handleSendMessage(message)}
-                  >
-                    {message}
-                  </Button>
-                ))}
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {INITIAL_MESSAGES.map((message) => (
+                    <Button
+                      key={message}
+                      variant="secondary"
+                      className="rounded-full"
+                      onClick={() => handleSendMessage(message)}
+                    >
+                      {message}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
           ) : (
@@ -296,12 +304,13 @@ export const ChatWidget = () => {
               </div>
             ))
           )}
+          <div ref={messagesEndRef} />
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
 
       {/* Input Area */}
-      <div className="border-t p-4">
+      <div className="p-4">
         <PromptInput onSubmit={handleSubmit}>
           <PromptInputTextarea
             value={inputValue}

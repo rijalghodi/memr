@@ -7,6 +7,7 @@ import { NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { extractFirstLineFromContent } from "@/lib/string";
 import { noteApi, useGetNote } from "@/service/local/api-note";
 
+import { ScrollArea } from "../ui/scroll-area";
 import { NoteDetailEmpty } from "./note-detail-empty";
 import { SelectCollection } from "./select-collection";
 
@@ -37,14 +38,15 @@ export function NoteWorkspace({ noteId }: Props) {
   if (!note) return <NoteDetailEmpty />;
 
   return (
-    <div className="space-y-3 pt-3 max-h-[calc(100vh-100px)] overflow-y-auto">
+    <div className="space-y-3 pt-3 flex flex-col h-full">
       <div className="px-6">
         <SelectCollection noteId={noteId} collectionId={note.collectionId} />
       </div>
-
-      <div className="w-full transition-all duration-500 animate-in fade-in slide-in-from-bottom-3">
-        <RichTextEditor value={note.content} onChange={handleContentChange} />
-      </div>
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="transition-all duration-500 animate-in fade-in slide-in-from-bottom-3">
+          <RichTextEditor value={note.content} onChange={handleContentChange} />
+        </div>
+      </ScrollArea>
     </div>
   );
 }
