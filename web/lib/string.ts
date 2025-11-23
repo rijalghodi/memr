@@ -25,7 +25,7 @@ export function markdownToText(content: string, maxLength?: number) {
   line = line.replace(/\s+/g, " ");
 
   if (maxLength) {
-    line = line.slice(0, maxLength);
+    line = truncateString(line, maxLength);
   }
 
   return line.trim();
@@ -33,11 +33,12 @@ export function markdownToText(content: string, maxLength?: number) {
 
 export function extractFirstLineFromContent(
   content: string,
-  maxLength?: number,
+  maxLength?: number
 ) {
   const trimmed = content.trim();
   const firstLine = trimmed.split("\n")[0];
-  return markdownToText(firstLine, maxLength);
+  const text = markdownToText(firstLine, maxLength);
+  return text;
 }
 
 export function truncateString(str: string, maxLength: number) {
