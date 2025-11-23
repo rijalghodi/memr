@@ -41,7 +41,7 @@ export function Main({ children }: Props) {
           <div className="flex-1 min-h-0">{children}</div>
         </div>
 
-        <div className="bg-background rounded-t-2xl w-full min-w-[300px] max-w-[400px]">
+        <div className="bg-background rounded-t-2xl w-[380px]">
           <ChatWidget />
         </div>
       </div>
