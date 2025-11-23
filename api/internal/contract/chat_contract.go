@@ -5,7 +5,7 @@ type ChatStartReq struct {
 }
 
 type ChatStartRes struct {
-	ChatID string `json:"chatId"`
+	ID string `json:"id"`
 }
 
 type ChatSendReq struct {

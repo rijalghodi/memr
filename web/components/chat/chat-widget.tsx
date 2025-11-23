@@ -46,18 +46,17 @@ export const ChatWidget = () => {
   const [isTyping, setIsTyping] = useState(false);
 
   // API hooks
-  const { mutateAsync: startChatAsync, isPending: isCreatingChat } =
-    chatApiHook.useStartChat({
-      onSuccess: (data) => {
-        if (data.data?.chatId) {
-          setCurrentChatId(data.data.chatId);
-          setMessages([]);
-        }
-      },
-      onError: (error) => {
-        console.error("Failed to create chat:", error);
-      },
-    });
+  const { isPending: isCreatingChat } = chatApiHook.useStartChat({
+    onSuccess: (data) => {
+      if (data.data?.id) {
+        setCurrentChatId(data.data.id);
+        // Don't clear messages here - let handleSendMessage manage the state
+      }
+    },
+    onError: (error) => {
+      console.error("Failed to create chat:", error);
+    },
+  });
 
   const { data: historyData, isLoading: isLoadingHistory } =
     chatApiHook.useGetChatHistory(currentChatId);
@@ -65,6 +64,8 @@ export const ChatWidget = () => {
   // Track if we've loaded history for current chat
   const loadedChatIdRef = useRef<string | null>(null);
   const lastHistoryMessagesRef = useRef<ChatMessage[]>([]);
+  // Track if we're currently sending a message to prevent history from overwriting
+  const isSendingMessageRef = useRef<boolean>(false);
 
   // Transform message history from API to component format
   const historyMessages = useMemo(() => {
@@ -94,6 +95,11 @@ export const ChatWidget = () => {
       return;
     }
 
+    // Don't overwrite messages if we're currently sending a message
+    if (isSendingMessageRef.current) {
+      return;
+    }
+
     // Only load history if chatId changed and we have history data
     if (
       currentChatId !== loadedChatIdRef.current &&
@@ -107,7 +113,27 @@ export const ChatWidget = () => {
 
   const handleSendMessage = useCallback(
     async (message: string) => {
+      // Ensure we have a chatId before proceeding
+      let chatId = currentChatId;
+      if (!chatId) {
+        const data = await chatApi.startChat();
+        if (data.data?.id) {
+          chatId = data.data.id;
+          setCurrentChatId(chatId);
+          // Mark this chat as loaded to prevent history from overwriting optimistic messages
+          loadedChatIdRef.current = chatId;
+        } else {
+          // Failed to create chat, abort
+          return;
+        }
+      }
+
+      if (!chatId) return;
+
       const messageContent = message.trim();
+
+      // Mark that we're sending a message to prevent history from overwriting
+      isSendingMessageRef.current = true;
 
       // Optimistic update: Add user message immediately
       const userMessage: ChatMessage = {
@@ -133,22 +159,6 @@ export const ChatWidget = () => {
 
       setMessages((prev) => [...prev, assistantMessage]);
 
-      // Ensure we have a chatId before proceeding
-      let chatId = currentChatId;
-      if (!chatId) {
-        const data = await startChatAsync();
-        if (data.data?.chatId) {
-          chatId = data.data.chatId;
-          setCurrentChatId(chatId);
-        } else {
-          // Failed to create chat, abort
-          return;
-        }
-      }
-
-      console.log("chatId", chatId);
-      if (!chatId) return;
-
       // Start streaming
       chatApi.sendMessageStream(
         chatId,
@@ -170,11 +180,13 @@ export const ChatWidget = () => {
 
           if (chunk.done) {
             setIsTyping(false);
+            isSendingMessageRef.current = false;
           }
         },
         (error) => {
           console.error("Streaming error:", error);
           setIsTyping(false);
+          isSendingMessageRef.current = false;
           // Update message with error or remove it
           setMessages((prev) =>
             prev.map((msg) => {
@@ -191,10 +203,11 @@ export const ChatWidget = () => {
         },
         () => {
           setIsTyping(false);
+          isSendingMessageRef.current = false;
         }
       );
     },
-    [currentChatId, startChatAsync]
+    [currentChatId]
   );
 
   const handleSubmit = useCallback(

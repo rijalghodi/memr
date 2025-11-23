@@ -14,7 +14,7 @@ import type { GErrorResponse, GResponse } from "./type";
 
 // Types matching Go contracts
 export type ChatStartRes = {
-  chatId: string;
+  id: string;
 };
 
 export type ChatRes = {
@@ -82,7 +82,7 @@ export const chatApi = {
 
   listChats: async (
     page: number = 1,
-    limit: number = 20,
+    limit: number = 20
   ): Promise<ChatListApiRes> => {
     const response = await apiClient.get("/v1/chats", {
       params: { page, limit },
@@ -100,7 +100,7 @@ export const chatApi = {
     message: string,
     onChunk: (chunk: ChatStreamChunk) => void,
     onError?: (error: Error) => void,
-    onComplete?: () => void,
+    onComplete?: () => void
   ): Promise<void> => {
     const token = Cookies.get(ACCESS_TOKEN_KEY);
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -115,7 +115,7 @@ export const chatApi = {
             Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify({ message }),
-        },
+        }
       );
 
       if (!response.ok) {
@@ -199,7 +199,7 @@ export const useStartChat = ({
 
 export const useListChats = (
   page: number = 1,
-  limit: number = 20,
+  limit: number = 20
 ): UseQueryResult<ChatListApiRes, GErrorResponse> => {
   return useQuery({
     queryKey: [LIST_CHATS_KEY, page, limit],
@@ -208,7 +208,7 @@ export const useListChats = (
 };
 
 export const useGetChatHistory = (
-  chatId: string | null,
+  chatId: string | null
 ): UseQueryResult<ChatHistoryApiRes, GErrorResponse> => {
   return useQuery({
     queryKey: [GET_CHAT_HISTORY_KEY, chatId],

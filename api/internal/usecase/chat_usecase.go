@@ -41,7 +41,7 @@ func (u *ChatUsecase) StartChat(ctx context.Context, userID string) (*contract.C
 	}
 
 	return &contract.ChatStartRes{
-		ChatID: chat.ID,
+		ID: chat.ID,
 	}, nil
 }
 
