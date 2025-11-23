@@ -1,38 +1,41 @@
 FROM golang:1.24-alpine AS build
 
-# Install swag tool for Swagger generation
+# Install swag
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 
-# Ensure GOPATH/bin is in PATH (where go install puts binaries)
 ENV PATH=$PATH:/go/bin
 
 WORKDIR /app
 
-# Copy go mod files first for better caching
+# Better caching
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy source code
+# Copy source
 COPY . .
 
-# Generate Swagger documentation
+# Generate Swagger docs
 RUN swag init --dir . --output ./docs --parseDependency --parseInternal
 
-# Build the application
+# Build static binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
+
+# ------------------------------
 
 FROM alpine:latest
 
-RUN apk add --no-cache curl ca-certificates
+RUN apk add --no-cache ca-certificates
 
-WORKDIR /root
+WORKDIR /app
 
-# Copy the binary from build stage
+# Copy binary
 COPY --from=build /app/main .
 
-# Copy .env if it exists (optional, might not be in repo)
-COPY --from=build /app/.env* ./
+# DO NOT copy .env from inside image; pass env via docker run
+# (safe, avoids leaking secrets)
+# If you must copy config, do this:
+# COPY .env ./
 
 EXPOSE 8000
 
-CMD ["./main", "http"]
+CMD ["./main"]

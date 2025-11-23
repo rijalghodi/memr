@@ -66,7 +66,7 @@ func (h *ChatHandler) StartChat(c *fiber.Ctx) error {
 // @Security BearerAuth
 // @Param page query int false "Page number (default: 1)" default(1)
 // @Param limit query int false "Items per page (default: 20)" default(20)
-// @Success 200 {object} util.BaseResponse{data=contract.ChatListRes}
+// @Success 200 {object} util.BaseResponse{data=contract.ChatRes}
 // @Failure 400 {object} util.BaseResponse
 // @Failure 401 {object} util.BaseResponse
 // @Router /v1/chats [get]
