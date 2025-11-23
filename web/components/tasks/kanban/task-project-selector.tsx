@@ -46,7 +46,7 @@ export const TaskProjectSelector = ({
           </span>
         ),
         value: project.id,
-      })),
+      }))
     );
     return opts;
   }, [value, projects]);
@@ -63,7 +63,7 @@ export const TaskProjectSelector = ({
       options={options}
     >
       {(value, label) => (
-        <Button variant="ghost" size="sm-compact">
+        <Button variant="ghost" size="sm-compact" className="font-normal">
           {value ? label : <ProjectIcon />}
         </Button>
       )}

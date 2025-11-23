@@ -38,7 +38,7 @@ export function TaskDatePicker({
           {date ? (
             <span
               data-overdue={isOverdue?.(date)}
-              className="text-primary data-[overdue=true]:text-destructive"
+              className="text-primary data-[overdue=true]:text-destructive font-normal"
             >
               {formatDate(date, "MMM d, yyyy")}
             </span>
