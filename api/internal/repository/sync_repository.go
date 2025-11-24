@@ -190,9 +190,8 @@ func (r *SyncRepository) syncTask(tx *gorm.DB, userID string, change *contract.C
 	// Prepare only non-falsy updates
 	updates := map[string]any{}
 
-	if change.ProjectID != nil {
-		updates["project_id"] = change.ProjectID
-	}
+	updates["project_id"] = change.ProjectID
+
 	if change.Title != nil {
 		updates["title"] = change.Title
 	}
@@ -314,9 +313,8 @@ func (r *SyncRepository) syncNote(tx *gorm.DB, userID string, change *contract.C
 	// Prepare only non-falsy updates
 	updates := map[string]any{}
 
-	if change.CollectionID != nil {
-		updates["collection_id"] = change.CollectionID
-	}
+	updates["collection_id"] = change.CollectionID
+
 	if change.Title != nil {
 		updates["title"] = *change.Title
 	}
