@@ -34,59 +34,11 @@ export const TaskProjectPicker = ({
   disabled,
 }: Props) => {
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const { data: projects, isLoading } = useGetProjects();
-
-  const handleCreateSuccess = useCallback(
-    (newProject: { id: string }) => {
-      onChange?.(newProject.id);
-      setOpen(false);
-      setSearch("");
-    },
-    [onChange],
-  );
-
-  const { mutate: createProject, isLoading: isCreating } = useCreateProject({
-    onSuccess: handleCreateSuccess,
-  });
+  const { data: projects } = useGetProjects();
 
   const selectedProject = useMemo(() => {
     return projects?.find((p) => p.id === value);
   }, [projects, value]);
-
-  const filteredProjects = useMemo(() => {
-    if (!search.trim()) {
-      return projects ?? [];
-    }
-    const searchLower = search.toLowerCase();
-    return (
-      projects?.filter((project) =>
-        (project.title || PROJECT_TITLE_FALLBACK)
-          .toLowerCase()
-          .includes(searchLower),
-      ) ?? []
-    );
-  }, [projects, search]);
-
-  const handleSelect = (projectId: string) => {
-    if (projectId === "") {
-      onChange?.(undefined);
-    } else {
-      const newValue = projectId === value ? undefined : projectId;
-      onChange?.(newValue);
-    }
-    setOpen(false);
-    setSearch("");
-  };
-
-  const handleCreateProject = () => {
-    if (search.trim()) {
-      createProject({
-        title: search.trim(),
-        color: getRandomColor(),
-      });
-    }
-  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -144,7 +96,7 @@ export const TaskProjectPickerContent = ({
       onClose?.();
       setSearch("");
     },
-    [onChange, onClose],
+    [onChange, onClose]
   );
 
   const { mutate: createProject, isLoading: isCreating } = useCreateProject({
@@ -160,7 +112,7 @@ export const TaskProjectPickerContent = ({
       projects?.filter((project) =>
         (project.title || PROJECT_TITLE_FALLBACK)
           .toLowerCase()
-          .includes(searchLower),
+          .includes(searchLower)
       ) ?? []
     );
   }, [projects, search]);
@@ -223,7 +175,7 @@ export const TaskProjectPickerContent = ({
                     <Check
                       className={cn(
                         "ml-auto size-4",
-                        value === project.id ? "opacity-100" : "opacity-0",
+                        value === project.id ? "opacity-100" : "opacity-0"
                       )}
                     />
                   </CommandItem>
