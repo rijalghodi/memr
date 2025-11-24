@@ -31,8 +31,7 @@ export function NoteWorkspace({ noteId }: Props) {
       id: noteId,
       content,
     });
-    document.title =
-      extractFirstLineFromContent(content, 30) || NOTE_TITLE_FALLBACK;
+    document.title = extractFirstLineFromContent(content, 30) || NOTE_TITLE_FALLBACK;
   };
 
   if (!note) return <NoteDetailEmpty />;
@@ -40,10 +39,7 @@ export function NoteWorkspace({ noteId }: Props) {
   return (
     <div className="space-y-3 pt-3 flex flex-col h-full">
       <div className="px-6">
-        <NoteCollectionPicker
-          noteId={noteId}
-          collectionId={note.collectionId}
-        />
+        <NoteCollectionPicker noteId={noteId} collectionId={note.collectionId} />
       </div>
       <ScrollArea className="flex-1 min-h-0">
         <div className="transition-all duration-500 animate-in fade-in slide-in-from-bottom-3">

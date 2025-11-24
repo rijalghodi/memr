@@ -22,9 +22,7 @@ export function CollectionEmpty({ onAddCollection }: CollectionEmptyProps) {
           <CollectionIcon />
         </EmptyMedia>
         <EmptyTitle>No Collections</EmptyTitle>
-        <EmptyDescription>
-          You haven&apos;t created any collections yet.
-        </EmptyDescription>
+        <EmptyDescription>You haven&apos;t created any collections yet.</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">

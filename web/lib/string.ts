@@ -31,10 +31,7 @@ export function markdownToText(content: string, maxLength?: number) {
   return line.trim();
 }
 
-export function extractFirstLineFromContent(
-  content: string,
-  maxLength?: number,
-) {
+export function extractFirstLineFromContent(content: string, maxLength?: number) {
   const trimmed = content.trim();
   const firstLine = trimmed.split("\n")[0];
   const text = markdownToText(firstLine, maxLength);

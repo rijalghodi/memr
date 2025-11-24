@@ -14,14 +14,14 @@ function preprocessMarkdown(content: string): string {
   // Pattern: [note=UUID] -> [Note](memr://note/UUID)
   let processed = content.replace(
     /\[note=([a-f0-9-]+)\]/gi,
-    (_, uuid) => `[Note](memr://note/${uuid})`,
+    (_, uuid) => `[Note](memr://note/${uuid})`
   );
 
   // Convert [task=UUID] to markdown links
   // Pattern: [task=UUID] -> [Task](memr://task/UUID)
   processed = processed.replace(
     /\[task=([a-f0-9-]+)\]/gi,
-    (_, uuid) => `[Task](memr://task/${uuid})`,
+    (_, uuid) => `[Task](memr://task/${uuid})`
   );
 
   return processed;
@@ -80,29 +80,21 @@ export function MarkdownViewer({ content }: { content: string }) {
         },
         // Style other markdown elements
         p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-        ul: ({ children }) => (
-          <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>
-        ),
+        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
         ol: ({ children }) => (
-          <ol className="list-decimal list-inside mb-2 space-y-1">
-            {children}
-          </ol>
+          <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>
         ),
         li: ({ children }) => <li className="ml-2">{children}</li>,
         code: ({ children, className }) => {
           const isInline = !className;
           return isInline ? (
-            <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">
-              {children}
-            </code>
+            <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">{children}</code>
           ) : (
             <code className={className}>{children}</code>
           );
         },
         pre: ({ children }) => (
-          <pre className="bg-muted p-3 rounded-lg overflow-x-auto mb-2">
-            {children}
-          </pre>
+          <pre className="bg-muted p-3 rounded-lg overflow-x-auto mb-2">{children}</pre>
         ),
         blockquote: ({ children }) => (
           <blockquote className="border-l-4 border-muted-foreground pl-4 italic mb-2">
@@ -116,9 +108,7 @@ export function MarkdownViewer({ content }: { content: string }) {
           <h2 className="text-lg font-bold mb-2 mt-4 first:mt-0">{children}</h2>
         ),
         h3: ({ children }) => (
-          <h3 className="text-base font-bold mb-2 mt-4 first:mt-0">
-            {children}
-          </h3>
+          <h3 className="text-base font-bold mb-2 mt-4 first:mt-0">{children}</h3>
         ),
       }}
     >

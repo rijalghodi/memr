@@ -4,11 +4,7 @@ import { BoldIcon } from "lucide-react";
 import React from "react";
 
 import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 import { useToolbar } from "./toolbar-provider";
@@ -29,7 +25,7 @@ const BoldToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className={cn(
               "h-8 w-8 p-0 sm:h-9 sm:w-9",
               editor?.isActive("bold") && "bg-accent",
-              className,
+              className
             )}
             onClick={(e) => {
               editor?.chain().focus().toggleBold().run();
@@ -48,7 +44,7 @@ const BoldToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  },
+  }
 );
 
 BoldToolbar.displayName = "BoldToolbar";

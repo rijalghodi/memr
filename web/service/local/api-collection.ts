@@ -59,18 +59,15 @@ export const collectionApi = {
           !unsynced ||
           !collection.syncedAt ||
           new Date(collection.syncedAt ?? new Date(0)).getTime() <
-            new Date(collection.updatedAt).getTime(),
+            new Date(collection.updatedAt).getTime()
       )
       .toArray(async (collections) =>
         Promise.all(
           collections.map(async (collection) => ({
             ...collection,
-            notesCount: await db.notes
-              .where("collectionId")
-              .equals(collection.id)
-              .count(),
-          })),
-        ),
+            notesCount: await db.notes.where("collectionId").equals(collection.id).count(),
+          }))
+        )
       );
     if (sortBy) {
       collections.sort((a, b) => {
@@ -165,15 +162,14 @@ export const useCreateCollection = ({
         onSuccess?.(result);
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -223,15 +219,14 @@ export const useUpdateCollection = ({
         onSuccess?.(result);
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -253,15 +248,14 @@ export const useDeleteCollection = ({
         await collectionApi.delete(id);
         onSuccess?.();
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };

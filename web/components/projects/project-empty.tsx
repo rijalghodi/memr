@@ -22,9 +22,7 @@ export function ProjectEmpty({ onAddProject }: ProjectEmptyProps) {
           <ProjectIcon />
         </EmptyMedia>
         <EmptyTitle>No Projects</EmptyTitle>
-        <EmptyDescription>
-          You haven&apos;t created any projects yet
-        </EmptyDescription>
+        <EmptyDescription>You haven&apos;t created any projects yet</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">

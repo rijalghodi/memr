@@ -1,22 +1,12 @@
 "use client";
 
 import { addDays, addMonths, addWeeks, startOfDay } from "date-fns";
-import {
-  Calendar as CalendarIcon,
-  CalendarPlus,
-  Moon,
-  Sun,
-  Sunrise,
-} from "lucide-react";
+import { Calendar as CalendarIcon, CalendarPlus, Moon, Sun, Sunrise } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 export type DatePickerProps = {
@@ -64,7 +54,7 @@ export const DatePicker = ({
         setInternalOpen(newOpen);
       }
     },
-    [isControlled, onOpenChange],
+    [isControlled, onOpenChange]
   );
 
   // Close handler for actions that should close the popover
@@ -94,33 +84,21 @@ export const DatePicker = ({
         )}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <DatePickerContent
-          date={date}
-          onSelect={onSelect}
-          onClose={handleClose}
-        />
+        <DatePickerContent date={date} onSelect={onSelect} onClose={handleClose} />
       </PopoverContent>
     </Popover>
   );
 };
 
-export const DatePickerContent = ({
-  date,
-  onSelect,
-  onClose,
-}: DatePickerContentProps) => {
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
-    date,
-  );
+export const DatePickerContent = ({ date, onSelect, onClose }: DatePickerContentProps) => {
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(date);
 
   // Sync selectedDate with date prop
   React.useEffect(() => {
     setSelectedDate(date);
   }, [date]);
 
-  const handleShortcutClick = (
-    shortcut: "today" | "tomorrow" | "nextWeek" | "nextMonth",
-  ) => {
+  const handleShortcutClick = (shortcut: "today" | "tomorrow" | "nextWeek" | "nextMonth") => {
     const today = startOfDay(new Date());
     let newDate: Date;
 
@@ -206,12 +184,7 @@ export const DatePickerContent = ({
         initialFocus
       />
       <div className="flex items-center justify-between gap-2 p-2 pb-4 pt-0">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1"
-          onClick={handleClear}
-        >
+        <Button variant="outline" size="sm" className="flex-1" onClick={handleClear}>
           Clear
         </Button>
         <Button size="sm" className="flex-1" onClick={handleOk}>

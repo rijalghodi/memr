@@ -6,10 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 import { getCssColorStyle, getRandomColor } from "@/lib/color";
 import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
 import { cn } from "@/lib/utils";
-import {
-  useCreateCollection,
-  useGetCollections,
-} from "@/service/local/api-collection";
+import { useCreateCollection, useGetCollections } from "@/service/local/api-collection";
 import { noteApi } from "@/service/local/api-note";
 
 import { CollectionIcon } from "../collections/collection-icon";
@@ -46,7 +43,7 @@ export function NoteCollectionPicker({
         collectionId: newCollectionId,
       });
     },
-    [noteId],
+    [noteId]
   );
 
   return (
@@ -60,9 +57,7 @@ export function NoteCollectionPicker({
             style={getCssColorStyle(currentCollection?.color ?? "")}
           >
             <CollectionIcon />
-            {currentCollection?.title || (
-              <span className="text-muted-foreground">Organize</span>
-            )}
+            {currentCollection?.title || <span className="text-muted-foreground">Organize</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0" align="start">
@@ -97,13 +92,12 @@ export const NoteCollectionPickerContent = ({
       onClose?.();
       setSearch("");
     },
-    [onChange, onClose],
+    [onChange, onClose]
   );
 
-  const { mutate: createCollection, isLoading: isCreating } =
-    useCreateCollection({
-      onSuccess: handleCreateSuccess,
-    });
+  const { mutate: createCollection, isLoading: isCreating } = useCreateCollection({
+    onSuccess: handleCreateSuccess,
+  });
 
   const filteredCollections = useMemo(() => {
     if (!search.trim()) {
@@ -112,9 +106,7 @@ export const NoteCollectionPickerContent = ({
     const searchLower = search.toLowerCase();
     return (
       collections?.filter((collection) =>
-        (collection.title || COLLECTION_TITLE_FALLBACK)
-          .toLowerCase()
-          .includes(searchLower),
+        (collection.title || COLLECTION_TITLE_FALLBACK).toLowerCase().includes(searchLower)
       ) ?? []
     );
   }, [collections, search]);
@@ -141,11 +133,7 @@ export const NoteCollectionPickerContent = ({
 
   return (
     <Command shouldFilter={false}>
-      <CommandInput
-        placeholder="Search collections..."
-        value={search}
-        onValueChange={setSearch}
-      />
+      <CommandInput placeholder="Search collections..." value={search} onValueChange={setSearch} />
       <CommandList>
         {isLoading ? (
           <div className="flex items-center justify-center p-4">
@@ -167,17 +155,14 @@ export const NoteCollectionPickerContent = ({
                     value={collection.id}
                     onSelect={() => handleSelect(collection.id)}
                   >
-                    <CollectionIcon
-                      className="size-4"
-                      style={{ color: collection.color }}
-                    />
+                    <CollectionIcon className="size-4" style={{ color: collection.color }} />
                     <span className="text-ellipsis line-clamp-1">
                       {collection.title || COLLECTION_TITLE_FALLBACK}
                     </span>
                     <Check
                       className={cn(
                         "ml-auto size-4",
-                        value === collection.id ? "opacity-100" : "opacity-0",
+                        value === collection.id ? "opacity-100" : "opacity-0"
                       )}
                     />
                   </CommandItem>
@@ -186,10 +171,7 @@ export const NoteCollectionPickerContent = ({
             )}
             <CommandSeparator />
             <CommandGroup>
-              <CommandItem
-                onSelect={handleCreateCollection}
-                disabled={isCreating}
-              >
+              <CommandItem onSelect={handleCreateCollection} disabled={isCreating}>
                 <Plus className="size-4" />
                 <span>Create collection &quot;{search.trim()}&quot;</span>
               </CommandItem>

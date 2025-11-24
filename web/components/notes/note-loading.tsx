@@ -6,10 +6,7 @@ export function NoteLoading() {
   return (
     <div>
       {Array.from({ length: 4 }).map((_, index) => (
-        <div
-          key={index}
-          className={cn("px-6 border-b border-b-muted last:border-b-0")}
-        >
+        <div key={index} className={cn("px-6 border-b border-b-muted last:border-b-0")}>
           <div className="flex justify-between items-center py-6 gap-4">
             <Skeleton className="h-10 w-10 rounded-lg" />
             <div className="space-y-3 flex-1">

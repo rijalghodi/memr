@@ -10,11 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/hooks/use-media-querry";
 import { cn } from "@/lib/utils";
 
@@ -29,9 +25,7 @@ export const HeadingsToolbar = React.forwardRef<
 >(({ className, ...props }, ref) => {
   const { editor } = useToolbar();
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const activeLevel = levels.find((level) =>
-    editor?.isActive("heading", { level }),
-  );
+  const activeLevel = levels.find((level) => editor?.isActive("heading", { level }));
 
   if (isMobile) {
     return (
@@ -45,9 +39,7 @@ export const HeadingsToolbar = React.forwardRef<
         {levels.map((level) => (
           <MobileToolbarItem
             key={level}
-            onClick={() =>
-              editor?.chain().focus().toggleHeading({ level }).run()
-            }
+            onClick={() => editor?.chain().focus().toggleHeading({ level }).run()}
             active={editor?.isActive("heading", { level })}
           >
             H{level}
@@ -68,7 +60,7 @@ export const HeadingsToolbar = React.forwardRef<
               className={cn(
                 "h-8 w-max gap-1 px-3 font-normal",
                 editor?.isActive("heading") && "bg-accent",
-                className,
+                className
               )}
               ref={ref}
               {...props}
@@ -82,7 +74,7 @@ export const HeadingsToolbar = React.forwardRef<
               onClick={() => editor?.chain().focus().setParagraph().run()}
               className={cn(
                 "flex items-center gap-2 h-fit",
-                !editor?.isActive("heading") && "bg-accent",
+                !editor?.isActive("heading") && "bg-accent"
               )}
             >
               Normal
@@ -90,12 +82,10 @@ export const HeadingsToolbar = React.forwardRef<
             {levels.map((level) => (
               <DropdownMenuItem
                 key={level}
-                onClick={() =>
-                  editor?.chain().focus().toggleHeading({ level }).run()
-                }
+                onClick={() => editor?.chain().focus().toggleHeading({ level }).run()}
                 className={cn(
                   "flex items-center gap-2",
-                  editor?.isActive("heading", { level }) && "bg-accent",
+                  editor?.isActive("heading", { level }) && "bg-accent"
                 )}
               >
                 H{level}

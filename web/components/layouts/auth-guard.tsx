@@ -13,14 +13,11 @@ type AuthGuardContextType = {
   invalidate: () => void;
 };
 
-const AuthGuardContext = createContext<AuthGuardContextType | undefined>(
-  undefined,
-);
+const AuthGuardContext = createContext<AuthGuardContextType | undefined>(undefined);
 
 export function useAuthGuard() {
   const context = useContext(AuthGuardContext);
-  if (context === undefined)
-    throw new Error("useAuthGuard must be used within AuthGuardProvider");
+  if (context === undefined) throw new Error("useAuthGuard must be used within AuthGuardProvider");
   return context;
 }
 
@@ -85,8 +82,7 @@ export function AuthGuard({
     }
   }, [error, isLoading, mustNotAuthenticated, navigate, isAuthenticated]);
 
-  if (isLoading || (!mustNotAuthenticated && !isAuthenticated))
-    return <AuthGuardLoader />;
+  if (isLoading || (!mustNotAuthenticated && !isAuthenticated)) return <AuthGuardLoader />;
 
   return <>{children}</>;
 }
@@ -100,9 +96,7 @@ export function AuthGuardLoader() {
           alt="Logo"
           width={100}
           height={100}
-          className={cn(
-            "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32",
-          )}
+          className={cn("animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32")}
         />
       </div>
     </>

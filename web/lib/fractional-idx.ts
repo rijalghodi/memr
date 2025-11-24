@@ -33,10 +33,7 @@ export function generateLastRank(): string {
  * @param right - The right rank (or undefined to use last rank)
  * @returns A rank string between left and right
  */
-export function generateBetweenRank(
-  left: string | undefined,
-  right: string | undefined,
-): string {
+export function generateBetweenRank(left: string | undefined, right: string | undefined): string {
   // Normalize undefined to null for fractional-indexing API
   const leftKey: string | null = left === undefined ? null : left || null;
   const rightKey: string | null = right === undefined ? null : right || null;

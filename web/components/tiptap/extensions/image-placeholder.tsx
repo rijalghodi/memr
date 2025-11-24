@@ -4,10 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  NODE_HANDLES_SELECTED_STYLE_CLASSNAME,
-  isValidUrl,
-} from "@/lib/tiptap-utils";
+import { NODE_HANDLES_SELECTED_STYLE_CLASSNAME, isValidUrl } from "@/lib/tiptap-utils";
 import {
   type CommandProps,
   Node,
@@ -85,27 +82,21 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
   const [urlError, setUrlError] = useState(false);
   const [isDragActive, setIsDragActive] = useState(false);
 
-  const {
-    previewUrl,
-    fileInputRef,
-    handleFileChange,
-    handleRemove,
-    uploading,
-    error,
-  } = useImageUpload({
-    onUpload: (imageUrl) => {
-      editor
-        .chain()
-        .focus()
-        .setImage({
-          src: imageUrl,
-          alt: altText || fileInputRef.current?.files?.[0]?.name,
-        })
-        .run();
-      handleRemove();
-      setIsExpanded(false);
-    },
-  });
+  const { previewUrl, fileInputRef, handleFileChange, handleRemove, uploading, error } =
+    useImageUpload({
+      onUpload: (imageUrl) => {
+        editor
+          .chain()
+          .focus()
+          .setImage({
+            src: imageUrl,
+            alt: altText || fileInputRef.current?.files?.[0]?.name,
+          })
+          .run();
+        handleRemove();
+        setIsExpanded(false);
+      },
+    });
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -166,39 +157,27 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
               "group relative flex cursor-pointer flex-col items-center gap-4 rounded-lg border-2 border-dashed p-8 transition-all hover:bg-accent",
               selected && "border-primary bg-primary/5",
               isDragActive && "border-primary bg-primary/5",
-              error && "border-destructive bg-destructive/5",
+              error && "border-destructive bg-destructive/5"
             )}
           >
             <div className="rounded-full bg-background p-4 shadow-sm transition-colors group-hover:bg-accent">
               <Image className="h-6 w-6" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-medium">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-xs text-muted-foreground">
-                SVG, PNG, JPG or GIF
-              </p>
+              <p className="text-sm font-medium">Click to upload or drag and drop</p>
+              <p className="text-xs text-muted-foreground">SVG, PNG, JPG or GIF</p>
             </div>
           </div>
         ) : (
           <div className="rounded-lg border bg-card p-4 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold">Add Image</h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsExpanded(false)}
-              >
+              <Button variant="ghost" size="icon" onClick={() => setIsExpanded(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
 
-            <Tabs
-              value={activeTab}
-              onValueChange={(v: any) => setActiveTab(v)}
-              className="w-full"
-            >
+            <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="upload">
                   <Upload className="mr-2 h-4 w-4" />
@@ -219,7 +198,7 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
                   className={cn(
                     "my-4 rounded-lg border-2 border-dashed p-8 text-center transition-colors",
                     isDragActive && "border-primary bg-primary/10",
-                    error && "border-destructive bg-destructive/10",
+                    error && "border-destructive bg-destructive/10"
                   )}
                 >
                   {previewUrl ? (
@@ -236,17 +215,11 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
                           placeholder="Alt text (optional)"
                         />
                         <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            onClick={handleRemove}
-                            disabled={uploading}
-                          >
+                          <Button variant="outline" onClick={handleRemove} disabled={uploading}>
                             Remove
                           </Button>
                           <Button disabled={uploading}>
-                            {uploading && (
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            )}
+                            {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Upload
                           </Button>
                         </div>
@@ -268,19 +241,13 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
                       >
                         <Upload className="h-8 w-8 text-muted-foreground" />
                         <div>
-                          <p className="text-sm font-medium">
-                            Click to upload or drag and drop
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            SVG, PNG, JPG or GIF
-                          </p>
+                          <p className="text-sm font-medium">Click to upload or drag and drop</p>
+                          <p className="text-xs text-muted-foreground">SVG, PNG, JPG or GIF</p>
                         </div>
                       </label>
                     </>
                   )}
-                  {error && (
-                    <p className="mt-2 text-sm text-destructive">{error}</p>
-                  )}
+                  {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
                 </div>
               </TabsContent>
 
@@ -296,9 +263,7 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
                       placeholder="Enter image URL..."
                     />
                     {urlError && (
-                      <p className="text-xs text-destructive">
-                        Please enter a valid URL
-                      </p>
+                      <p className="text-xs text-destructive">Please enter a valid URL</p>
                     )}
                   </div>
                   <div className="space-y-2">
@@ -308,11 +273,7 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
                       placeholder="Alt text (optional)"
                     />
                   </div>
-                  <Button
-                    onClick={handleInsertEmbed}
-                    className="w-full"
-                    disabled={!url}
-                  >
+                  <Button onClick={handleInsertEmbed} className="w-full" disabled={!url}>
                     Add Image
                   </Button>
                 </div>

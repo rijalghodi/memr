@@ -60,7 +60,7 @@ export function useImageUpload({ onUpload }: UseImageUploadProps = {}) {
         }
       }
     },
-    [onUpload],
+    [onUpload]
   );
 
   const handleRemove = useCallback(() => {

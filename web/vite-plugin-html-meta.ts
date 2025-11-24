@@ -24,7 +24,7 @@ export function htmlMetaPlugin(): Plugin {
       // Replace the existing title tag
       let result = html.replace(
         /<title>.*?<\/title>/,
-        `<title>${BRAND.APP_NAME} - ${BRAND.APP_TAGLINE}</title>`,
+        `<title>${BRAND.APP_NAME} - ${BRAND.APP_TAGLINE}</title>`
       );
 
       // Inject meta tags before the closing </head> tag

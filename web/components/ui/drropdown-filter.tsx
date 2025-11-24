@@ -25,10 +25,7 @@ export type DropdownFilterProps = {
   variant?: "ghost" | "default" | "outline" | "secondary" | "destructive";
   className?: string;
   icon?: React.ReactNode;
-  children?: (
-    value: string,
-    label: string | React.ReactNode,
-  ) => React.ReactNode;
+  children?: (value: string, label: string | React.ReactNode) => React.ReactNode;
   side?: "top" | "bottom" | "left" | "right";
   align?: "start" | "center" | "end";
   emptyContent?: React.ReactNode;
@@ -60,18 +57,12 @@ export function DropdownFilter({
         {children ? (
           children(value ?? "", selectedOption?.label ?? "")
         ) : (
-          <Button
-            variant={variant}
-            size={isMobile ? "sm" : size}
-            className={className}
-          >
+          <Button variant={variant} size={isMobile ? "sm" : size} className={className}>
             {icon}
             {selectedOption ? (
               selectedOption.label
             ) : (
-              <span className="text-muted-foreground">
-                {placeholder ?? "Select an option"}
-              </span>
+              <span className="text-muted-foreground">{placeholder ?? "Select an option"}</span>
             )}
             <ChevronDown />
           </Button>
@@ -85,10 +76,7 @@ export function DropdownFilter({
         ) : !options || options.length === 0 ? (
           <DropdownMenuLabel>{emptyContent ?? "No options"}</DropdownMenuLabel>
         ) : (
-          <DropdownMenuRadioGroup
-            value={value}
-            onValueChange={onValueChange as any}
-          >
+          <DropdownMenuRadioGroup value={value} onValueChange={onValueChange as any}>
             {options?.map((option) => (
               <DropdownMenuRadioItem key={option.value} value={option.value}>
                 {option.label}

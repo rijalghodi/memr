@@ -144,8 +144,7 @@ info:
   contact:
     email: rijalghodi.dev@gmail.com
     name: Rijal Ghodi
-  description:
-    Second brain that understand you. Manage project, todo, and resources
+  description: Second brain that understand you. Manage project, todo, and resources
     in single app.
   license:
     name: MIT

@@ -21,9 +21,7 @@ export function NoteDetailEmpty() {
           <NoteIcon />
         </EmptyMedia>
         <EmptyTitle>Note not found</EmptyTitle>
-        <EmptyDescription>
-          The note you are looking for does not exist.
-        </EmptyDescription>
+        <EmptyDescription>The note you are looking for does not exist.</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">

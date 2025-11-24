@@ -1,11 +1,4 @@
-import {
-  ArrowLeft,
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  X,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Home, X } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -32,21 +25,13 @@ export function SessionTabs() {
     closeTab,
     closeAllTabs,
   } = useSessionTabs();
-  const sessionTabs = rawSessionTabs.filter(
-    (tab) => tab.pathname !== ROUTES.HOME,
-  );
+  const sessionTabs = rawSessionTabs.filter((tab) => tab.pathname !== ROUTES.HOME);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  const {
-    canGoBack,
-    canGoForward,
-    navigate: navigateTo,
-    goBack,
-    goForward,
-  } = useBrowserNavigate();
+  const { canGoBack, canGoForward, navigate: navigateTo, goBack, goForward } = useBrowserNavigate();
 
   const handleGoBack = () => {
     goBack();
@@ -227,14 +212,12 @@ function SessionTabItem({
   const active = activeTab?.pathname === pathname;
 
   // Only fetch data for parameterized routes
-  const noteData = useGetNote(
-    route.path === ROUTES.NOTE ? route.params.noteId : undefined,
-  );
+  const noteData = useGetNote(route.path === ROUTES.NOTE ? route.params.noteId : undefined);
   const collectionData = useGetCollection(
-    route.path === ROUTES.COLLECTION ? route.params.collectionId : undefined,
+    route.path === ROUTES.COLLECTION ? route.params.collectionId : undefined
   );
   const projectData = useGetProject(
-    route.path === ROUTES.PROJECT ? route.params.projectId : undefined,
+    route.path === ROUTES.PROJECT ? route.params.projectId : undefined
   );
 
   const title = useMemo(() => {
@@ -255,12 +238,7 @@ function SessionTabItem({
     }
 
     return "";
-  }, [
-    route.path,
-    noteData.data?.title,
-    collectionData.data?.title,
-    projectData.data?.title,
-  ]);
+  }, [route.path, noteData.data?.title, collectionData.data?.title, projectData.data?.title]);
 
   return (
     <li
@@ -269,7 +247,7 @@ function SessionTabItem({
         "text-xs font-medium [&>svg]:size-3.5 text-foreground/90 border-b border-b-transparent",
         "data-[active=true]:bg-background data-[active=true]:border-b-primary data-[active=true]:text-primary transition-all duration-100",
         "max-w-48 min-w-24",
-        className,
+        className
       )}
       data-active={active}
       onClick={() => navigate(pathname)}
@@ -284,7 +262,7 @@ function SessionTabItem({
         className={cn(
           "absolute right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-100",
           "h-full pr-2 pl-0.5 flex items-center justify-center",
-          "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground",
+          "bg-accent group-data-[active=true]:bg-background text-muted-foreground hover:text-foreground"
         )}
         aria-label="Close tab"
       >

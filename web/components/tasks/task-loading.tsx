@@ -8,10 +8,7 @@ export function TaskLoading() {
     <div className="h-full w-full flex flex-col overflow-hidden">
       <div className="flex gap-0 h-full flex-1 px-6 overflow-x-auto">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="flex flex-col h-full w-full max-w-[280px] rounded-lg"
-          >
+          <div key={index} className="flex flex-col h-full w-full max-w-[280px] rounded-lg">
             {/* Header skeleton */}
             <header className="px-2 space-y-1 py-2">
               <Skeleton className="h-4 w-16" />

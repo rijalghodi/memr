@@ -1,22 +1,12 @@
 "use client";
 
 import { addDays, addMonths, addWeeks, startOfDay } from "date-fns";
-import {
-  Calendar as CalendarIcon,
-  CalendarPlus,
-  Moon,
-  Sun,
-  Sunrise,
-} from "lucide-react";
+import { Calendar as CalendarIcon, CalendarPlus, Moon, Sun, Sunrise } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 export type DatePickerProps = {
@@ -37,17 +27,13 @@ export const DatePicker = ({
   children,
 }: DatePickerProps) => {
   const [open, setOpen] = React.useState(false);
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
-    date,
-  );
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(date);
 
   React.useEffect(() => {
     setSelectedDate(date);
   }, [date]);
 
-  const handleShortcutClick = (
-    shortcut: "today" | "tomorrow" | "nextWeek" | "nextMonth",
-  ) => {
+  const handleShortcutClick = (shortcut: "today" | "tomorrow" | "nextWeek" | "nextMonth") => {
     const today = startOfDay(new Date());
     let newDate: Date;
 
@@ -195,12 +181,7 @@ export const DatePicker = ({
           </div>
         </div>
         <div className="flex items-center justify-between gap-2 p-2 pb-4 pt-0">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            onClick={handleClear}
-          >
+          <Button variant="outline" size="sm" className="flex-1" onClick={handleClear}>
             Clear
           </Button>
           <Button size="sm" className="flex-1" onClick={handleOk}>

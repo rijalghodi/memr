@@ -13,17 +13,9 @@ export const State = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center text-center py-5 h-[200px] gap-2 [&_svg]:size-5 [&_svg]:text-muted-foreground">
-      {icon === "error" ? (
-        <AlertCircle />
-      ) : icon === "empty" ? (
-        <FileText />
-      ) : (
-        icon
-      )}
+      {icon === "error" ? <AlertCircle /> : icon === "empty" ? <FileText /> : icon}
       <p className="text-muted-foreground text-sm">{title}</p>
-      {description && (
-        <p className="text-muted-foreground text-sm">{description}</p>
-      )}
+      {description && <p className="text-muted-foreground text-sm">{description}</p>}
     </div>
   );
 };

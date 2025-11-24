@@ -33,28 +33,16 @@ function App() {
                 </AuthGuard>
               }
             />
-            <Route
-              path={ROUTES.GOOGLE_SUCCESS}
-              element={<GoogleSuccessPage />}
-            />
+            <Route path={ROUTES.GOOGLE_SUCCESS} element={<GoogleSuccessPage />} />
 
             {/* App routes with layout */}
             <Route element={<AppLayout />}>
               <Route path={ROUTES.HOME} element={<HomePage />} />
               <Route path={ROUTES.NOTES} element={<NotesPage />} />
               <Route path={ROUTES.NOTE} element={<NoteEditorPage />} />
-              <Route
-                path={ROUTES.COLLECTIONS}
-                element={<CollectionsDashboardPage />}
-              />
-              <Route
-                path={ROUTES.COLLECTION}
-                element={<CollectionWorkspacePage />}
-              />
-              <Route
-                path={ROUTES.PROJECTS}
-                element={<ProjectsDashboardPage />}
-              />
+              <Route path={ROUTES.COLLECTIONS} element={<CollectionsDashboardPage />} />
+              <Route path={ROUTES.COLLECTION} element={<CollectionWorkspacePage />} />
+              <Route path={ROUTES.PROJECTS} element={<ProjectsDashboardPage />} />
               <Route path={ROUTES.PROJECT} element={<ProjectWorkspacePage />} />
               <Route path={ROUTES.TASKS} element={<TasksPage />} />
             </Route>

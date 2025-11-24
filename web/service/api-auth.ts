@@ -1,9 +1,4 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-  UseQueryResult,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, UseQueryResult } from "@tanstack/react-query";
 
 import { apiClient } from "./api-client";
 import type { GErrorResponse, GResponse } from "./type";
@@ -99,7 +94,7 @@ export const useGoogleOAuth = ({
 };
 
 export const useGetCurrentUser = (
-  enabled: boolean = true,
+  enabled: boolean = true
 ): UseQueryResult<GetCurrentUserApiRes, GErrorResponse> => {
   return useQuery({
     queryKey: [GET_CURRENT_USER_KEY],

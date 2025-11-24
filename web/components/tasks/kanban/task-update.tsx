@@ -16,11 +16,9 @@ type TaskUpdateProps = {
 export function TaskUpdate({ task, onTaskUpdate }: TaskUpdateProps) {
   const [title, setTitle] = useState(task.title || "");
   const [dueDate, setDueDate] = useState<Date | undefined>(
-    task.dueDate ? new Date(task.dueDate) : undefined,
+    task.dueDate ? new Date(task.dueDate) : undefined
   );
-  const [projectId, setProjectId] = useState<string | undefined>(
-    task.projectId,
-  );
+  const [projectId, setProjectId] = useState<string | undefined>(task.projectId);
   const isUserEditingRef = useRef(false);
 
   // Update state when task changes externally (only if user is not editing)
@@ -40,7 +38,7 @@ export function TaskUpdate({ task, onTaskUpdate }: TaskUpdateProps) {
     });
 
     setProjectId((prevProjectId) =>
-      prevProjectId !== task.projectId ? task.projectId : prevProjectId,
+      prevProjectId !== task.projectId ? task.projectId : prevProjectId
     );
   }, [task.title, task.dueDate, task.projectId]);
 
@@ -82,9 +80,7 @@ export function TaskUpdate({ task, onTaskUpdate }: TaskUpdateProps) {
         <div className="flex items-center gap-2">
           <Checkbox
             checked={task.status === 2}
-            onCheckedChange={(checked) =>
-              onTaskUpdate?.(task.id, { status: checked ? 2 : 0 })
-            }
+            onCheckedChange={(checked) => onTaskUpdate?.(task.id, { status: checked ? 2 : 0 })}
             onClick={(e) => {
               e.stopPropagation();
             }}

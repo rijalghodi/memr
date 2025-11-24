@@ -2,18 +2,10 @@
 /* eslint-disable */
 // @ts-nocheck
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useToolbar } from "./toolbar-provider";
 import type { Extension } from "@tiptap/core";
@@ -23,9 +15,7 @@ import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-querry";
 import { MobileToolbarGroup, MobileToolbarItem } from "./mobile-toolbar-group";
 
-type TextStylingExtensions =
-  | Extension<ColorOptions, any>
-  | Extension<HighlightOptions, any>;
+type TextStylingExtensions = Extension<ColorOptions, any> | Extension<HighlightOptions, any>;
 
 const TEXT_COLORS = [
   { name: "Default", color: "var(--editor-text-default)" },
@@ -110,8 +100,7 @@ export const ColorHighlightToolbar = () => {
   };
 
   const isDisabled =
-    !editor?.can().chain().setHighlight().run() ||
-    !editor?.can().chain().setColor("").run();
+    !editor?.can().chain().setHighlight().run() || !editor?.can().chain().setColor("").run();
 
   if (isMobile) {
     return (
@@ -141,10 +130,7 @@ export const ColorHighlightToolbar = () => {
               active={currentHighlight === color}
             >
               <div className="flex items-center gap-2">
-                <div
-                  className="rounded-sm border px-2"
-                  style={{ backgroundColor: color }}
-                >
+                <div className="rounded-sm border px-2" style={{ backgroundColor: color }}>
                   A
                 </div>
                 <span>{name}</span>
@@ -193,9 +179,7 @@ export const ColorHighlightToolbar = () => {
 
             <Separator className="my-3" />
 
-            <div className="mb-2.5 w-full px-2 pr-3 text-xs text-gray-11">
-              Background
-            </div>
+            <div className="mb-2.5 w-full px-2 pr-3 text-xs text-gray-11">Background</div>
             {HIGHLIGHT_COLORS.map(({ name, color }) => (
               <ColorHighlightButton
                 key={name}

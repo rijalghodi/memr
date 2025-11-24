@@ -58,11 +58,7 @@ interface TextNodeWithPosition {
   pos: number;
 }
 
-const getRegex = (
-  searchString: string,
-  disableRegex: boolean,
-  caseSensitive: boolean,
-): RegExp => {
+const getRegex = (searchString: string, disableRegex: boolean, caseSensitive: boolean): RegExp => {
   const escapedString = disableRegex
     ? searchString.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")
     : searchString;
@@ -79,7 +75,7 @@ function processSearches(
   searchTerm: RegExp,
   selectedResultIndex: number,
   searchResultClass: string,
-  selectedResultClass: string,
+  selectedResultClass: string
 ): ProcessedSearches {
   const decorations: Decoration[] = [];
   const results: Range[] = [];
@@ -96,9 +92,7 @@ function processSearches(
   });
 
   for (const { text, pos } of textNodesWithPosition) {
-    const matches = Array.from(text.matchAll(searchTerm)).filter(
-      ([matchText]) => matchText.trim(),
-    );
+    const matches = Array.from(text.matchAll(searchTerm)).filter(([matchText]) => matchText.trim());
 
     for (const match of matches) {
       if (match.index !== undefined) {
@@ -116,9 +110,8 @@ function processSearches(
     const { from, to } = result;
     decorations.push(
       Decoration.inline(from, to, {
-        class:
-          selectedResultIndex === i ? selectedResultClass : searchResultClass,
-      }),
+        class: selectedResultIndex === i ? selectedResultClass : searchResultClass,
+      })
     );
   }
 
@@ -132,13 +125,9 @@ const replace = (
   replaceTerm: string,
   results: Range[],
   selectedResult: number,
-  { state, dispatch }: any,
+  { state, dispatch }: any
 ) => {
-  if (
-    !results.length ||
-    selectedResult < 0 ||
-    selectedResult >= results.length
-  ) {
+  if (!results.length || selectedResult < 0 || selectedResult >= results.length) {
     return;
   }
 
@@ -157,7 +146,7 @@ const replace = (
 const replaceAll = (
   replaceTerm: string,
   results: Range[],
-  { tr, dispatch }: { tr: any; dispatch: any },
+  { tr, dispatch }: { tr: any; dispatch: any }
 ) => {
   if (!results.length || !dispatch) {
     return;
@@ -249,9 +238,7 @@ const selectPrevious = (editor: CoreEditor) => {
   }
 };
 
-export const searchAndReplacePluginKey = new PluginKey(
-  "searchAndReplacePlugin",
-);
+export const searchAndReplacePluginKey = new PluginKey("searchAndReplacePlugin");
 
 export interface SearchAndReplaceOptions {
   searchResultClass: string;
@@ -259,10 +246,7 @@ export interface SearchAndReplaceOptions {
   disableRegex: boolean;
 }
 
-export const SearchAndReplace = Extension.create<
-  SearchAndReplaceOptions,
-  SearchAndReplaceStorage
->({
+export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, SearchAndReplaceStorage>({
   name: "searchAndReplace",
 
   addOptions() {
@@ -305,8 +289,7 @@ export const SearchAndReplace = Extension.create<
       replace:
         () =>
         ({ editor, state, dispatch }) => {
-          const storage = editor.storage
-            .searchAndReplace as SearchAndReplaceStorage;
+          const storage = editor.storage.searchAndReplace as SearchAndReplaceStorage;
           const { replaceTerm, results, selectedResult } = storage;
 
           replace(replaceTerm, results, selectedResult, { state, dispatch });
@@ -348,8 +331,7 @@ export const SearchAndReplace = Extension.create<
 
   addProseMirrorPlugins() {
     const editor = this.editor;
-    const { searchResultClass, selectedResultClass, disableRegex } =
-      this.options;
+    const { searchResultClass, selectedResultClass, disableRegex } = this.options;
 
     const setLastSearchTerm = (t: string) => {
       editor.storage.searchAndReplace.lastSearchTerm = t;
@@ -402,7 +384,7 @@ export const SearchAndReplace = Extension.create<
               getRegex(searchTerm, disableRegex, caseSensitive),
               selectedResult,
               searchResultClass,
-              selectedResultClass,
+              selectedResultClass
             );
 
             editor.storage.searchAndReplace.results = results;
@@ -411,8 +393,7 @@ export const SearchAndReplace = Extension.create<
             if (results.length === 0) {
               editor.storage.searchAndReplace.selectedResult = 0;
             } else if (selectedResult >= results.length) {
-              editor.storage.searchAndReplace.selectedResult =
-                results.length - 1;
+              editor.storage.searchAndReplace.selectedResult = results.length - 1;
             } else if (selectedResult < 0) {
               editor.storage.searchAndReplace.selectedResult = 0;
             }

@@ -75,10 +75,7 @@ export const ChatWidget = () => {
 
     if (isSendingMessageRef.current) return;
 
-    if (
-      currentChatId !== loadedChatIdRef.current &&
-      historyMessages.length > 0
-    ) {
+    if (currentChatId !== loadedChatIdRef.current && historyMessages.length > 0) {
       setMessages(historyMessages);
       loadedChatIdRef.current = currentChatId;
     }
@@ -86,11 +83,9 @@ export const ChatWidget = () => {
 
   const updateAssistantMessage = useCallback(
     (messageId: string, updater: (msg: ChatMessage) => ChatMessage) => {
-      setMessages((prev) =>
-        prev.map((msg) => (msg.id === messageId ? updater(msg) : msg)),
-      );
+      setMessages((prev) => prev.map((msg) => (msg.id === messageId ? updater(msg) : msg)));
     },
-    [],
+    []
   );
 
   const handleSendMessage = useCallback(
@@ -153,10 +148,10 @@ export const ChatWidget = () => {
           }));
           finishStreaming();
         },
-        finishStreaming,
+        finishStreaming
       );
     },
-    [currentChatId, updateAssistantMessage],
+    [currentChatId, updateAssistantMessage]
   );
 
   const handleSubmit = useCallback(
@@ -165,7 +160,7 @@ export const ChatWidget = () => {
       if (!inputValue.trim() || isTyping) return;
       handleSendMessage(inputValue.trim());
     },
-    [inputValue, isTyping, handleSendMessage],
+    [inputValue, isTyping, handleSendMessage]
   );
 
   const handleResetChat = useCallback(() => {
@@ -203,10 +198,7 @@ export const ChatWidget = () => {
               align="end"
               className="w-[240px] max-h-[360px] rounded-lg"
             >
-              <ChatHistory
-                onSelectChat={setCurrentChatId}
-                selectedChatId={currentChatId}
-              />
+              <ChatHistory onSelectChat={setCurrentChatId} selectedChatId={currentChatId} />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -245,9 +237,7 @@ export const ChatWidget = () => {
                     {message.isStreaming && !message.content.trim() ? (
                       <div className="flex items-center gap-2">
                         <Spinner size={14} />
-                        <span className="text-muted-foreground text-sm">
-                          Thinking...
-                        </span>
+                        <span className="text-muted-foreground text-sm">Thinking...</span>
                       </div>
                     ) : (
                       <MarkdownViewer content={message.content} />

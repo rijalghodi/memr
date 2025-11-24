@@ -6,11 +6,7 @@ function addSecondsToCurrentDate(seconds: number): Date {
   return new Date(Date.now() + seconds * 1000);
 }
 
-function setCookieWithExpiration(
-  key: string,
-  value: string,
-  expires?: string | Date | number,
-) {
+function setCookieWithExpiration(key: string, value: string, expires?: string | Date | number) {
   const expiresDate =
     typeof expires === "number"
       ? addSecondsToCurrentDate(expires)
@@ -41,11 +37,7 @@ export function setAuthCookie({
   setCookieWithExpiration(ACCESS_TOKEN_KEY, accessToken, accessTokenExpires);
 
   if (refreshToken) {
-    setCookieWithExpiration(
-      REFRESH_TOKEN_KEY,
-      refreshToken,
-      refreshTokenExpires,
-    );
+    setCookieWithExpiration(REFRESH_TOKEN_KEY, refreshToken, refreshTokenExpires);
   }
 }
 

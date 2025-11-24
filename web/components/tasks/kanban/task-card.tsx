@@ -20,10 +20,7 @@ import { TASK_TITLE_FALLBACK } from "@/lib/constant";
 import { cn } from "@/lib/utils";
 
 import { TaskDatePicker } from "./task-date-picker";
-import {
-  TaskProjectPicker,
-  TaskProjectPickerContent,
-} from "./task-project-picker";
+import { TaskProjectPicker, TaskProjectPickerContent } from "./task-project-picker";
 import type { TKanbanTask } from "./type";
 
 type Props = {
@@ -39,20 +36,12 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
       <div className="flex items-start gap-2">
         <Checkbox
           checked={task.status === 2}
-          onCheckedChange={(checked) =>
-            onTaskUpdate?.(task.id, { status: checked ? 2 : 0 })
-          }
+          onCheckedChange={(checked) => onTaskUpdate?.(task.id, { status: checked ? 2 : 0 })}
           onClick={(e) => {
             e.stopPropagation();
           }}
-          data-overdue={
-            task.dueDate &&
-            new Date(task.dueDate) < new Date() &&
-            task.status !== 2
-          }
-          className={cn(
-            "border-muted-foreground mt-1 data-[overdue=true]:border-destructive",
-          )}
+          data-overdue={task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 2}
+          className={cn("border-muted-foreground mt-1 data-[overdue=true]:border-destructive")}
         />
 
         <input
@@ -71,7 +60,7 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
           }}
           className={cn(
             "w-full text-sm font-medium text-foreground/90 border-none p-0.5 shadow-none rounded-xs outline-none ring-0",
-            "focus:bg-accent",
+            "focus:bg-accent"
           )}
           placeholder={TASK_TITLE_FALLBACK}
         />
@@ -80,10 +69,7 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
         {task.dueDate && (
           <TaskDatePicker
             isOverdue={(date) =>
-              date &&
-              !isToday(new Date(date)) &&
-              new Date(date) < new Date() &&
-              task.status !== 2
+              date && !isToday(new Date(date)) && new Date(date) < new Date() && task.status !== 2
             }
             value={new Date(task.dueDate)}
             onChange={(date) =>
@@ -110,11 +96,7 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
             asChild
             className="absolute right-2 top-2 opacity-0 group-hover/task-card:opacity-100 data-[state=open]:opacity-100 transition-opacity duration-300"
           >
-            <Button
-              variant="secondary"
-              size="icon-sm"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <Button variant="secondary" size="icon-sm" onClick={(e) => e.stopPropagation()}>
               <MoreVertical />
             </Button>
           </DropdownMenuTrigger>

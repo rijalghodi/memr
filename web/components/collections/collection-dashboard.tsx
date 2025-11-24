@@ -5,10 +5,7 @@ import { useState } from "react";
 
 import { getRandomColor } from "@/lib/color";
 import { getRoute, ROUTES } from "@/lib/routes";
-import {
-  collectionApiHook,
-  useGetCollections,
-} from "@/service/local/api-collection";
+import { collectionApiHook, useGetCollections } from "@/service/local/api-collection";
 
 import { useBrowserNavigate } from "../browser-navigation";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";

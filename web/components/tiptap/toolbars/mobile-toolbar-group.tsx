@@ -19,11 +19,7 @@ interface MobileToolbarGroupProps {
   className?: string;
 }
 
-export const MobileToolbarGroup = ({
-  label,
-  children,
-  className,
-}: MobileToolbarGroupProps) => {
+export const MobileToolbarGroup = ({ label, children, className }: MobileToolbarGroupProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const closeDrawer = () => setIsOpen(false);
@@ -50,7 +46,7 @@ export const MobileToolbarGroup = ({
               ? React.cloneElement(child, { closeDrawer } as {
                   closeDrawer: () => void;
                 })
-              : child,
+              : child
           )}
         </div>
       </DrawerContent>
@@ -71,7 +67,7 @@ export const MobileToolbarItem = ({
   <button
     className={cn(
       "flex w-full items-center rounded-md px-4 py-2 text-sm transition-colors hover:bg-accent",
-      active && "bg-accent",
+      active && "bg-accent"
     )}
     onClick={(e) => {
       onClick?.(e);
