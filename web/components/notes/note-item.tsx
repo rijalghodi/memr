@@ -1,8 +1,9 @@
 "use client";
 
 import { MoreHorizontal, Trash } from "lucide-react";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
+import { getCssColorStyle } from "@/lib/color";
 import {
   NOTE_CONTENT_EXCERPT_FALLBACK,
   NOTE_TITLE_FALLBACK,
@@ -11,28 +12,41 @@ import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { markdownToText, truncateString } from "@/lib/string";
 import { cn } from "@/lib/utils";
-import { useDeleteNote } from "@/service/local/api-note";
+import { useGetCollections } from "@/service/local/api-collection";
+import { useDeleteNote, useUpdateNote } from "@/service/local/api-note";
 
 import { useBrowserNavigate } from "../browser-navigation";
+import { CollectionIcon } from "../collections/collection-icon";
 import { Button } from "../ui/button";
 import { useConfirmation } from "../ui/confirmation-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { NoteCollectionPickerContent } from "./note-collection-picker";
 import { NoteIcon } from "./note-icon";
 
 type Props = {
   id: string;
   title?: string;
   content?: string;
+  collectionId?: string;
   createdAt: string;
   updatedAt: string;
 };
 
-export function NoteItem({ id, title, content = "", updatedAt }: Props) {
+export function NoteItem({
+  id,
+  title,
+  content = "",
+  collectionId,
+  updatedAt,
+}: Props) {
   const displayContent = content
     ? markdownToText(content, 200)
     : NOTE_CONTENT_EXCERPT_FALLBACK;
@@ -48,6 +62,20 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
       console.error("Failed to delete note:", error);
     },
   });
+
+  const { mutate: updateNote, isLoading: isUpdating } = useUpdateNote({
+    onSuccess: () => {
+      // Note updated successfully
+    },
+    onError: (error) => {
+      console.error("Failed to update note:", error);
+    },
+  });
+  const { data: collections } = useGetCollections();
+
+  const currentCollection = useMemo(() => {
+    return collections?.find((c) => c.id === collectionId);
+  }, [collections, collectionId]);
 
   const { confirm } = useConfirmation();
 
@@ -70,6 +98,13 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
     navigate(getRoute(ROUTES.NOTE, { noteId: id }));
   };
 
+  const handleChangeCollection = (collectionId: string | undefined) => {
+    updateNote({
+      id: id,
+      collectionId: collectionId,
+    });
+  };
+
   return (
     <li
       className={cn(
@@ -85,6 +120,15 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
           </div>
           <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">
             {displayTitle}
+            {currentCollection && (
+              <div
+                className="text-xs px-1 py-1 rounded-sm ml-2 inline-flex items-center gap-1"
+                style={getCssColorStyle(currentCollection?.color ?? "")}
+              >
+                <CollectionIcon className="size-3 inline-block" />
+                {currentCollection?.title}
+              </div>
+            )}
           </h3>
           <p className="text-sm text-muted-foreground col-start-2 line-clamp-1 text-ellipsis">
             {displayContent}
@@ -124,10 +168,23 @@ export function NoteItem({ id, title, content = "", updatedAt }: Props) {
                 align="end"
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
-                  "group-hover/note-item:block hidden w-[120px]",
+                  "group-hover/note-item:block hidden w-auto",
                   isDropdownOpen && "block",
                 )}
               >
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <CollectionIcon className="size-4" />
+                    Set Collection
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <NoteCollectionPickerContent
+                      value={collectionId}
+                      onChange={handleChangeCollection}
+                      onClose={() => setIsDropdownOpen(false)}
+                    />
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
                 <DropdownMenuItem
                   variant="destructive"
                   onClick={handleDelete}

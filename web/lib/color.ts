@@ -24,3 +24,19 @@ export const COLORS: string[] = [
   "#475569", // Slate
   "#0369a1", // Sky 700
 ] as const;
+
+const CSS_COLOR_REGEX = /^#([0-9a-fA-F]{6})$/;
+
+export function isValidColor(color: string) {
+  return CSS_COLOR_REGEX.test(color);
+}
+
+export function getCssColorStyle(color: string) {
+  if (!isValidColor(color)) {
+    return {};
+  }
+  return {
+    color: color,
+    backgroundColor: color ? `${color}15` : undefined,
+  };
+}

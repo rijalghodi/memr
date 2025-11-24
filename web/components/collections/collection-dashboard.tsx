@@ -3,7 +3,7 @@
 import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
 import { useState } from "react";
 
-import { getRandomColor } from "@/lib/random-color";
+import { getRandomColor } from "@/lib/color";
 import { getRoute, ROUTES } from "@/lib/routes";
 import {
   collectionApiHook,
