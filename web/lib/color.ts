@@ -20,9 +20,10 @@ export const COLORS: string[] = [
   "#ea580c", // Orange
   "#dc2626", // Red
   "#7c3aed", // Violet
-  "#57534e", // Stone
-  "#475569", // Slate
-  "#0369a1", // Sky 700
+  // "#245501", // Green 700
+  // "#57534e", // Stone
+  // "#475569", // Slate
+  // "#0369a1", // Sky 700
 ] as const;
 
 const CSS_COLOR_REGEX = /^#([0-9a-fA-F]{6})$/;

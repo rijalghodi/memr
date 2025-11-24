@@ -1,5 +1,3 @@
-import { Plus } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -29,20 +27,17 @@ export function NoteEmpty({
         <EmptyMedia variant="icon">
           <NoteIcon />
         </EmptyMedia>
-        <EmptyTitle>
-          {isFiltered ? "No Notes Found" : "No Notes Yet"}
-        </EmptyTitle>
+        <EmptyTitle>{isFiltered ? "No Notes Found" : "No Notes"}</EmptyTitle>
         <EmptyDescription>
           {isFiltered
             ? "No notes found matching your filters."
-            : "You haven&apos;t created any notes yet."}
+            : "You haven't created any notes yet."}
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
           <Button onClick={onAddNote} className="rounded-full">
-            <Plus />
-            New Note
+            Create Note
           </Button>
           {isFiltered && (
             <Button

@@ -21,7 +21,7 @@ export function ProjectEmpty({ onAddProject }: ProjectEmptyProps) {
         <EmptyMedia variant="icon">
           <ProjectIcon />
         </EmptyMedia>
-        <EmptyTitle>No Projects Yet</EmptyTitle>
+        <EmptyTitle>No Projects</EmptyTitle>
         <EmptyDescription>
           You haven&apos;t created any projects yet
         </EmptyDescription>

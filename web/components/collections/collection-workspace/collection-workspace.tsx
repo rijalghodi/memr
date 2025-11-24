@@ -13,14 +13,13 @@ import {
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 
 import { NoteItem } from "../../notes/note-item";
-import { NoteLoading } from "../../notes/note-loading";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../../ui";
 import { Button } from "../../ui/button";
 import { DropdownFilter } from "../../ui/drropdown-filter";
 import { CollectionIcon } from "../collection-icon";
 import { NoteEmpty } from "./note-empty";
 
-type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
+type SortByValue = "updatedAt" | "createdAt";
 
 export function CollectionWorkspace({
   collectionId,
@@ -117,17 +116,14 @@ export function CollectionWorkspace({
                 value={sortBy}
                 onValueChange={handleSortChange}
                 icon={<ArrowDownUp />}
+                placeholder="Sort by"
                 options={[
                   {
-                    label: "Last Updated",
+                    label: "Last Modified",
                     value: "updatedAt",
                   },
                   {
-                    label: "Last Viewed",
-                    value: "viewedAt",
-                  },
-                  {
-                    label: "Created",
+                    label: "Last Created",
                     value: "createdAt",
                   },
                 ]}
@@ -139,9 +135,7 @@ export function CollectionWorkspace({
 
       {/* Content */}
       <div data-slot="content" className="pb-6">
-        {isLoadingNotes ? (
-          <NoteLoading />
-        ) : notes.length === 0 ? (
+        {isLoadingNotes ? null : notes.length === 0 ? (
           <NoteEmpty
             isFiltered={isFiltered}
             onAddNote={handleAddNote}

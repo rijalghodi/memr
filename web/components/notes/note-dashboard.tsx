@@ -4,7 +4,7 @@ import { ArrowDownUp, ListFilter, Plus } from "lucide-react";
 import React, { useState } from "react";
 
 import { getRoute, ROUTES } from "@/lib/routes";
-import { noteApiHook, useGetNotes } from "@/service/local/api-note";
+import { noteApi, useGetNotes } from "@/service/local/api-note";
 
 import { useBrowserNavigate } from "../browser-navigation";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
@@ -14,33 +14,28 @@ import { ScrollArea } from "../ui/scroll-area";
 import { NoteEmpty } from "./note-empty";
 import { NoteItem } from "./note-item";
 
-type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
+type SortByValue = "updatedAt" | "createdAt";
 
 export function NoteDashboard() {
   const [sortBy, setSortBy] = useState<SortByValue | undefined>();
   const { navigate } = useBrowserNavigate();
   const { data: notes, isLoading } = useGetNotes({ sortBy });
 
-  const handleSortChange = (value: string) => {
+  const handleSortChange = React.useCallback((value: string) => {
     setSortBy(value as SortByValue);
-  };
+  }, []);
 
-  // add noote
-  const { mutate: createNote } = noteApiHook.useCreateNote({
-    onSuccess: (data) => {
-      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }));
-    },
-  });
-
-  const handleAddNote = () => {
-    createNote({
+  const handleAddNote = React.useCallback(async () => {
+    const result = await noteApi.create({
+      collectionId: undefined,
       content: "",
     });
-  };
+    navigate(getRoute(ROUTES.NOTE, { noteId: result.id }));
+  }, [navigate]);
 
-  const handleResetFilters = () => {
+  const handleResetFilters = React.useCallback(() => {
     setSortBy(undefined);
-  };
+  }, []);
 
   const isFiltered = sortBy !== undefined;
 
@@ -70,17 +65,14 @@ export function NoteDashboard() {
                 value={sortBy}
                 onValueChange={handleSortChange}
                 icon={<ArrowDownUp />}
+                placeholder="Sort by"
                 options={[
                   {
-                    label: "Last Updated",
+                    label: "Last Modified",
                     value: "updatedAt",
                   },
                   {
-                    label: "Last Viewed",
-                    value: "viewedAt",
-                  },
-                  {
-                    label: "Created",
+                    label: "Last Created",
                     value: "createdAt",
                   },
                 ]}

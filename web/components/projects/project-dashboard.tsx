@@ -14,16 +14,18 @@ import { DropdownFilter } from "../ui/drropdown-filter";
 import { ProjectEmpty } from "./project-empty";
 import { ProjectItem } from "./project-item";
 
-type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
+type SortByValue = "updatedAt" | "createdAt";
 
 export function ProjectDashboard() {
-  const [sortBy, setSortBy] = useState<SortByValue>("updatedAt");
+  const [sortBy, setSortBy] = useState<SortByValue | undefined>();
   const { navigate } = useBrowserNavigate();
   const { data: projects, isLoading } = useGetProjects({ sortBy });
 
   const handleSortChange = (value: string) => {
     setSortBy(value as SortByValue);
   };
+
+  console.log(sortBy);
 
   // add project
   const { mutate: createProject } = projectApiHook.useCreateProject({
@@ -83,7 +85,7 @@ export function ProjectDashboard() {
 }
 
 type ProjectSortProps = {
-  value: SortByValue;
+  value?: SortByValue;
   onValueChange: (value: SortByValue) => void;
 };
 
@@ -95,17 +97,14 @@ function ProjectSort({ value, onValueChange }: ProjectSortProps) {
       value={value}
       onValueChange={(value) => onValueChange(value as SortByValue)}
       icon={<ArrowDownUp />}
+      placeholder="Sort by"
       options={[
         {
           label: "Last Modified",
           value: "updatedAt",
         },
         {
-          label: "Last Viewed",
-          value: "viewedAt",
-        },
-        {
-          label: "Created",
+          label: "Last Created",
           value: "createdAt",
         },
       ]}

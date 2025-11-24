@@ -21,9 +21,9 @@ export function CollectionEmpty({ onAddCollection }: CollectionEmptyProps) {
         <EmptyMedia variant="icon">
           <CollectionIcon />
         </EmptyMedia>
-        <EmptyTitle>No Collections Yet</EmptyTitle>
+        <EmptyTitle>No Collections</EmptyTitle>
         <EmptyDescription>
-          You haven&apos;t created any collections yet
+          You haven&apos;t created any collections yet.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
