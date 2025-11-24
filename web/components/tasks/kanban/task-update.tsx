@@ -5,7 +5,7 @@ import { PopoverContent } from "@/components/ui/popover";
 import { TASK_TITLE_FALLBACK } from "@/lib/constant";
 
 import { TaskDatePicker } from "./task-date-picker";
-import { TaskProjectSelector } from "./task-project-selector";
+import { TaskProjectPicker } from "./task-project-picker";
 import type { TKanbanTask } from "./type";
 
 type TaskUpdateProps = {
@@ -105,10 +105,7 @@ export function TaskUpdate({ task, onTaskUpdate }: TaskUpdateProps) {
 
         <div className="flex items-center gap-2">
           <TaskDatePicker value={dueDate} onChange={handleDueDateChange} />
-          <TaskProjectSelector
-            value={projectId}
-            onChange={handleProjectChange}
-          />
+          <TaskProjectPicker value={projectId} onChange={handleProjectChange} />
         </div>
       </div>
     </PopoverContent>
