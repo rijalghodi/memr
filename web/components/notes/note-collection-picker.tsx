@@ -46,7 +46,7 @@ export function NoteCollectionPicker({
         collectionId: newCollectionId,
       });
     },
-    [noteId]
+    [noteId],
   );
 
   return (
@@ -97,7 +97,7 @@ export const NoteCollectionPickerContent = ({
       onClose?.();
       setSearch("");
     },
-    [onChange, onClose]
+    [onChange, onClose],
   );
 
   const { mutate: createCollection, isLoading: isCreating } =
@@ -114,7 +114,7 @@ export const NoteCollectionPickerContent = ({
       collections?.filter((collection) =>
         (collection.title || COLLECTION_TITLE_FALLBACK)
           .toLowerCase()
-          .includes(searchLower)
+          .includes(searchLower),
       ) ?? []
     );
   }, [collections, search]);
@@ -177,7 +177,7 @@ export const NoteCollectionPickerContent = ({
                     <Check
                       className={cn(
                         "ml-auto size-4",
-                        value === collection.id ? "opacity-100" : "opacity-0"
+                        value === collection.id ? "opacity-100" : "opacity-0",
                       )}
                     />
                   </CommandItem>

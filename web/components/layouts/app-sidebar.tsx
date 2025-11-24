@@ -8,7 +8,7 @@ import {
   SquareCheckBig,
   SquarePen,
 } from "lucide-react";
-import { JSX, useMemo } from "react";
+import { JSX, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -37,9 +37,12 @@ import {
 import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { useGetCurrentUser } from "@/service/api-auth";
-import { useGetCollections } from "@/service/local/api-collection";
-import { noteApiHook, useGetNotes } from "@/service/local/api-note";
-import { useGetProjects } from "@/service/local/api-project";
+import {
+  collectionApi,
+  useGetCollections,
+} from "@/service/local/api-collection";
+import { noteApi, noteApiHook, useGetNotes } from "@/service/local/api-note";
+import { projectApi, useGetProjects } from "@/service/local/api-project";
 import { useGetSetting } from "@/service/local/api-setting";
 
 import { useBrowserNavigate } from "../browser-navigation";
@@ -50,6 +53,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  buttonVariants,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -101,12 +105,29 @@ type TEntityMenu = {
   icon?: JSX.Element;
   submenu?: TEntityMenu[];
   seeAllHref?: string;
+  onAdd?: () => void;
 };
 
 export function SidebarEntityMenus() {
+  const { navigate } = useBrowserNavigate();
   const { data: notes } = useGetNotes({ sortBy: "updatedAt" });
   const { data: collections } = useGetCollections({ sortBy: "updatedAt" });
   const { data: projects } = useGetProjects({ sortBy: "updatedAt" });
+
+  const handleAddNote = useCallback(async () => {
+    const note = await noteApi.create({});
+    navigate(getRoute(ROUTES.NOTE, { noteId: note.id }));
+  }, [navigate]);
+
+  const handleAddCollection = useCallback(async () => {
+    const collection = await collectionApi.create({});
+    navigate(getRoute(ROUTES.COLLECTION, { collectionId: collection.id }));
+  }, [navigate]);
+
+  const handleAddProject = useCallback(async () => {
+    const project = await projectApi.create({});
+    navigate(getRoute(ROUTES.PROJECT, { projectId: project.id }));
+  }, [navigate]);
 
   const items: TEntityMenu[] = useMemo(
     () => [
@@ -115,6 +136,7 @@ export function SidebarEntityMenus() {
         href: ROUTES.NOTES,
         seeAllHref: ROUTES.NOTES,
         icon: <NoteIcon />,
+        onAdd: handleAddNote,
         submenu:
           notes?.slice(0, 5).map((note) => ({
             title: note.title || NOTE_TITLE_FALLBACK,
@@ -127,6 +149,7 @@ export function SidebarEntityMenus() {
         href: ROUTES.COLLECTIONS,
         seeAllHref: ROUTES.COLLECTIONS,
         icon: <CollectionIcon />,
+        onAdd: handleAddCollection,
         submenu:
           collections?.slice(0, 5).map((collection) => ({
             title: collection.title || COLLECTION_TITLE_FALLBACK,
@@ -139,6 +162,7 @@ export function SidebarEntityMenus() {
         href: ROUTES.PROJECTS,
         seeAllHref: ROUTES.PROJECTS,
         icon: <ProjectIcon />,
+        onAdd: handleAddProject,
         submenu:
           projects?.slice(0, 5).map((project) => ({
             title: project.title || PROJECT_TITLE_FALLBACK,
@@ -152,10 +176,15 @@ export function SidebarEntityMenus() {
           })) ?? [],
       },
     ],
-    [notes, collections, projects]
+    [
+      notes,
+      collections,
+      projects,
+      handleAddNote,
+      handleAddCollection,
+      handleAddProject,
+    ],
   );
-
-  const { navigate } = useBrowserNavigate();
 
   return (
     <SidebarMenu className="gap-5">
@@ -167,8 +196,14 @@ export function SidebarEntityMenus() {
                 <SidebarMenuButton size="sm" className="font-semibold group">
                   <ChevronDown className="size-3 group-data-[state=open]:-rotate-180 transform transition-transform duration-200 ease-in-out" />
                   <span className="truncate">{item.title}</span>
-                  <div className="">
-                    <Plus className="size-3.5 text-muted-foreground hover:text-foreground transition-colors duration-200 ease-in-out" />
+                  <div
+                    className={buttonVariants({
+                      size: "sm-compact",
+                      variant: "ghost",
+                    })}
+                    onClick={item.onAdd}
+                  >
+                    <Plus className="size-3.5" />
                   </div>
                 </SidebarMenuButton>
               </CollapsibleTrigger>
