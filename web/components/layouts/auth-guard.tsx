@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import logo from "@/public/logo.png";
 import { authApiHook } from "@/service/api-auth";
 
 type AuthGuardContextType = {
@@ -15,7 +14,7 @@ type AuthGuardContextType = {
 };
 
 const AuthGuardContext = createContext<AuthGuardContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export function useAuthGuard() {
@@ -97,12 +96,12 @@ export function AuthGuardLoader() {
     <>
       <div className="flex justify-center items-center h-screen w-screen">
         <img
-          src={logo}
+          src="/logo.png"
           alt="Logo"
           width={100}
           height={100}
           className={cn(
-            "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32",
+            "animate-scale-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32"
           )}
         />
       </div>
