@@ -17,12 +17,12 @@ import { CollectionItem } from "./collection-item";
 type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
 export function CollectionDashboard() {
-  const [sortBy, setSortBy] = useState<SortByValue>("updatedAt");
+  const [sortBy, setSortBy] = useState<SortByValue | undefined>();
   const { navigate } = useBrowserNavigate();
   const { data: collections, isLoading } = useGetCollections({ sortBy });
 
-  const handleSortChange = (value: string) => {
-    setSortBy(value as SortByValue);
+  const handleSortChange = (value?: SortByValue) => {
+    setSortBy(value);
   };
 
   const { mutate: createCollection } = collectionApiHook.useCreateCollection({
@@ -80,8 +80,8 @@ export function CollectionDashboard() {
 }
 
 type CollectionSortProps = {
-  value: SortByValue;
-  onValueChange: (value: string) => void;
+  value?: SortByValue;
+  onValueChange: (value?: SortByValue) => void;
 };
 
 function CollectionSort({ value, onValueChange }: CollectionSortProps) {
@@ -92,13 +92,14 @@ function CollectionSort({ value, onValueChange }: CollectionSortProps) {
       value={value}
       onValueChange={(value) => onValueChange(value as SortByValue)}
       icon={<ArrowDownUp />}
+      placeholder="Sort by"
       options={[
         {
           label: "Last Modified",
           value: "updatedAt",
         },
         {
-          label: "Created",
+          label: "Last Created",
           value: "createdAt",
         },
       ]}
