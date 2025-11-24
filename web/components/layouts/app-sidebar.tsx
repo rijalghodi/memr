@@ -28,6 +28,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { useLogout } from "@/hooks/use-logout";
 import {
   COLLECTION_TITLE_FALLBACK,
   NOTE_TITLE_FALLBACK,
@@ -35,6 +36,7 @@ import {
 } from "@/lib/constant";
 import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
+import { useGetCurrentUser } from "@/service/api-auth";
 import { useGetCollections } from "@/service/local/api-collection";
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 import { useGetProjects } from "@/service/local/api-project";
@@ -58,6 +60,7 @@ import {
 
 export function AppSidebar() {
   const { navigate } = useBrowserNavigate();
+
   // handle add button
   const { mutate: createNote } = noteApiHook.useCreateNote({
     onSuccess: (data) => {
@@ -218,7 +221,12 @@ export function SidebarEntityMenus() {
 
 export function ProfileButton() {
   const { data: lastSyncTimeSetting } = useGetSetting("lastSyncTime");
+  const { logout } = useLogout();
   const lastSyncTime = lastSyncTimeSetting?.value as string | undefined;
+  const { data: user } = useGetCurrentUser();
+  const userName = user?.data?.name || "User";
+  const userEmail = user?.data?.email || "";
+  const userImage = user?.data?.googleImage;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -227,27 +235,29 @@ export function ProfileButton() {
       >
         <SidebarMenuButton size="default" className="mb-2">
           <Avatar className="size-6">
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage src={userImage} />
+            <AvatarFallback>{userName}</AvatarFallback>
           </Avatar>
-          <span>John Doe</span>
+          <span>{userName}</span>
         </SidebarMenuButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[240px] rounded-lg" align="start">
         <DropdownMenuLabel className="flex items-center gap-2">
           <Avatar className="size-6">
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage src={userImage} />
+            <AvatarFallback>{userName}</AvatarFallback>
           </Avatar>
           <div className="space-y-0.5">
-            <div className="text-xs font-medium">John Doe</div>
-            <div className="text-xs text-muted-foreground">
-              john.doe@example.com
-            </div>
+            <div className="text-xs font-medium">{userName}</div>
+            <div className="text-xs text-muted-foreground">{userEmail}</div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer" variant="destructive">
+        <DropdownMenuItem
+          className="cursor-pointer"
+          variant="destructive"
+          onClick={logout}
+        >
           <LogOutIcon />
           Logout
         </DropdownMenuItem>

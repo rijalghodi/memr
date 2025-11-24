@@ -29,10 +29,15 @@ func (u *AuthUsecase) LoginGoogleUser(c *fiber.Ctx, req *contract.GoogleLoginReq
 	userFromDB, err := u.userRepo.GetUserByEmail(req.Email)
 
 	if userFromDB == nil || err != nil {
+		var googleImage *string
+		if req.Picture != "" {
+			googleImage = &req.Picture
+		}
 		user := &model.User{
-			Name:       req.Name,
-			Email:      req.Email,
-			IsVerified: req.VerifiedEmail,
+			Name:        req.Name,
+			Email:       req.Email,
+			IsVerified:  req.VerifiedEmail,
+			GoogleImage: googleImage,
 		}
 
 		if err := u.userRepo.CreateUser(user); err != nil {
@@ -48,11 +53,16 @@ func (u *AuthUsecase) LoginGoogleUser(c *fiber.Ctx, req *contract.GoogleLoginReq
 
 		return &contract.GoogleLoginRes{
 			TokenRes: *tokens,
-			UserRes:  u.buildUserRes(user),
+			UserRes:  *u.buildUserRes(user),
 		}, nil
 	}
 
 	userFromDB.IsVerified = req.VerifiedEmail
+	var googleImage *string
+	if req.Picture != "" {
+		googleImage = &req.Picture
+	}
+	userFromDB.GoogleImage = googleImage
 	if err := u.userRepo.UpdateUser(userFromDB); err != nil {
 		logger.Log.Errorf("Failed to update user: %+v", err)
 		return nil, err
@@ -66,7 +76,7 @@ func (u *AuthUsecase) LoginGoogleUser(c *fiber.Ctx, req *contract.GoogleLoginReq
 
 	return &contract.GoogleLoginRes{
 		TokenRes: *tokens,
-		UserRes:  u.buildUserRes(userFromDB),
+		UserRes:  *u.buildUserRes(userFromDB),
 	}, nil
 }
 
@@ -101,28 +111,36 @@ func (u *AuthUsecase) RefreshToken(c *fiber.Ctx, req *contract.RefreshTokenReq) 
 
 	res := contract.RefreshTokenRes{
 		TokenRes: *tokens,
-		UserRes:  u.buildUserRes(user),
+		UserRes:  *u.buildUserRes(user),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(util.ToSuccessResponse(res))
 }
 
-func (u *AuthUsecase) GetUserByID(id string) (*model.User, error) {
+func (u *AuthUsecase) GetUserByID(id string) (*contract.UserRes, error) {
 	user, err := u.userRepo.GetUserByID(id)
 	if err != nil {
 		logger.Log.Error("Failed to get user by ID", zap.Error(err), zap.String("userID", id))
-		return nil, fiber.NewError(fiber.StatusInternalServerError)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
-	return user, nil
+	return u.buildUserRes(user), nil
 }
 
-func (u *AuthUsecase) buildUserRes(user *model.User) contract.UserRes {
-	return contract.UserRes{
-		ID:         user.ID,
-		Email:      user.Email,
-		Name:       user.Name,
-		IsVerified: user.IsVerified,
-		CreatedAt:  user.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:  user.UpdatedAt.Format(time.RFC3339),
+func (u *AuthUsecase) buildUserRes(user *model.User) *contract.UserRes {
+	if user == nil {
+		return nil
+	}
+	googleImage := ""
+	if user.GoogleImage != nil {
+		googleImage = *user.GoogleImage
+	}
+	return &contract.UserRes{
+		ID:          user.ID,
+		Email:       user.Email,
+		Name:        user.Name,
+		GoogleImage: googleImage,
+		IsVerified:  user.IsVerified,
+		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:   user.UpdatedAt.Format(time.RFC3339),
 	}
 }

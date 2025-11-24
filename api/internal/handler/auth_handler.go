@@ -77,10 +77,10 @@ func (h *AuthHandler) GetCurrentUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	user, err := h.userUsecase.GetUserByID(c, claims.ID)
+	user, err := h.authUsecase.GetUserByID(claims.ID)
 	if err != nil {
 		logger.Log.Error("Failed to get user by ID: %v", err)
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to get user")
+		return err
 	}
 
 	if user == nil {
