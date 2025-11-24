@@ -11,11 +11,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Spinner } from "@/components/ui/spinner";
 import { getRandomColor } from "@/lib/color";
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
@@ -28,11 +24,7 @@ export type Props = {
   disabled?: boolean;
 };
 
-export const TaskProjectPicker = ({
-  value: value,
-  onChange: onChange,
-  disabled,
-}: Props) => {
+export const TaskProjectPicker = ({ value: value, onChange: onChange, disabled }: Props) => {
   const [open, setOpen] = useState(false);
   const { data: projects } = useGetProjects();
 
@@ -52,10 +44,7 @@ export const TaskProjectPicker = ({
         >
           {selectedProject ? (
             <span className="flex items-center gap-1">
-              <ProjectIcon
-                className="size-4"
-                style={{ color: selectedProject.color }}
-              />
+              <ProjectIcon className="size-4" style={{ color: selectedProject.color }} />
               <span className="text-ellipsis line-clamp-1">
                 {selectedProject.title || PROJECT_TITLE_FALLBACK}
               </span>
@@ -96,7 +85,7 @@ export const TaskProjectPickerContent = ({
       onClose?.();
       setSearch("");
     },
-    [onChange, onClose],
+    [onChange, onClose]
   );
 
   const { mutate: createProject, isLoading: isCreating } = useCreateProject({
@@ -110,9 +99,7 @@ export const TaskProjectPickerContent = ({
     const searchLower = search.toLowerCase();
     return (
       projects?.filter((project) =>
-        (project.title || PROJECT_TITLE_FALLBACK)
-          .toLowerCase()
-          .includes(searchLower),
+        (project.title || PROJECT_TITLE_FALLBACK).toLowerCase().includes(searchLower)
       ) ?? []
     );
   }, [projects, search]);
@@ -139,11 +126,7 @@ export const TaskProjectPickerContent = ({
 
   return (
     <Command shouldFilter={false}>
-      <CommandInput
-        placeholder="Search projects..."
-        value={search}
-        onValueChange={setSearch}
-      />
+      <CommandInput placeholder="Search projects..." value={search} onValueChange={setSearch} />
       <CommandList>
         {isLoading ? (
           <div className="flex items-center justify-center p-4">
@@ -165,17 +148,14 @@ export const TaskProjectPickerContent = ({
                     value={project.id}
                     onSelect={() => handleSelect(project.id)}
                   >
-                    <ProjectIcon
-                      className="size-4"
-                      style={{ color: project.color }}
-                    />
+                    <ProjectIcon className="size-4" style={{ color: project.color }} />
                     <span className="text-ellipsis line-clamp-1">
                       {project.title || PROJECT_TITLE_FALLBACK}
                     </span>
                     <Check
                       className={cn(
                         "ml-auto size-4",
-                        value === project.id ? "opacity-100" : "opacity-0",
+                        value === project.id ? "opacity-100" : "opacity-0"
                       )}
                     />
                   </CommandItem>

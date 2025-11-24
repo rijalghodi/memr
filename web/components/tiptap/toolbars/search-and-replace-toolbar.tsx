@@ -8,17 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useToolbar } from "./toolbar-provider";
 import { type SearchAndReplaceStorage } from "../extensions/search-and-replace";
@@ -106,23 +98,12 @@ export function SearchAndReplaceToolbar() {
               placeholder="Search..."
             />
             <span>
-              {results?.length === 0 ? selectedResult : selectedResult + 1}/
-              {results?.length}
+              {results?.length === 0 ? selectedResult : selectedResult + 1}/{results?.length}
             </span>
-            <Button
-              onClick={selectPrevious}
-              size="icon"
-              variant="ghost"
-              className="size-7"
-            >
+            <Button onClick={selectPrevious} size="icon" variant="ghost" className="size-7">
               <ArrowLeftIcon className="size-4" />
             </Button>
-            <Button
-              onClick={selectNext}
-              size="icon"
-              className="size-7"
-              variant="ghost"
-            >
+            <Button onClick={selectNext} size="icon" className="size-7" variant="ghost">
               <ArrowRightIcon className="h-4 w-4" />
             </Button>
             <Separator orientation="vertical" className="h-7 mx-0.5" />
@@ -179,13 +160,10 @@ export function SearchAndReplaceToolbar() {
                   }}
                   placeholder="Search..."
                 />
-                {results?.length === 0 ? selectedResult : selectedResult + 1}/
-                {results?.length}
+                {results?.length === 0 ? selectedResult : selectedResult + 1}/{results?.length}
               </div>
               <div className="mb-2">
-                <Label className="mb-1 text-xs text-gray-11">
-                  Replace with
-                </Label>
+                <Label className="mb-1 text-xs text-gray-11">Replace with</Label>
                 <Input
                   className="w-full"
                   value={replaceText}
@@ -222,12 +200,7 @@ export function SearchAndReplaceToolbar() {
                 >
                   <ArrowLeftIcon className="h-4 w-4" />
                 </Button>
-                <Button
-                  onClick={selectNext}
-                  size="icon"
-                  className="h-7 w-7"
-                  variant="secondary"
-                >
+                <Button onClick={selectNext} size="icon" className="h-7 w-7" variant="secondary">
                   <ArrowRightIcon className="h-4 w-4" />
                 </Button>
               </div>
@@ -241,11 +214,7 @@ export function SearchAndReplaceToolbar() {
                 >
                   Replace All
                 </Button>
-                <Button
-                  onClick={replace}
-                  size="sm"
-                  className="h-7 px-3 text-xs"
-                >
+                <Button onClick={replace} size="sm" className="h-7 px-3 text-xs">
                   Replace
                 </Button>
               </div>

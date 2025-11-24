@@ -115,13 +115,6 @@ export default [
     },
   },
   {
-    ignores: [
-      "dist/**",
-      "node_modules/**",
-      ".next/**",
-      "out/**",
-      "build/**",
-      "next-env.d.ts",
-    ],
+    ignores: ["dist/**", "node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"],
   },
 ];

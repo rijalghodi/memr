@@ -9,18 +9,10 @@ import React, { type FormEvent } from "react";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToolbar } from "./toolbar-provider";
 import { getUrlFromString } from "@/lib/tiptap-utils";
 
@@ -43,25 +35,20 @@ const LinkToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Popover>
         <Tooltip>
           <TooltipTrigger asChild>
-            <PopoverTrigger
-              disabled={!editor?.can().chain().setLink({ href: "" }).run()}
-              asChild
-            >
+            <PopoverTrigger disabled={!editor?.can().chain().setLink({ href: "" }).run()} asChild>
               <Button
                 variant="ghost"
                 size="sm"
                 className={cn(
                   "h-8 w-max px-3 font-normal",
                   editor?.isActive("link") && "bg-accent",
-                  className,
+                  className
                 )}
                 ref={ref}
                 {...props}
               >
                 <p className="mr-2 text-base">↗</p>
-                <p className={"underline decoration-gray-7 underline-offset-4"}>
-                  Link
-                </p>
+                <p className={"underline decoration-gray-7 underline-offset-4"}>Link</p>
               </Button>
             </PopoverTrigger>
           </TooltipTrigger>
@@ -83,9 +70,7 @@ const LinkToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             </PopoverClose>
             <form onSubmit={handleSubmit}>
               <Label>Link</Label>
-              <p className="text-sm text-gray-11">
-                Attach a link to the selected text
-              </p>
+              <p className="text-sm text-gray-11">Attach a link to the selected text</p>
               <div className="mt-3 flex flex-col items-end justify-end gap-3">
                 <Input
                   value={link}
@@ -121,7 +106,7 @@ const LinkToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </PopoverContent>
       </Popover>
     );
-  },
+  }
 );
 
 LinkToolbar.displayName = "LinkToolbar";

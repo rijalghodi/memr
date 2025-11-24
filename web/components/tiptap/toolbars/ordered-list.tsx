@@ -4,11 +4,7 @@ import { ListOrdered } from "lucide-react";
 import React from "react";
 
 import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 import { useToolbar } from "./toolbar-provider";
@@ -25,7 +21,7 @@ const OrderedListToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className={cn(
               "h-8 w-8 p-0 sm:h-9 sm:w-9",
               editor?.isActive("orderedList") && "bg-accent",
-              className,
+              className
             )}
             onClick={(e) => {
               editor?.chain().focus().toggleOrderedList().run();
@@ -43,7 +39,7 @@ const OrderedListToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  },
+  }
 );
 
 OrderedListToolbar.displayName = "OrderedListToolbar";

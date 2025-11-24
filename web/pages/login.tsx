@@ -13,19 +13,10 @@ export function LoginPage() {
           {/* Heading */}
           <div className="space-y-2">
             <div className="flex justify-center mb-4">
-              <img
-                src="/logo.png"
-                alt={BRAND.APP_NAME}
-                width={150}
-                height={60}
-              />
+              <img src="/logo.png" alt={BRAND.APP_NAME} width={150} height={60} />
             </div>
-            <h1 className="text-2xl font-semibold text-foreground">
-              {BRAND.APP_TAGLINE}
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Log in to your Memr account
-            </p>
+            <h1 className="text-2xl font-semibold text-foreground">{BRAND.APP_TAGLINE}</h1>
+            <p className="text-lg text-muted-foreground">Log in to your Memr account</p>
           </div>
 
           {/* Google Login Button */}

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { SESSION_TABS_KEY } from "@/lib/constant";
@@ -53,19 +46,13 @@ type NavigationContextValue = {
 
 const NavigationContext = createContext<NavigationContextValue | null>(null);
 
-export function NavigationProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function NavigationProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
 
   // Session Tabs State
-  const [sessionTabs, setSessionTabs] = useState<SessionTab[]>(() =>
-    loadTabsFromStorage(),
-  );
+  const [sessionTabs, setSessionTabs] = useState<SessionTab[]>(() => loadTabsFromStorage());
 
   // Browser Navigation State
   const [canGoBack, setCanGoBack] = useState(false);
@@ -80,16 +67,13 @@ export function NavigationProvider({
   }, [sessionTabs]);
 
   // Determine active tab based on current pathname
-  const activeTab =
-    sessionTabs.find((tab) => tab.pathname === pathname) || null;
+  const activeTab = sessionTabs.find((tab) => tab.pathname === pathname) || null;
 
   // Add tab to session tabs
   const addTab = useCallback((pathname: string) => {
     setSessionTabs((prevTabs) => {
       // Check if pathname already exists - replace it
-      const existingIndex = prevTabs.findIndex(
-        (tab) => tab.pathname === pathname,
-      );
+      const existingIndex = prevTabs.findIndex((tab) => tab.pathname === pathname);
 
       const newTab: SessionTab = {
         pathname,
@@ -139,7 +123,7 @@ export function NavigationProvider({
         updateCanNavigate();
       }
     },
-    [updateCanNavigate],
+    [updateCanNavigate]
   );
 
   const closeAllTabs = useCallback(() => {
@@ -171,7 +155,7 @@ export function NavigationProvider({
       navigate(pathname);
       updateCanNavigate();
     },
-    [navigate, updateCanNavigate, addTab],
+    [navigate, updateCanNavigate, addTab]
   );
 
   const handleGoBack = useCallback(() => {

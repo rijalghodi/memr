@@ -20,11 +20,7 @@ export function LoginForm({}: Props) {
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
       setIdToken(token);
     } catch (err: any) {
@@ -84,9 +80,7 @@ export function LoginForm({}: Props) {
 
       {idToken && (
         <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-md">
-          <h3 className="text-sm font-semibold text-green-800 mb-2">
-            Login Successful!
-          </h3>
+          <h3 className="text-sm font-semibold text-green-800 mb-2">Login Successful!</h3>
           <div className="text-xs text-green-700">
             <p className="font-medium mb-1">ID Token:</p>
             <p className="break-all font-mono bg-white p-2 rounded border border-green-300">

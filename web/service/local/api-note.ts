@@ -58,8 +58,7 @@ export const noteApi = {
         (note) =>
           !unsynced ||
           !note.syncedAt ||
-          new Date(note.syncedAt ?? new Date(0)).getTime() <
-            new Date(note.updatedAt).getTime(),
+          new Date(note.syncedAt ?? new Date(0)).getTime() < new Date(note.updatedAt).getTime()
       )
       .toArray();
     if (collectionId) {
@@ -165,15 +164,14 @@ export const useCreateNote = ({
         onSuccess?.(result);
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -224,15 +222,14 @@ export const useUpdateNote = ({
         onSuccess?.(result);
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -254,15 +251,14 @@ export const useDeleteNote = ({
         await noteApi.delete(id);
         onSuccess?.();
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };

@@ -14,12 +14,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-} from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { CommandList } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -45,24 +40,21 @@ const menuItems: CommandItemType[] = [
     description: "Large section heading",
     icon: Heading1,
     keywords: "h1 title header",
-    command: (editor) =>
-      editor.chain().focus().toggleHeading({ level: 1 }).run(),
+    command: (editor) => editor.chain().focus().toggleHeading({ level: 1 }).run(),
   },
   {
     title: "Heading 2",
     description: "Medium section heading",
     icon: Heading2,
     keywords: "h2 subtitle",
-    command: (editor) =>
-      editor.chain().focus().toggleHeading({ level: 2 }).run(),
+    command: (editor) => editor.chain().focus().toggleHeading({ level: 2 }).run(),
   },
   {
     title: "Heading 3",
     description: "Small section heading",
     icon: Heading3,
     keywords: "h3 subheader",
-    command: (editor) =>
-      editor.chain().focus().toggleHeading({ level: 3 }).run(),
+    command: (editor) => editor.chain().focus().toggleHeading({ level: 3 }).run(),
   },
   {
     title: "Bullet List",
@@ -112,12 +104,7 @@ export const SlashCommandExtension = Extension.create({
             if (event.key === "Backspace") {
               const { state } = view;
               const { $from } = state.selection;
-              const currentLineText = $from.parent.textBetween(
-                0,
-                $from.parentOffset,
-                "\n",
-                " ",
-              );
+              const currentLineText = $from.parent.textBetween(0, $from.parentOffset, "\n", " ");
 
               const isSlashCommandOpened =
                 currentLineText.startsWith("/") &&
@@ -130,7 +117,7 @@ export const SlashCommandExtension = Extension.create({
                     detail: {
                       text: currentLineText.slice(1, -1).trim(),
                     },
-                  }),
+                  })
                 );
               }
 
@@ -146,12 +133,7 @@ export const SlashCommandExtension = Extension.create({
           handleTextInput(view, _from, _to, text) {
             const { state } = view;
             const { $from } = state.selection;
-            const currentLineText = $from.parent.textBetween(
-              0,
-              $from.parentOffset,
-              "\n",
-              " ",
-            );
+            const currentLineText = $from.parent.textBetween(0, $from.parentOffset, "\n", " ");
 
             // Simulate updated line text by inserting text
             const updatedLineText = currentLineText + text;
@@ -168,7 +150,7 @@ export const SlashCommandExtension = Extension.create({
                   detail: {
                     text: updatedLineText.slice(1).trim(),
                   },
-                }),
+                })
               );
             }
             return false;
@@ -216,7 +198,7 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
         setSelectedIndex(-1);
       }
     },
-    [editor, search],
+    [editor, search]
   );
 
   const filteredMenuItems = useMemo(
@@ -225,9 +207,9 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
         (item) =>
           item.title.toLowerCase().includes(search.toLowerCase()) ||
           item.description.toLowerCase().includes(search.toLowerCase()) ||
-          item.keywords.toLowerCase().includes(search.toLowerCase()),
+          item.keywords.toLowerCase().includes(search.toLowerCase())
       ),
-    [search],
+    [search]
   );
 
   const handleKeyDown = useCallback(
@@ -271,7 +253,7 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
           break;
       }
     },
-    [open, selectedIndex, filteredMenuItems, executeCommand, editor],
+    [open, selectedIndex, filteredMenuItems, executeCommand, editor]
   );
 
   useEffect(() => {
@@ -315,15 +297,8 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
     const editorElement = editor.options.element;
     const handleEditorKeyDown = (e: Event) => handleKeyDown(e as KeyboardEvent);
 
-    (editorElement as HTMLElement).addEventListener(
-      "keydown",
-      handleEditorKeyDown,
-    );
-    return () =>
-      (editorElement as HTMLElement).removeEventListener(
-        "keydown",
-        handleEditorKeyDown,
-      );
+    (editorElement as HTMLElement).addEventListener("keydown", handleEditorKeyDown);
+    return () => (editorElement as HTMLElement).removeEventListener("keydown", handleEditorKeyDown);
   }, [handleKeyDown, editor]);
 
   useEffect(() => {
@@ -367,7 +342,7 @@ export const SlashCommand = ({ editor }: { editor: Editor }) => {
                   onSelect={() => executeCommand(item.command)}
                   className={cn(
                     "gap-3 rounded-sm px-3",
-                    itemIndex === selectedIndex ? "bg-accent/50" : "",
+                    itemIndex === selectedIndex ? "bg-accent/50" : ""
                   )}
                   aria-selected={itemIndex === selectedIndex}
                   ref={(el) => {

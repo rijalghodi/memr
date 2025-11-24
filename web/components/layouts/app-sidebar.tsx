@@ -1,21 +1,10 @@
 "use client";
 
-import {
-  ArrowRight,
-  ChevronDown,
-  LogOutIcon,
-  Plus,
-  SquareCheckBig,
-  SquarePen,
-} from "lucide-react";
+import { ArrowRight, ChevronDown, LogOutIcon, Plus, SquareCheckBig, SquarePen } from "lucide-react";
 import { JSX, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Sidebar,
   SidebarContent,
@@ -37,10 +26,7 @@ import {
 import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { useGetCurrentUser } from "@/service/api-auth";
-import {
-  collectionApi,
-  useGetCollections,
-} from "@/service/local/api-collection";
+import { collectionApi, useGetCollections } from "@/service/local/api-collection";
 import { noteApi, noteApiHook, useGetNotes } from "@/service/local/api-note";
 import { projectApi, useGetProjects } from "@/service/local/api-project";
 import { useGetSetting } from "@/service/local/api-setting";
@@ -167,23 +153,11 @@ export function SidebarEntityMenus() {
           projects?.slice(0, 5).map((project) => ({
             title: project.title || PROJECT_TITLE_FALLBACK,
             href: getRoute(ROUTES.PROJECT, { projectId: project.id }),
-            icon: (
-              <ProjectIcon
-                className="size-5"
-                style={{ color: project.color }}
-              />
-            ),
+            icon: <ProjectIcon className="size-5" style={{ color: project.color }} />,
           })) ?? [],
       },
     ],
-    [
-      notes,
-      collections,
-      projects,
-      handleAddNote,
-      handleAddCollection,
-      handleAddProject,
-    ],
+    [notes, collections, projects, handleAddNote, handleAddCollection, handleAddProject]
   );
 
   return (
@@ -217,13 +191,8 @@ export function SidebarEntityMenus() {
                     <>
                       {item.submenu?.map((subitem, idx) => {
                         return (
-                          <SidebarMenuSubItem
-                            key={`${idx}-entity-menu-sub-item`}
-                          >
-                            <SidebarMenuSubButton
-                              size="sm"
-                              onClick={() => navigate(subitem.href)}
-                            >
+                          <SidebarMenuSubItem key={`${idx}-entity-menu-sub-item`}>
+                            <SidebarMenuSubButton size="sm" onClick={() => navigate(subitem.href)}>
                               {subitem.icon}
                               {subitem.title || NOTE_TITLE_FALLBACK}
                             </SidebarMenuSubButton>
@@ -264,10 +233,7 @@ export function ProfileButton() {
   const userImage = user?.data?.googleImage;
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        asChild
-        className="data-[state=open]:bg-sidebar-accent"
-      >
+      <DropdownMenuTrigger asChild className="data-[state=open]:bg-sidebar-accent">
         <SidebarMenuButton size="default" className="mb-2">
           <Avatar className="size-6">
             <AvatarImage src={userImage} />

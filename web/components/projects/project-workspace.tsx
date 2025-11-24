@@ -4,12 +4,7 @@ import React, { useMemo } from "react";
 
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
 import { projectApi, useGetProject } from "@/service/local/api-project";
-import {
-  taskApi,
-  useCreateTask,
-  useDeleteTask,
-  useGetTasks,
-} from "@/service/local/api-task";
+import { taskApi, useCreateTask, useDeleteTask, useGetTasks } from "@/service/local/api-task";
 
 import { GroupItem, TaskKanban } from "../tasks/kanban/task-kanban";
 import { TKanbanTask } from "../tasks/kanban/type";
@@ -104,10 +99,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
         <div className="px-6 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ProjectIcon
-                className="size-8"
-                style={{ color: project?.color }}
-              />
+              <ProjectIcon className="size-8" style={{ color: project?.color }} />
               <input
                 className="text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md"
                 placeholder={PROJECT_TITLE_FALLBACK}
@@ -132,9 +124,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
             </div>
           </div>
           <CollapsibleContent>
-            <div className="flex items-center">
-              {/* Filters can be added here if needed */}
-            </div>
+            <div className="flex items-center">{/* Filters can be added here if needed */}</div>
           </CollapsibleContent>
         </div>
       </Collapsible>

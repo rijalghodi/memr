@@ -6,10 +6,7 @@ import React, { useState } from "react";
 import { useBrowserNavigate } from "@/components/browser-navigation";
 import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
 import { getRoute, ROUTES } from "@/lib/routes";
-import {
-  collectionApi,
-  useGetCollection,
-} from "@/service/local/api-collection";
+import { collectionApi, useGetCollection } from "@/service/local/api-collection";
 import { noteApiHook, useGetNotes } from "@/service/local/api-note";
 
 import { NoteItem } from "../../notes/note-item";
@@ -21,11 +18,7 @@ import { NoteEmpty } from "./note-empty";
 
 type SortByValue = "updatedAt" | "createdAt";
 
-export function CollectionWorkspace({
-  collectionId,
-}: {
-  collectionId: string;
-}) {
+export function CollectionWorkspace({ collectionId }: { collectionId: string }) {
   const [sortBy, setSortBy] = useState<SortByValue | undefined>();
   const { navigate } = useBrowserNavigate();
   const { data: collection } = useGetCollection(collectionId);
@@ -58,7 +51,7 @@ export function CollectionWorkspace({
   };
 
   const handleTitleUpdate = (
-    e: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>
   ) => {
     const newTitle = e.target.value;
     collectionApi.update({
@@ -77,10 +70,7 @@ export function CollectionWorkspace({
         <div className="px-6 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CollectionIcon
-                className="size-6"
-                style={{ color: collection?.color }}
-              />
+              <CollectionIcon className="size-6" style={{ color: collection?.color }} />
               <input
                 className="text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md"
                 placeholder={COLLECTION_TITLE_FALLBACK}

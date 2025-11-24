@@ -8,11 +8,7 @@ import {
   ConversationContent,
   ConversationScrollButton,
 } from "@/components/ui/ai/conversation";
-import {
-  Message,
-  MessageAvatar,
-  MessageContent,
-} from "@/components/ui/ai/message";
+import { Message, MessageAvatar, MessageContent } from "@/components/ui/ai/message";
 import {
   PromptInput,
   PromptInputButton,
@@ -26,17 +22,8 @@ import {
   PromptInputToolbar,
   PromptInputTools,
 } from "@/components/ui/ai/prompt-input";
-import {
-  Reasoning,
-  ReasoningContent,
-  ReasoningTrigger,
-} from "@/components/ui/ai/reasoning";
-import {
-  Source,
-  Sources,
-  SourcesContent,
-  SourcesTrigger,
-} from "@/components/ui/ai/source";
+import { Reasoning, ReasoningContent, ReasoningTrigger } from "@/components/ui/ai/reasoning";
+import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ui/ai/source";
 import { Button } from "@/components/ui/button";
 
 import { Spinner } from "../spinner";
@@ -118,16 +105,14 @@ export const ExampleChat = () => {
   const [inputValue, setInputValue] = useState("");
   const [selectedModel, setSelectedModel] = useState(models[0].id);
   const [isTyping, setIsTyping] = useState(false);
-  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
-    null,
-  );
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
 
   const simulateTyping = useCallback(
     (
       messageId: string,
       content: string,
       reasoning?: string,
-      sources?: Array<{ title: string; url: string }>,
+      sources?: Array<{ title: string; url: string }>
     ) => {
       let currentIndex = 0;
       const typeInterval = setInterval(() => {
@@ -139,13 +124,12 @@ export const ExampleChat = () => {
                 ...msg,
                 content: currentContent,
                 isStreaming: currentIndex < content.length,
-                reasoning:
-                  currentIndex >= content.length ? reasoning : undefined,
+                reasoning: currentIndex >= content.length ? reasoning : undefined,
                 sources: currentIndex >= content.length ? sources : undefined,
               };
             }
             return msg;
-          }),
+          })
         );
 
         currentIndex += Math.random() > 0.1 ? 1 : 0; // Simulate variable typing speed
@@ -159,7 +143,7 @@ export const ExampleChat = () => {
 
       return () => clearInterval(typeInterval);
     },
-    [],
+    []
   );
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
@@ -182,8 +166,7 @@ export const ExampleChat = () => {
 
       // Simulate AI response with delay
       setTimeout(() => {
-        const responseData =
-          sampleResponses[Math.floor(Math.random() * sampleResponses.length)];
+        const responseData = sampleResponses[Math.floor(Math.random() * sampleResponses.length)];
         const assistantMessageId = crypto.randomUUID();
 
         const assistantMessage: ChatMessage = {
@@ -202,11 +185,11 @@ export const ExampleChat = () => {
           assistantMessageId,
           responseData.content,
           responseData.reasoning,
-          responseData.sources,
+          responseData.sources
         );
       }, 800);
     },
-    [inputValue, isTyping, simulateTyping],
+    [inputValue, isTyping, simulateTyping]
   );
 
   const handleReset = useCallback(() => {
@@ -242,12 +225,7 @@ export const ExampleChat = () => {
             {models.find((m) => m.id === selectedModel)?.name}
           </span>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleReset}
-          className="h-8 px-2"
-        >
+        <Button variant="ghost" size="sm" onClick={handleReset} className="h-8 px-2">
           <RotateCcwIcon className="size-4" />
           <span className="ml-1">Reset</span>
         </Button>
@@ -263,9 +241,7 @@ export const ExampleChat = () => {
                   {message.isStreaming && message.content === "" ? (
                     <div className="flex items-center gap-2">
                       <Spinner size={14} />
-                      <span className="text-muted-foreground text-sm">
-                        Thinking...
-                      </span>
+                      <span className="text-muted-foreground text-sm">Thinking...</span>
                     </div>
                   ) : (
                     message.content
@@ -284,10 +260,7 @@ export const ExampleChat = () => {
               {/* Reasoning */}
               {message.reasoning && (
                 <div className="ml-10">
-                  <Reasoning
-                    isStreaming={message.isStreaming}
-                    defaultOpen={false}
-                  >
+                  <Reasoning isStreaming={message.isStreaming} defaultOpen={false}>
                     <ReasoningTrigger />
                     <ReasoningContent>{message.reasoning}</ReasoningContent>
                   </Reasoning>
@@ -301,11 +274,7 @@ export const ExampleChat = () => {
                     <SourcesTrigger count={message.sources.length} />
                     <SourcesContent>
                       {message.sources.map((source, index) => (
-                        <Source
-                          key={index}
-                          href={source.url}
-                          title={source.title}
-                        />
+                        <Source key={index} href={source.url} title={source.title} />
                       ))}
                     </SourcesContent>
                   </Sources>

@@ -4,10 +4,7 @@ import { MoreHorizontal, Trash } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
 import { getCssColorStyle } from "@/lib/color";
-import {
-  NOTE_CONTENT_EXCERPT_FALLBACK,
-  NOTE_TITLE_FALLBACK,
-} from "@/lib/constant";
+import { NOTE_CONTENT_EXCERPT_FALLBACK, NOTE_TITLE_FALLBACK } from "@/lib/constant";
 import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { markdownToText, truncateString } from "@/lib/string";
@@ -40,16 +37,8 @@ type Props = {
   updatedAt: string;
 };
 
-export function NoteItem({
-  id,
-  title,
-  content = "",
-  collectionId,
-  updatedAt,
-}: Props) {
-  const displayContent = content
-    ? markdownToText(content, 200)
-    : NOTE_CONTENT_EXCERPT_FALLBACK;
+export function NoteItem({ id, title, content = "", collectionId, updatedAt }: Props) {
+  const displayContent = content ? markdownToText(content, 200) : NOTE_CONTENT_EXCERPT_FALLBACK;
   const displayTitle = title || NOTE_TITLE_FALLBACK;
 
   const { navigate } = useBrowserNavigate();
@@ -109,7 +98,7 @@ export function NoteItem({
     <li
       className={cn(
         "px-6 group hover:bg-muted cursor-pointer group/note-item transition-colors border-b border-b-muted group-last:border-b-0",
-        isDropdownOpen && "bg-muted",
+        isDropdownOpen && "bg-muted"
       )}
       onClick={handleClick}
     >
@@ -138,21 +127,13 @@ export function NoteItem({
           <div
             className={cn(
               "text-xs group-hover/note-item:hidden fade-in duration-100",
-              isDropdownOpen && "hidden",
+              isDropdownOpen && "hidden"
             )}
           >
             {formatDate(new Date(updatedAt))}
           </div>
-          <div
-            className={cn(
-              "group-hover/note-item:block hidden",
-              isDropdownOpen && "block",
-            )}
-          >
-            <DropdownMenu
-              open={isDropdownOpen}
-              onOpenChange={setIsDropdownOpen}
-            >
+          <div className={cn("group-hover/note-item:block hidden", isDropdownOpen && "block")}>
+            <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -169,7 +150,7 @@ export function NoteItem({
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
                   "group-hover/note-item:block hidden w-auto",
-                  isDropdownOpen && "block",
+                  isDropdownOpen && "block"
                 )}
               >
                 <DropdownMenuSub>

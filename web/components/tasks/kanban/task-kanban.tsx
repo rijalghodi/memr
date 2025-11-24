@@ -12,9 +12,7 @@ import { TKanbanTask } from "./type";
 export type GroupItem = { id: string; title: string };
 
 // Helper function to group tasks by group
-function groupTasksByGroup(
-  tasks: TKanbanTask[],
-): Record<string, TKanbanTask[]> {
+function groupTasksByGroup(tasks: TKanbanTask[]): Record<string, TKanbanTask[]> {
   return tasks?.reduce(
     (acc, task) => {
       if (!acc[task.groupId]) {
@@ -23,7 +21,7 @@ function groupTasksByGroup(
       acc[task.groupId].push(task);
       return acc;
     },
-    {} as Record<string, TKanbanTask[]>,
+    {} as Record<string, TKanbanTask[]>
   );
 }
 
@@ -36,13 +34,7 @@ type Props = {
 };
 
 // Main Kanban component
-export function TaskKanban({
-  tasks,
-  onTaskUpdate,
-  onTaskAdd,
-  onTaskDelete,
-  groups,
-}: Props) {
+export function TaskKanban({ tasks, onTaskUpdate, onTaskAdd, onTaskDelete, groups }: Props) {
   // Group tasks by group
   const tasksByGroup = useMemo(() => {
     return groupTasksByGroup(tasks);
@@ -51,19 +43,14 @@ export function TaskKanban({
   const handleTaskDrop = useCallback(
     (group: string, newTasks: TKanbanTask[], oldTasks: TKanbanTask[]) => {
       // Find tasks that were added (moved from another list)
-      const addedTaskIdx = newTasks.findIndex(
-        (task) => !oldTasks.some((t) => t.id === task.id),
-      );
+      const addedTaskIdx = newTasks.findIndex((task) => !oldTasks.some((t) => t.id === task.id));
       const addedTask = newTasks[addedTaskIdx];
 
       // Update group and sortOrder for tasks that were moved to this list
       if (addedTask) {
         // Get the previous task (before insertion point) and next task (after insertion point)
         const prevTask = addedTaskIdx > 0 ? newTasks[addedTaskIdx - 1] : null;
-        const nextTask =
-          addedTaskIdx < newTasks.length - 1
-            ? newTasks[addedTaskIdx + 1]
-            : null;
+        const nextTask = addedTaskIdx < newTasks.length - 1 ? newTasks[addedTaskIdx + 1] : null;
 
         // Generate sortOrders for all added tasks at once
         const prevSortOrder = prevTask?.sortOrder || undefined;
@@ -88,25 +75,19 @@ export function TaskKanban({
           if (!movedTask) return;
 
           const prevTask = movedTaskIdx > 0 ? newTasks[movedTaskIdx - 1] : null;
-          const nextTask =
-            movedTaskIdx < newTasks.length - 1
-              ? newTasks[movedTaskIdx + 1]
-              : null;
+          const nextTask = movedTaskIdx < newTasks.length - 1 ? newTasks[movedTaskIdx + 1] : null;
 
           const prevSortOrder = prevTask?.sortOrder || undefined;
           const nextSortOrder = nextTask?.sortOrder || undefined;
 
-          const newSortOrder = generateBetweenRank(
-            prevSortOrder,
-            nextSortOrder,
-          );
+          const newSortOrder = generateBetweenRank(prevSortOrder, nextSortOrder);
           onTaskUpdate(movedTask.id, {
             sortOrder: newSortOrder,
           });
         }
       }
     },
-    [onTaskUpdate],
+    [onTaskUpdate]
   );
 
   // Handle task add
@@ -131,7 +112,7 @@ export function TaskKanban({
         sortOrder: newSortOrder,
       });
     },
-    [onTaskAdd, tasks],
+    [onTaskAdd, tasks]
   );
 
   // Handle list reorder (group columns)

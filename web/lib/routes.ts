@@ -16,9 +16,7 @@ export const getRoute = (path: string, params: Record<string, string>) => {
   return path.replace(/:(\w+)/g, (match, p1) => params[p1] ?? match);
 };
 
-export const extractRoute = (
-  path: string,
-): { path: string; params: Record<string, string> } => {
+export const extractRoute = (path: string): { path: string; params: Record<string, string> } => {
   // Check exact matches first
   const exactMatch = Object.values(ROUTES).find((route) => route === path);
   if (exactMatch) {

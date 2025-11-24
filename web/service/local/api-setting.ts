@@ -84,15 +84,14 @@ export const useCreateSetting = ({
         onSuccess?.(result);
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -138,15 +137,14 @@ export const useUpsertSetting = ({
         onSuccess?.(result);
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -168,15 +166,14 @@ export const useDeleteSetting = ({
         await settingApi.delete(name);
         onSuccess?.();
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };

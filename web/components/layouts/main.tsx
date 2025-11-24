@@ -27,12 +27,7 @@ export function Main({ children }: Props) {
 
         <img src="/logo-long.png" alt="logo" width={80} height={24} />
 
-        <Button
-          variant="ghost-primary"
-          size="icon"
-          onClick={() => sync()}
-          title="Sync"
-        >
+        <Button variant="ghost-primary" size="icon" onClick={() => sync()} title="Sync">
           <RefreshCcw
             data-syncing={isSyncing}
             className={"size-4 data-[syncing=true]:animate-spin"}

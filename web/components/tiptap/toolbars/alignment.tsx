@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  AlignCenter,
-  AlignJustify,
-  AlignLeft,
-  AlignRight,
-  Check,
-  ChevronDown,
-} from "lucide-react";
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Check, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,11 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/hooks/use-media-querry";
 
 import { MobileToolbarGroup, MobileToolbarItem } from "./mobile-toolbar-group";
@@ -35,9 +24,7 @@ export const AlignmentTooolbar = () => {
   };
 
   const isDisabled =
-    (editor?.isActive("image") ??
-    editor?.isActive("video") ??
-    editor === undefined)
+    (editor?.isActive("image") ?? editor?.isActive("video") ?? editor === undefined)
       ? false
       : false;
 
@@ -88,9 +75,7 @@ export const AlignmentTooolbar = () => {
   if (isMobile) {
     return (
       <MobileToolbarGroup
-        label={
-          alignmentOptions[findIndex(currentTextAlign())]?.name ?? "Left Align"
-        }
+        label={alignmentOptions[findIndex(currentTextAlign())]?.name ?? "Left Align"}
       >
         {alignmentOptions.map((option, index) => (
           <MobileToolbarItem
@@ -112,9 +97,7 @@ export const AlignmentTooolbar = () => {
         <TooltipTrigger asChild>
           <DropdownMenuTrigger disabled={isDisabled} asChild>
             <Button variant="ghost" size="sm" className="h-8 w-max font-normal">
-              <span className="mr-2">
-                {alignmentOptions[findIndex(currentTextAlign())]?.icon}
-              </span>
+              <span className="mr-2">{alignmentOptions[findIndex(currentTextAlign())]?.icon}</span>
               {alignmentOptions[findIndex(currentTextAlign())]?.name}
               <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
@@ -139,9 +122,7 @@ export const AlignmentTooolbar = () => {
               <span className="mr-2">{option.icon}</span>
               {option.name}
 
-              {option.value === currentTextAlign() && (
-                <Check className="ml-auto h-4 w-4" />
-              )}
+              {option.value === currentTextAlign() && <Check className="ml-auto h-4 w-4" />}
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>

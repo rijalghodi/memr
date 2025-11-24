@@ -15,11 +15,7 @@ type NoteEmptyProps = {
   isFiltered: boolean;
 };
 
-export function NoteEmpty({
-  onAddNote,
-  onResetFilters,
-  isFiltered,
-}: NoteEmptyProps) {
+export function NoteEmpty({ onAddNote, onResetFilters, isFiltered }: NoteEmptyProps) {
   return (
     <Empty>
       <EmptyHeader>
@@ -39,11 +35,7 @@ export function NoteEmpty({
             Create Note
           </Button>
           {isFiltered && (
-            <Button
-              variant="outline"
-              className="rounded-full"
-              onClick={onResetFilters}
-            >
+            <Button variant="outline" className="rounded-full" onClick={onResetFilters}>
               Reset Filters
             </Button>
           )}

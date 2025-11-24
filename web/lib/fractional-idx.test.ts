@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  generateBetweenRank,
-  generateFirstRank,
-  generateLastRank,
-} from "./fractional-idx";
+import { generateBetweenRank, generateFirstRank, generateLastRank } from "./fractional-idx";
 
 describe("fractional-idx", () => {
   describe("generateFirstRank", () => {
@@ -69,9 +65,7 @@ describe("fractional-idx", () => {
         const rank = generateBetweenRank(undefined, rightRank);
         // Use simple string comparison (fractional indexing uses lexicographic order)
         // Note: generateKeyBetween(null, firstRank) returns "Zz" which is < "a0" in simple comparison
-        expect(rank < rightRank || rank.localeCompare(rightRank) < 0).toBe(
-          true,
-        );
+        expect(rank < rightRank || rank.localeCompare(rightRank) < 0).toBe(true);
       });
 
       it("should generate rank that is greater than or equal to first rank", () => {
@@ -138,8 +132,7 @@ describe("fractional-idx", () => {
         expect(rank2).not.toBe(rank3);
         expect(rank1).not.toBe(rank3);
         // Use simple string comparison for fractional indexing
-        const compare = (a: string, b: string) =>
-          a < b ? -1 : a > b ? 1 : a.localeCompare(b);
+        const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : a.localeCompare(b));
         expect(compare(rank1, rank2)).toBeLessThan(0);
         expect(compare(rank2, rank3)).toBeLessThan(0);
       });
@@ -231,8 +224,7 @@ describe("fractional-idx", () => {
         const rank3 = generateBetweenRank(undefined, rank2);
 
         // Use simple string comparison for fractional indexing keys
-        const compare = (a: string, b: string) =>
-          a < b ? -1 : a > b ? 1 : a.localeCompare(b);
+        const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : a.localeCompare(b));
         expect(compare(rank3, rank2)).toBeLessThan(0);
         expect(compare(rank2, rank1)).toBeLessThan(0);
         expect(compare(rank1, rightRank)).toBeLessThan(0);
@@ -264,8 +256,7 @@ describe("fractional-idx", () => {
         const task1_3 = generateBetweenRank(task1_2, column2);
 
         // Verify order using simple string comparison
-        const compare = (a: string, b: string) =>
-          a < b ? -1 : a > b ? 1 : a.localeCompare(b);
+        const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : a.localeCompare(b));
         expect(compare(column1, task1_1)).toBeLessThan(0);
         expect(compare(task1_1, task1_2)).toBeLessThan(0);
         expect(compare(task1_2, task1_3)).toBeLessThan(0);

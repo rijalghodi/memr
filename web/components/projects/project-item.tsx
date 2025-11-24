@@ -30,13 +30,7 @@ type Props = {
   updatedAt: string;
 };
 
-export function ProjectItem({
-  id,
-  title,
-  tasksCount,
-  color,
-  updatedAt,
-}: Props) {
+export function ProjectItem({ id, title, tasksCount, color, updatedAt }: Props) {
   const displayTitle = title || PROJECT_TITLE_FALLBACK;
 
   const { navigate } = useBrowserNavigate();
@@ -75,7 +69,7 @@ export function ProjectItem({
     <li
       className={cn(
         "px-6 group hover:bg-muted cursor-pointer group/project-item transition-colors border-b border-b-muted group-last:border-b-0",
-        isDropdownOpen && "bg-muted",
+        isDropdownOpen && "bg-muted"
       )}
       onClick={handleClick}
     >
@@ -84,9 +78,7 @@ export function ProjectItem({
           <div className="flex items-center justify-start">
             <ProjectIcon className="size-6" style={{ color: color }} />
           </div>
-          <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">
-            {displayTitle}
-          </h3>
+          <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">{displayTitle}</h3>
 
           <p className="text-sm text-muted-foreground col-start-2 line-clamp-1 text-ellipsis">
             {!tasksCount ? (
@@ -102,21 +94,13 @@ export function ProjectItem({
           <div
             className={cn(
               "text-xs group-hover/project-item:hidden fade-in duration-100",
-              isDropdownOpen && "hidden",
+              isDropdownOpen && "hidden"
             )}
           >
             {formatDate(new Date(updatedAt))}
           </div>
-          <div
-            className={cn(
-              "group-hover/project-item:block hidden",
-              isDropdownOpen && "block",
-            )}
-          >
-            <DropdownMenu
-              open={isDropdownOpen}
-              onOpenChange={setIsDropdownOpen}
-            >
+          <div className={cn("group-hover/project-item:block hidden", isDropdownOpen && "block")}>
+            <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -133,7 +117,7 @@ export function ProjectItem({
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
                   "group-hover/project-item:block hidden w-[120px]",
-                  isDropdownOpen && "block",
+                  isDropdownOpen && "block"
                 )}
               >
                 <DropdownMenuItem

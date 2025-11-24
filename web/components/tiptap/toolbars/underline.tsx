@@ -4,11 +4,7 @@ import { UnderlineIcon } from "lucide-react";
 import React from "react";
 
 import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 import { useToolbar } from "./toolbar-provider";
@@ -25,7 +21,7 @@ const UnderlineToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className={cn(
               "h-8 w-8 p-0 sm:h-9 sm:w-9",
               editor?.isActive("underline") && "bg-accent",
-              className,
+              className
             )}
             onClick={(e) => {
               editor?.chain().focus().toggleUnderline().run();
@@ -44,7 +40,7 @@ const UnderlineToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  },
+  }
 );
 
 UnderlineToolbar.displayName = "UnderlineToolbar";

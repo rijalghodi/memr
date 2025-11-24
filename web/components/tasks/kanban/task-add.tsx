@@ -10,9 +10,7 @@ import { TaskProjectPicker } from "./task-project-picker";
 import { TKanbanTask } from "./type";
 
 type Props = {
-  onSubmit?: (
-    data: Pick<TKanbanTask, "title" | "dueDate" | "projectId">,
-  ) => void;
+  onSubmit?: (data: Pick<TKanbanTask, "title" | "dueDate" | "projectId">) => void;
 };
 
 export function TaskAdd({ onSubmit }: Props) {
@@ -48,7 +46,7 @@ export function TaskAdd({ onSubmit }: Props) {
         placeholder="What would you like to do?"
         className={cn(
           "text-sm w-full resize-none rounded-none border-none px-1 py-1 pb-0 shadow-none outline-none ring-0",
-          "field-sizing-content bg-transparent dark:bg-transparent focus-visible:ring-0",
+          "field-sizing-content bg-transparent dark:bg-transparent focus-visible:ring-0"
         )}
         value={data.title}
         onChange={(e) => setData({ ...data, title: e.target.value })}
@@ -60,9 +58,7 @@ export function TaskAdd({ onSubmit }: Props) {
           <TaskDatePicker
             value={data.dueDate}
             onChange={(date) => setData({ ...data, dueDate: date })}
-            isOverdue={(date) =>
-              date && !isToday(new Date(date)) && new Date(date) < new Date()
-            }
+            isOverdue={(date) => date && !isToday(new Date(date)) && new Date(date) < new Date()}
           />
           <TaskProjectPicker
             value={data.projectId}

@@ -105,10 +105,7 @@ export const FloatingToolbar = ({ editor }: { editor: Editor | null }) => {
       if (!referenceNode) {
         const coords = editor.view.coordsAtPos(from);
         // Try to find the element at the coordinates
-        const elementAtPoint = document.elementFromPoint(
-          coords.left,
-          coords.top,
-        );
+        const elementAtPoint = document.elementFromPoint(coords.left, coords.top);
         if (elementAtPoint) {
           // Find the closest element within the editor
           const editorElement = editor.view.dom;

@@ -1,12 +1,7 @@
 "use client";
 import "./tiptap.css";
 
-import {
-  type Editor,
-  EditorContent,
-  type Extension,
-  useEditor,
-} from "@tiptap/react";
+import { type Editor, EditorContent, type Extension, useEditor } from "@tiptap/react";
 import { useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
@@ -94,10 +89,7 @@ export function RichTextEditor({
     const normalizedValue = value || "";
     const normalizedCurrent = currentMarkdown || "";
 
-    if (
-      normalizedValue !== normalizedCurrent &&
-      normalizedValue !== lastValueRef.current
-    ) {
+    if (normalizedValue !== normalizedCurrent && normalizedValue !== lastValueRef.current) {
       isUpdatingFromExternalRef.current = true;
       editor.commands.setContent(normalizedValue, { contentType: "markdown" });
       lastValueRef.current = normalizedValue;
@@ -114,10 +106,7 @@ export function RichTextEditor({
 
   return (
     <div className={cn("relative h-full w-full pb-[60px]", className)}>
-      <EditorContent
-        editor={editor}
-        className=" min-h-[600px] w-full min-w-full cursor-text"
-      />
+      <EditorContent editor={editor} className=" min-h-[600px] w-full min-w-full cursor-text" />
       <FloatingToolbar editor={editor} />
       <SlashCommand editor={editor} />
     </div>

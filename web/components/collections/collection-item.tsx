@@ -30,26 +30,19 @@ type Props = {
   updatedAt: string;
 };
 
-export function CollectionItem({
-  id,
-  title,
-  notesCount,
-  color,
-  updatedAt,
-}: Props) {
+export function CollectionItem({ id, title, notesCount, color, updatedAt }: Props) {
   const displayTitle = title || COLLECTION_TITLE_FALLBACK;
 
   const { navigate } = useBrowserNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { mutate: deleteCollection, isLoading: isDeleting } =
-    useDeleteCollection({
-      onSuccess: () => {
-        // Collection deleted successfully
-      },
-      onError: (error) => {
-        console.error("Failed to delete collection:", error);
-      },
-    });
+  const { mutate: deleteCollection, isLoading: isDeleting } = useDeleteCollection({
+    onSuccess: () => {
+      // Collection deleted successfully
+    },
+    onError: (error) => {
+      console.error("Failed to delete collection:", error);
+    },
+  });
 
   const { confirm } = useConfirmation();
 
@@ -76,21 +69,16 @@ export function CollectionItem({
     <li
       className={cn(
         "px-6 group hover:bg-muted cursor-pointer group/collection-item transition-colors border-b border-b-muted group-last:border-b-0",
-        isDropdownOpen && "bg-muted",
+        isDropdownOpen && "bg-muted"
       )}
       onClick={handleClick}
     >
       <div className="flex justify-between items-center py-4">
         <div className="grid grid-cols-[28px_1fr] gap-1 gap-y-0.5 flex-1">
           <div className="flex items-center justify-start">
-            <CollectionIcon
-              className="size-5 text-muted-foreground"
-              style={{ color: color }}
-            />
+            <CollectionIcon className="size-5 text-muted-foreground" style={{ color: color }} />
           </div>
-          <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">
-            {displayTitle}
-          </h3>
+          <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">{displayTitle}</h3>
 
           <p className="text-sm text-muted-foreground col-start-2 line-clamp-1 text-ellipsis">
             {!notesCount ? (
@@ -106,21 +94,15 @@ export function CollectionItem({
           <div
             className={cn(
               "text-xs group-hover/collection-item:hidden fade-in duration-100",
-              isDropdownOpen && "hidden",
+              isDropdownOpen && "hidden"
             )}
           >
             {formatDate(new Date(updatedAt))}
           </div>
           <div
-            className={cn(
-              "group-hover/collection-item:block hidden",
-              isDropdownOpen && "block",
-            )}
+            className={cn("group-hover/collection-item:block hidden", isDropdownOpen && "block")}
           >
-            <DropdownMenu
-              open={isDropdownOpen}
-              onOpenChange={setIsDropdownOpen}
-            >
+            <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -137,7 +119,7 @@ export function CollectionItem({
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
                   "group-hover/collection-item:block hidden w-[120px]",
-                  isDropdownOpen && "block",
+                  isDropdownOpen && "block"
                 )}
               >
                 <DropdownMenuItem

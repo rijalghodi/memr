@@ -27,9 +27,7 @@ type ConfirmationContextType = {
   confirm: (options: ConfirmationOptions) => void;
 };
 
-const ConfirmationContext = React.createContext<ConfirmationContextType | null>(
-  null,
-);
+const ConfirmationContext = React.createContext<ConfirmationContextType | null>(null);
 
 export function useConfirmation() {
   const context = React.useContext(ConfirmationContext);
@@ -39,16 +37,10 @@ export function useConfirmation() {
   return context;
 }
 
-export function ConfirmationProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function ConfirmationProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [options, setOptions] = React.useState<ConfirmationOptions | null>(
-    null,
-  );
+  const [options, setOptions] = React.useState<ConfirmationOptions | null>(null);
 
   const confirm = React.useCallback((newOptions: ConfirmationOptions) => {
     setOptions(newOptions);
@@ -82,7 +74,7 @@ export function ConfirmationProvider({
     () => ({
       confirm,
     }),
-    [confirm],
+    [confirm]
   );
 
   const title = options?.title || "Confirm Action";
@@ -95,10 +87,7 @@ export function ConfirmationProvider({
   return (
     <ConfirmationContext.Provider value={contextValue}>
       {children}
-      <AlertDialog
-        open={isOpen}
-        onOpenChange={(open) => !open && !loading && handleCancel()}
-      >
+      <AlertDialog open={isOpen} onOpenChange={(open) => !open && !loading && handleCancel()}>
         <AlertDialogContent className="sm:max-w-sm">
           <AlertDialogHeader>
             <AlertDialogTitle>{title}</AlertDialogTitle>

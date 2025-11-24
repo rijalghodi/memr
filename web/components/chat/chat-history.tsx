@@ -92,29 +92,21 @@ export function ChatHistory({
   onSelectChat: (chatId: string) => void;
   selectedChatId?: string | null;
 }) {
-  const { data: chatsData, isLoading: isLoadingChats } =
-    chatApiHook.useListChats(1, 20);
+  const { data: chatsData, isLoading: isLoadingChats } = chatApiHook.useListChats(1, 20);
 
   const groupedChats = useMemo(
     () => groupChatsByDate(chatsData?.data?.items),
-    [chatsData?.data?.items],
+    [chatsData?.data?.items]
   );
 
   return (
     <>
-      <DropdownMenuLabel className="text-xs font-medium px-4 py-2">
-        Chat History
-      </DropdownMenuLabel>
+      <DropdownMenuLabel className="text-xs font-medium px-4 py-2">Chat History</DropdownMenuLabel>
       <DropdownMenuSeparator />
       {isLoadingChats ? (
-        <div className="px-4 py-2 text-sm text-muted-foreground">
-          Loading...
-        </div>
+        <div className="px-4 py-2 text-sm text-muted-foreground">Loading...</div>
       ) : groupedChats.length > 0 ? (
-        <DropdownMenuRadioGroup
-          value={selectedChatId || undefined}
-          onValueChange={onSelectChat}
-        >
+        <DropdownMenuRadioGroup value={selectedChatId || undefined} onValueChange={onSelectChat}>
           {groupedChats.map((group, groupIndex) => (
             <div key={group.name}>
               {groupIndex > 0 && <DropdownMenuSeparator />}
@@ -122,11 +114,7 @@ export function ChatHistory({
                 {group.name}
               </DropdownMenuLabel>
               {group.chats.map((chat) => (
-                <DropdownMenuRadioItem
-                  value={chat.id}
-                  key={chat.id}
-                  className="px-4 py-2.5"
-                >
+                <DropdownMenuRadioItem value={chat.id} key={chat.id} className="px-4 py-2.5">
                   <div className="space-y-0.5">
                     <p className="text-sm text-foreground line-clamp-1">
                       {chat.firstMessage || "Untitled Chat"}
@@ -145,9 +133,7 @@ export function ChatHistory({
           ))}
         </DropdownMenuRadioGroup>
       ) : (
-        <div className="px-4 py-2 text-sm text-muted-foreground">
-          No chat history
-        </div>
+        <div className="px-4 py-2 text-sm text-muted-foreground">No chat history</div>
       )}
     </>
   );

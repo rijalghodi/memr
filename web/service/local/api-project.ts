@@ -59,7 +59,7 @@ export const projectApi = {
           !unsynced ||
           !project.syncedAt ||
           new Date(project.syncedAt ?? new Date(0)).getTime() <
-            new Date(project.updatedAt).getTime(),
+            new Date(project.updatedAt).getTime()
       )
       .toArray(async (projects) =>
         Promise.all(
@@ -70,8 +70,8 @@ export const projectApi = {
               .equals(project.id)
               .filter((task) => !task.deletedAt)
               .count(),
-          })),
-        ),
+          }))
+        )
       );
     // Sort by specified field (always DESC)
 
@@ -168,15 +168,14 @@ export const useCreateProject = ({
         onSuccess?.(result);
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -227,15 +226,14 @@ export const useUpdateProject = ({
         onSuccess?.(result);
         return result;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };
@@ -257,15 +255,14 @@ export const useDeleteProject = ({
         await projectApi.delete(id);
         onSuccess?.();
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        const errorMessage = error instanceof Error ? error.message : "An error occurred";
         onError?.(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [onSuccess, onError],
+    [onSuccess, onError]
   );
 
   return { mutate, isLoading };

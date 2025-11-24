@@ -21,10 +21,7 @@ function Textarea({
     const scrollHeight = textarea.scrollHeight;
 
     // Calculate line height
-    const lineHeight = parseInt(
-      window.getComputedStyle(textarea).lineHeight,
-      10,
-    );
+    const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
 
     // Calculate max height based on maxRows
     const maxHeight = maxRows ? maxRows * lineHeight : scrollHeight;
@@ -63,7 +60,7 @@ function Textarea({
         "shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed",
         "disabled:opacity-50 md:text-sm",
         "resize-none overflow-hidden",
-        className,
+        className
       )}
       onChange={handleChange}
       {...props}
