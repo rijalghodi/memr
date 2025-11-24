@@ -47,6 +47,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui";
+import { getRandomColor } from "@/lib/color";
 
 export function AppSidebar() {
   const { navigate } = useBrowserNavigate();
@@ -106,12 +107,18 @@ export function SidebarEntityMenus() {
   }, [navigate]);
 
   const handleAddCollection = useCallback(async () => {
-    const collection = await collectionApi.create({});
+    const collection = await collectionApi.create({
+      title: "",
+      color: getRandomColor(),
+    });
     navigate(getRoute(ROUTES.COLLECTION, { collectionId: collection.id }));
   }, [navigate]);
 
   const handleAddProject = useCallback(async () => {
-    const project = await projectApi.create({});
+    const project = await projectApi.create({
+      title: "",
+      color: getRandomColor(),
+    });
     navigate(getRoute(ROUTES.PROJECT, { projectId: project.id }));
   }, [navigate]);
 
@@ -175,7 +182,10 @@ export function SidebarEntityMenus() {
                       size: "sm-compact",
                       variant: "ghost",
                     })}
-                    onClick={item.onAdd}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      item.onAdd?.();
+                    }}
                   >
                     <Plus className="size-3.5" />
                   </div>

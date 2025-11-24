@@ -12,5 +12,6 @@ type Project struct {
 	UpdatedAt   time.Time  `gorm:"default:CURRENT_TIMESTAMP"`
 	DeletedAt   *time.Time `gorm:"index"`
 
-	User *User `gorm:"foreignKey:UserID"`
+	User  *User  `gorm:"foreignKey:UserID"`
+	Tasks []Task `gorm:"foreignKey:ProjectID"`
 }
