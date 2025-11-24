@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { TaskDatePicker } from "./task-date-picker";
-import { TaskProjectSelector } from "./task-project-selector";
+import { TaskProjectPicker } from "./task-project-picker";
 import { TKanbanTask } from "./type";
 
 type Props = {
@@ -64,7 +64,7 @@ export function TaskAdd({ onSubmit }: Props) {
               date && !isToday(new Date(date)) && new Date(date) < new Date()
             }
           />
-          <TaskProjectSelector
+          <TaskProjectPicker
             value={data.projectId}
             onChange={(projectId) => setData({ ...data, projectId })}
           />

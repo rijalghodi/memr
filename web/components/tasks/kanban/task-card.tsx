@@ -1,7 +1,8 @@
 import { isToday } from "date-fns";
-import { CalendarIcon, FolderIcon, MoreVertical, Trash } from "lucide-react";
+import { CalendarIcon, MoreVertical, Trash } from "lucide-react";
 import { useState } from "react";
 
+import { ProjectIcon } from "@/components/projects/project-icon";
 import {
   Button,
   Checkbox,
@@ -18,9 +19,11 @@ import { DatePickerContent } from "@/components/ui/date-picker";
 import { TASK_TITLE_FALLBACK } from "@/lib/constant";
 import { cn } from "@/lib/utils";
 
-import { ProjectPickerContent } from "./project-picker-content";
 import { TaskDatePicker } from "./task-date-picker";
-import { TaskProjectSelector } from "./task-project-selector";
+import {
+  TaskProjectPicker,
+  TaskProjectPickerContent,
+} from "./task-project-picker";
 import type { TKanbanTask } from "./type";
 
 type Props = {
@@ -92,7 +95,7 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
         )}
 
         {task.projectId && (
-          <TaskProjectSelector
+          <TaskProjectPicker
             value={task.projectId}
             onChange={(projectId) =>
               onTaskUpdate?.(task.id, {
@@ -109,7 +112,7 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
           >
             <Button
               variant="secondary"
-              size="icon"
+              size="icon-sm"
               onClick={(e) => e.stopPropagation()}
             >
               <MoreVertical />
@@ -137,14 +140,14 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
             </DropdownMenuSub>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
-                <FolderIcon />
+                <ProjectIcon />
                 Set Project
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
-                  <ProjectPickerContent
+                  <TaskProjectPickerContent
                     value={task.projectId}
-                    onSelect={(projectId) =>
+                    onChange={(projectId) =>
                       onTaskUpdate?.(task.id, {
                         projectId: projectId ?? undefined,
                       })

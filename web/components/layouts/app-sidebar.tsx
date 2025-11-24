@@ -253,15 +253,12 @@ export function ProfileButton() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="cursor-pointer"
-          variant="destructive"
-          onClick={logout}
-        >
+        <DropdownMenuItem className="cursor-pointer" onClick={logout}>
           <LogOutIcon />
           Logout
         </DropdownMenuItem>
-        <DropdownMenuLabel className="text-xs font-normal pt-2 pb-3">
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel className="text-xs font-normal pt-2 pb-2">
           Last synced:{" "}
           {lastSyncTime
             ? formatDate(new Date(lastSyncTime), undefined, {
