@@ -19,15 +19,16 @@ func NewAgentRepository(db *gorm.DB) *AgentRepository {
 	return &AgentRepository{db: db}
 }
 
+// NoteSearchFilters represents filters for note search
+type NoteSearchFilters struct {
+	CollectionID   *string   `json:"collection_id"`
+	QueryEmbedding []float32 `json:"query_embedding"`
+	Limit          int       `json:"limit"`
+}
+
 // SearchNotes performs vector similarity search on notes
 func (r *AgentRepository) SearchNotes(ctx context.Context, userID string, filters NoteSearchFilters) ([]model.Note, error) {
 	var notes []model.Note
-
-	if len(filters.QueryEmbedding) == 0 {
-		return notes, nil
-	}
-
-	queryVector := pgvector.NewVector(filters.QueryEmbedding)
 
 	baseQuery := "SELECT id, user_id, collection_id, title, content, embedding, created_at, updated_at, deleted_at FROM notes WHERE user_id = ? AND deleted_at IS NULL AND embedding IS NOT NULL"
 	args := []interface{}{userID}
@@ -38,9 +39,16 @@ func (r *AgentRepository) SearchNotes(ctx context.Context, userID string, filter
 		args = append(args, *filters.CollectionID)
 	}
 
-	// Similarity ordering and limit
-	baseQuery += " ORDER BY embedding <-> ? LIMIT ?"
-	args = append(args, queryVector, filters.Limit)
+	// Only add similarity ordering if QueryEmbedding is not empty
+	if len(filters.QueryEmbedding) > 0 {
+		queryVector := pgvector.NewVector(filters.QueryEmbedding)
+		baseQuery += " ORDER BY embedding <-> ? LIMIT ?"
+		args = append(args, queryVector, filters.Limit)
+	} else {
+		// No embedding provided, just order by created_at and limit
+		baseQuery += " ORDER BY created_at DESC LIMIT ?"
+		args = append(args, filters.Limit)
+	}
 
 	err := r.db.WithContext(ctx).
 		Raw(baseQuery, args...).
@@ -52,19 +60,20 @@ func (r *AgentRepository) SearchNotes(ctx context.Context, userID string, filter
 	}
 
 	for i := range notes {
-		notes[i].Collection = &model.Collection{
-			Title: notes[i].Collection.Title,
+		if notes[i].CollectionID != nil {
+			var collection model.Collection
+			if err := r.db.WithContext(ctx).
+				Select("id, title").
+				Where("id = ?", notes[i].CollectionID).
+				First(&collection).Error; err == nil {
+				notes[i].Collection = &collection
+			} else {
+				notes[i].Collection = nil
+			}
 		}
 	}
 
 	return notes, nil
-}
-
-// NoteSearchFilters represents filters for note search
-type NoteSearchFilters struct {
-	CollectionID   *string   `json:"collection_id"`
-	QueryEmbedding []float32 `json:"query_embedding"`
-	Limit          int       `json:"limit"`
 }
 
 // SearchTasks performs filtered search on tasks
@@ -129,6 +138,7 @@ func (r *AgentRepository) ListProjects(ctx context.Context, userID string) ([]mo
 
 	err := r.db.WithContext(ctx).
 		Where("user_id = ? AND deleted_at IS NULL", userID).
+		Preload("Tasks").
 		Find(&projects).Error
 
 	if err != nil {
@@ -145,6 +155,7 @@ func (r *AgentRepository) ListCollections(ctx context.Context, userID string) ([
 
 	err := r.db.WithContext(ctx).
 		Where("user_id = ? AND deleted_at IS NULL", userID).
+		Preload("Notes").
 		Find(&collections).Error
 	if err != nil {
 		logger.Log.Error("Failed to list collections", zap.Error(err), zap.String("userID", userID))

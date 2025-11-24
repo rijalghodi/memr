@@ -24,6 +24,20 @@ function preprocessMarkdown(content: string): string {
     (_, uuid) => `[Task](memr://task/${uuid})`
   );
 
+  // Convert [collection=UUID] to markdown links
+  // Pattern: [collection=UUID] -> [Collection](memr://collection/UUID)
+  processed = processed.replace(
+    /\[collection=([a-f0-9-]+)\]/gi,
+    (_, uuid) => `[Collection](memr://collection/${uuid})`
+  );
+
+  // Convert [project=UUID] to markdown links
+  // Pattern: [project=UUID] -> [Project](memr://project/UUID)
+  processed = processed.replace(
+    /\[project=([a-f0-9-]+)\]/gi,
+    (_, uuid) => `[Project](memr://project/${uuid})`
+  );
+
   return processed;
 }
 
