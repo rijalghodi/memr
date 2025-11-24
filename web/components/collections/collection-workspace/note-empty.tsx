@@ -26,9 +26,7 @@ export function NoteEmpty({
         <EmptyMedia>
           <NoteIcon className="text-muted-foreground" />
         </EmptyMedia>
-        <EmptyTitle>
-          {isFiltered ? "No Notes Found" : "No Notes Yet"}
-        </EmptyTitle>
+        <EmptyTitle>{isFiltered ? "No Notes Found" : "No Notes"}</EmptyTitle>
         <EmptyDescription>
           {isFiltered
             ? "No notes found matching your filters."

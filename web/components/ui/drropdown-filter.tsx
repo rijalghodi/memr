@@ -32,6 +32,7 @@ export type DropdownFilterProps = {
   side?: "top" | "bottom" | "left" | "right";
   align?: "start" | "center" | "end";
   emptyContent?: React.ReactNode;
+  placeholder?: string;
 };
 export function DropdownFilter({
   disabled,
@@ -47,17 +48,17 @@ export function DropdownFilter({
   side = "bottom",
   align = "start",
   emptyContent,
+  placeholder,
 }: DropdownFilterProps) {
   const isMobile = useIsMobile();
+
+  const selectedOption = options?.find((option) => option.value === value);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild disabled={disabled}>
         {children ? (
-          children(
-            value ?? "",
-            options?.find((option) => option.value === value)?.label ?? "",
-          )
+          children(value ?? "", selectedOption?.label ?? "")
         ) : (
           <Button
             variant={variant}
@@ -65,7 +66,13 @@ export function DropdownFilter({
             className={className}
           >
             {icon}
-            {options?.find((option) => option.value === value)?.label}
+            {selectedOption ? (
+              selectedOption.label
+            ) : (
+              <span className="text-muted-foreground">
+                {placeholder ?? "Select an option"}
+              </span>
+            )}
             <ChevronDown />
           </Button>
         )}

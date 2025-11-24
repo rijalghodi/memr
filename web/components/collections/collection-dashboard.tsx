@@ -101,10 +101,6 @@ function CollectionSort({ value, onValueChange }: CollectionSortProps) {
           value: "updatedAt",
         },
         {
-          label: "Last Viewed",
-          value: "viewedAt",
-        },
-        {
           label: "Created",
           value: "createdAt",
         },

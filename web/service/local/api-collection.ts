@@ -51,7 +51,7 @@ export const collectionApi = {
     sortBy?: "updatedAt" | "createdAt" | "viewedAt";
     unsynced?: boolean;
   }): Promise<CollectionRes[]> => {
-    const { sortBy, unsynced } = params ?? {};
+    const { sortBy = "updatedAt", unsynced } = params ?? {};
     const collections = await db.collections
       .filter((collection) => !collection.deletedAt)
       .filter(
@@ -183,10 +183,10 @@ export const useGetCollections = (params?: {
   sortBy?: "updatedAt" | "createdAt" | "viewedAt";
   unsynced?: boolean;
 }) => {
-  const { sortBy, unsynced } = params ?? {};
+  const { sortBy = "updatedAt", unsynced } = params ?? {};
   const collections = useLiveQuery(async () => {
     return await collectionApi.getAll({ sortBy, unsynced });
-  }, []);
+  }, [sortBy, unsynced]);
 
   return {
     data: collections ?? [],

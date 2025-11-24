@@ -184,9 +184,10 @@ export const useGetNotes = (params?: {
   sortBy?: "updatedAt" | "createdAt" | "viewedAt";
   unsynced?: boolean;
 }) => {
+  const { collectionId, sortBy = "updatedAt", unsynced } = params ?? {};
   const notes = useLiveQuery(async () => {
-    return await noteApi.getAll(params);
-  }, [params]);
+    return await noteApi.getAll({ collectionId, sortBy, unsynced });
+  }, [collectionId, sortBy, unsynced]);
 
   return {
     data: notes ?? [],

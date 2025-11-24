@@ -47,9 +47,10 @@ export const projectApi = {
   },
 
   getAll: async (params?: {
-    sortBy?: "updatedAt" | "createdAt" | "viewedAt";
+    sortBy?: "updatedAt" | "createdAt";
     unsynced?: boolean;
   }): Promise<ProjectRes[]> => {
+    console.log("params in api project", params);
     const { sortBy, unsynced } = params ?? {};
     const projects = await db.projects
       .filter((project) => !project.deletedAt)
@@ -72,6 +73,9 @@ export const projectApi = {
           })),
         ),
       );
+    // Sort by specified field (always DESC)
+
+    console.log("sortBy in api project", sortBy);
     if (sortBy) {
       projects.sort((a, b) => {
         return (
@@ -179,13 +183,14 @@ export const useCreateProject = ({
 };
 
 export const useGetProjects = (params?: {
-  sortBy?: "updatedAt" | "createdAt" | "viewedAt";
+  sortBy?: "updatedAt" | "createdAt";
   unsynced?: boolean;
 }) => {
-  const { sortBy, unsynced } = params ?? {};
+  const { sortBy = "updatedAt", unsynced } = params ?? {};
   const projects = useLiveQuery(async () => {
+    console.log("params in useGetProjects", sortBy, unsynced);
     return await projectApi.getAll({ sortBy, unsynced });
-  }, []);
+  }, [sortBy, unsynced]);
 
   return {
     data: projects ?? [],

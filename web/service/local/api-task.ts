@@ -199,7 +199,7 @@ export const useGetTasks = (params?: {
   const { projectId, sortBy, unsynced } = params ?? {};
   const tasks = useLiveQuery(async () => {
     return await taskApi.getAll({ projectId, sortBy, unsynced });
-  }, [projectId]);
+  }, [projectId, sortBy, unsynced]);
 
   return {
     data: tasks ?? [],
