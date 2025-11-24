@@ -25,31 +25,40 @@ func NewToolExecutor(openaiClient *openai.OpenAIClient, repo *AgentRepository) *
 
 // SearchNotesTool executes the search_notes tool
 func (e *ToolExecutor) SearchNotesTool(ctx context.Context, userID string, arguments map[string]interface{}) (string, error) {
+	filters := NoteSearchFilters{}
+
 	query, ok := arguments["query"].(string)
 	if !ok || query == "" {
 		return "[]", fmt.Errorf("query parameter is required")
 	}
 
+	// Parse limit
 	limit := 10
-	if limitVal, ok := arguments["limit"].(float64); ok {
-		limit = int(limitVal)
-		if limit > 50 {
-			limit = 50
-		}
-		if limit < 1 {
-			limit = 1
-		}
+	if v, ok := arguments["limit"].(float64); ok {
+		limit = int(v)
+	}
+	if limit > 50 {
+		limit = 50
+	} else if limit < 1 {
+		limit = 1
+	}
+	filters.Limit = limit
+
+	// Parse collection_id
+	if collectionID, ok := arguments["collection_id"].(string); ok && collectionID != "" {
+		filters.CollectionID = &collectionID
 	}
 
 	// Generate embedding for the query
 	embedding, err := e.openaiClient.GenerateEmbedding(ctx, query)
+	filters.QueryEmbedding = embedding
 	if err != nil {
 		logger.Log.Error("Failed to generate embedding for search", zap.Error(err))
-		return "[]", fmt.Errorf("failed to generate embedding: %w", err)
+		return "[]", fmt.Errorf("failed to generate embedding for search: %w", err)
 	}
 
 	// Search notes
-	notes, err := e.repo.SearchNotes(ctx, userID, embedding, limit)
+	notes, err := e.repo.SearchNotes(ctx, userID, filters)
 	if err != nil {
 		logger.Log.Error("Failed to search notes", zap.Error(err))
 		return "[]", fmt.Errorf("failed to search notes: %w", err)
@@ -59,9 +68,11 @@ func (e *ToolExecutor) SearchNotesTool(ctx context.Context, userID string, argum
 	results := make([]map[string]interface{}, 0, len(notes))
 	for _, note := range notes {
 		result := map[string]interface{}{
-			"id":      note.ID,
-			"title":   note.Title,
-			"content": note.Content,
+			"id":               note.ID,
+			"title":            note.Title,
+			"content":          note.Content,
+			"collection_id":    note.CollectionID,
+			"collection_title": note.Collection.Title,
 		}
 		results = append(results, result)
 	}
@@ -125,12 +136,13 @@ func (e *ToolExecutor) SearchTasksTool(ctx context.Context, userID string, argum
 	results := make([]map[string]interface{}, 0, len(tasks))
 	for _, task := range tasks {
 		result := map[string]interface{}{
-			"id":          task.ID,
-			"title":       task.Title,
-			"description": task.Description,
-			"status":      task.Status,
-			"due_date":    nil,
-			"project_id":  task.ProjectID,
+			"id":            task.ID,
+			"title":         task.Title,
+			"description":   task.Description,
+			"status":        task.Status,
+			"due_date":      nil,
+			"project_id":    task.ProjectID,
+			"project_title": task.Project.Title,
 		}
 		if task.DueDate != nil {
 			result["due_date"] = task.DueDate.Format(time.RFC3339)
@@ -143,6 +155,50 @@ func (e *ToolExecutor) SearchTasksTool(ctx context.Context, userID string, argum
 		return "[]", fmt.Errorf("failed to marshal results: %w", err)
 	}
 
+	return string(jsonBytes), nil
+}
+
+// ListCollectionsTool executes the list_collections tool
+func (e *ToolExecutor) ListCollectionsTool(ctx context.Context, userID string) (string, error) {
+	collections, err := e.repo.ListCollections(ctx, userID)
+	if err != nil {
+		logger.Log.Error("Failed to list collections", zap.Error(err))
+		return "[]", fmt.Errorf("failed to list collections: %w", err)
+	}
+	results := make([]map[string]interface{}, 0, len(collections))
+	for _, collection := range collections {
+		result := map[string]interface{}{
+			"id":    collection.ID,
+			"title": collection.Title,
+		}
+		results = append(results, result)
+	}
+	jsonBytes, err := json.Marshal(results)
+	if err != nil {
+		return "[]", fmt.Errorf("failed to marshal results: %w", err)
+	}
+	return string(jsonBytes), nil
+}
+
+// ListProjectsTool executes the list_projects tool
+func (e *ToolExecutor) ListProjectsTool(ctx context.Context, userID string) (string, error) {
+	projects, err := e.repo.ListProjects(ctx, userID)
+	if err != nil {
+		logger.Log.Error("Failed to list projects", zap.Error(err))
+		return "[]", fmt.Errorf("failed to list projects: %w", err)
+	}
+	results := make([]map[string]interface{}, 0, len(projects))
+	for _, project := range projects {
+		result := map[string]interface{}{
+			"id":    project.ID,
+			"title": project.Title,
+		}
+		results = append(results, result)
+	}
+	jsonBytes, err := json.Marshal(results)
+	if err != nil {
+		return "[]", fmt.Errorf("failed to marshal results: %w", err)
+	}
 	return string(jsonBytes), nil
 }
 
@@ -166,6 +222,10 @@ func GetToolDefinitions() []openai.ChatTool {
 							"description": "Maximum number of results to return (1-50, default: 10)",
 							"minimum":     1,
 							"maximum":     50,
+						},
+						"collection_id": map[string]interface{}{
+							"type":        "string",
+							"description": "Filter notes by collection ID (UUID)",
 						},
 					},
 					"required": []string{"query"},
@@ -202,6 +262,20 @@ func GetToolDefinitions() []openai.ChatTool {
 						},
 					},
 				},
+			},
+		},
+		{
+			Type: "function",
+			Function: openai.ChatToolFunction{
+				Name:        "list_collections",
+				Description: "List all note collections for the user.",
+			},
+		},
+		{
+			Type: "function",
+			Function: openai.ChatToolFunction{
+				Name:        "list_projects",
+				Description: "List all task projects for the user.",
 			},
 		},
 	}

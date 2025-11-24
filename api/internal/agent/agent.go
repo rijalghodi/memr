@@ -66,6 +66,10 @@ func (a *Agent) ProcessMessage(ctx context.Context, userID string, systemPrompt 
 				toolResult, toolErr = a.toolExecutor.SearchNotesTool(ctx, userID, arguments)
 			case "search_tasks":
 				toolResult, toolErr = a.toolExecutor.SearchTasksTool(ctx, userID, arguments)
+			case "list_collections":
+				toolResult, toolErr = a.toolExecutor.ListCollectionsTool(ctx, userID)
+			case "list_projects":
+				toolResult, toolErr = a.toolExecutor.ListProjectsTool(ctx, userID)
 			default:
 				toolErr = fmt.Errorf("unknown tool: %s", toolName)
 			}
@@ -149,6 +153,10 @@ func (a *Agent) ProcessMessageStream(ctx context.Context, userID string, systemP
 				toolResult, toolErr = a.toolExecutor.SearchNotesTool(ctx, userID, arguments)
 			case "search_tasks":
 				toolResult, toolErr = a.toolExecutor.SearchTasksTool(ctx, userID, arguments)
+			case "list_collections":
+				toolResult, toolErr = a.toolExecutor.ListCollectionsTool(ctx, userID)
+			case "list_projects":
+				toolResult, toolErr = a.toolExecutor.ListProjectsTool(ctx, userID)
 			default:
 				toolErr = fmt.Errorf("unknown tool: %s", toolName)
 			}
