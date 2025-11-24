@@ -4,7 +4,7 @@ export const BRAND = {
   SITE_NAME: "Memr, AI-powered second brain",
   APP_NAME: "Memr",
   APP_TAGLINE: "AI-powered second brain",
-  OG_IMAGE_URL: `https://memr-ai.app/opengraph-image.png`,
+  OG_IMAGE_URL: `https://memr-ai.vercel.app/opengraph-image.png`,
   SITE_DESCRIPTION:
     "Memr is an AI-powered second brain that captures your notes, organizes your projects, and manages your tasks automatically. It connects ideas, generates structure, and keeps everything searchable so you can focus on thinking, not organizing.",
   KEYWORDS: [
