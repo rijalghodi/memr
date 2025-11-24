@@ -10,16 +10,16 @@ import {
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { SESSION_TABS_KEY } from "@/lib/constant";
+
 export type SessionTab = {
   pathname: string;
 };
 
-const STORAGE_KEY = "memr.sessionTabs";
-
 function loadTabsFromStorage(): SessionTab[] {
   if (typeof window === "undefined") return [];
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(SESSION_TABS_KEY);
     if (!stored) return [];
     return JSON.parse(stored) as SessionTab[];
   } catch {
@@ -30,7 +30,7 @@ function loadTabsFromStorage(): SessionTab[] {
 function saveTabsToStorage(tabs: SessionTab[]): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tabs));
+    localStorage.setItem(SESSION_TABS_KEY, JSON.stringify(tabs));
   } catch {
     // Ignore storage errors
   }

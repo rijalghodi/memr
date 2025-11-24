@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { SYNC_INTERVAL } from "@/lib/constant";
 import type { Change } from "@/service/api-sync";
@@ -94,7 +94,7 @@ export function useAutoSync() {
     },
   });
 
-  const performSync = async () => {
+  const performSync = useCallback(async () => {
     console.log("useAutoSync useEffect");
     try {
       setIsSyncing(true);
@@ -185,7 +185,7 @@ export function useAutoSync() {
     } catch (error) {
       console.error("Error during sync:", error);
     }
-  };
+  }, [pushChanges, lastSyncTime]);
 
   useEffect(() => {
     intervalRef.current = setInterval(performSync, SYNC_INTERVAL);
@@ -195,7 +195,7 @@ export function useAutoSync() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [pushChanges]);
+  }, [performSync]);
 
   return {
     isSyncing,

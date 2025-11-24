@@ -1,5 +1,5 @@
 import { RefreshCcw } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { ChatWidget } from "../chat/chat-widget";
 import { useAutoSync } from "../sync/use-auto-sync";
@@ -12,6 +12,13 @@ type Props = {
 
 export function Main({ children }: Props) {
   const { isSyncing, sync } = useAutoSync();
+
+  useEffect(() => {
+    // Sync on first load
+    sync();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
