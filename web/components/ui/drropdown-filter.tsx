@@ -8,6 +8,7 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
@@ -30,6 +31,7 @@ export type DropdownFilterProps = {
   ) => React.ReactNode;
   side?: "top" | "bottom" | "left" | "right";
   align?: "start" | "center" | "end";
+  emptyContent?: React.ReactNode;
 };
 export function DropdownFilter({
   disabled,
@@ -44,6 +46,7 @@ export function DropdownFilter({
   children,
   side = "bottom",
   align = "start",
+  emptyContent,
 }: DropdownFilterProps) {
   const isMobile = useIsMobile();
 
@@ -72,6 +75,8 @@ export function DropdownFilter({
           <div className="flex items-center justify-center p-4">
             <Spinner />
           </div>
+        ) : !options || options.length === 0 ? (
+          <DropdownMenuLabel>{emptyContent ?? "No options"}</DropdownMenuLabel>
         ) : (
           <DropdownMenuRadioGroup
             value={value}

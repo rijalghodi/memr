@@ -40,6 +40,14 @@ export const ProjectPickerContent = ({
     );
   }
 
+  if (projects?.length === 0) {
+    return (
+      <div className="p-4 text-sm text-muted-foreground">
+        You have no projects
+      </div>
+    );
+  }
+
   return (
     <DropdownMenuRadioGroup value={value} onValueChange={handleSelect}>
       {value && (
