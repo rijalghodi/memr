@@ -64,9 +64,5 @@ function AvatarFallback({
 export { Avatar, AvatarFallback, AvatarImage };
 
 const getInitials = (name: string) => {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join("");
+  return name.charAt(0).toUpperCase();
 };

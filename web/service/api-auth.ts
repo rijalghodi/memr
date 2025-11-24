@@ -43,14 +43,12 @@ export type RefreshTokenRes = {
 };
 
 export type UserRes = {
-  image?: {
-    url: string;
-  };
-  createdAt: string;
-  email: string;
   id: string;
-  isVerified: boolean;
+  email: string;
   name: string;
+  googleImage?: string;
+  isVerified: boolean;
+  createdAt: string;
   updatedAt: string;
 };
 

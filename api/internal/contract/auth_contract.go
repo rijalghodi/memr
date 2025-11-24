@@ -1,12 +1,13 @@
 package contract
 
 type UserRes struct {
-	ID         string `json:"id"`
-	Email      string `json:"email"`
-	Name       string `json:"name"`
-	IsVerified bool   `json:"isVerified"`
-	CreatedAt  string `json:"createdAt"`
-	UpdatedAt  string `json:"updatedAt"`
+	ID          string `json:"id"`
+	Email       string `json:"email"`
+	Name        string `json:"name"`
+	GoogleImage string `json:"googleImage"`
+	IsVerified  bool   `json:"isVerified"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
 }
 
 type TokenRes struct {

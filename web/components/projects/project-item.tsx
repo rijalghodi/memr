@@ -4,6 +4,7 @@ import { MoreHorizontal, Trash } from "lucide-react";
 import { useState } from "react";
 
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
+import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { truncateString } from "@/lib/string";
 import { cn } from "@/lib/utils";
@@ -19,7 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { ProjectIcon } from "./project-icon";
-import { formatDate } from "@/lib/date";
 
 type Props = {
   id: string;
@@ -75,7 +75,7 @@ export function ProjectItem({
     <li
       className={cn(
         "px-6 group hover:bg-muted cursor-pointer group/project-item transition-colors border-b border-b-muted group-last:border-b-0",
-        isDropdownOpen && "bg-muted"
+        isDropdownOpen && "bg-muted",
       )}
       onClick={handleClick}
     >
@@ -102,7 +102,7 @@ export function ProjectItem({
           <div
             className={cn(
               "text-xs group-hover/project-item:hidden fade-in duration-100",
-              isDropdownOpen && "hidden"
+              isDropdownOpen && "hidden",
             )}
           >
             {formatDate(new Date(updatedAt))}
@@ -110,7 +110,7 @@ export function ProjectItem({
           <div
             className={cn(
               "group-hover/project-item:block hidden",
-              isDropdownOpen && "block"
+              isDropdownOpen && "block",
             )}
           >
             <DropdownMenu
@@ -133,7 +133,7 @@ export function ProjectItem({
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
                   "group-hover/project-item:block hidden w-[120px]",
-                  isDropdownOpen && "block"
+                  isDropdownOpen && "block",
                 )}
               >
                 <DropdownMenuItem
