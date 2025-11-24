@@ -25,10 +25,10 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md text-xs gap-1.5 px-3 has-[>svg]:px-2.5 [&_svg:not([class*='size-'])]:size-3.5",
+        sm: "h-8 rounded-sm text-xs gap-1.5 px-3 has-[>svg]:px-2.5 [&_svg:not([class*='size-'])]:size-3.5",
         "sm-compact":
           "text-xs px-1 h-6.5 min-w-6.5 leading-none rounded-sm [&_svg:not([class*='size-'])]:size-3.5",
-        xs: "h-7 rounded-md text-xs gap-1.5 px-3 has-[>svg]:px-2.5 [&_svg:not([class*='size-'])]:size-3",
+        xs: "h-7 rounded-xs text-xs gap-1.5 px-3 has-[>svg]:px-2.5 [&_svg:not([class*='size-'])]:size-3",
         lg: "h-11 rounded-md text-base px-6 has-[>svg]:px-4 [&_svg:not([class*='size-'])]:size-5",
         icon: "size-9",
         "icon-sm": "size-8 rounded-sm [&_svg:not([class*='size-'])]:size-3.5",
@@ -39,7 +39,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  },
+  }
 );
 
 type ButtonProps = React.ComponentProps<"button"> &
