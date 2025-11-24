@@ -36,11 +36,16 @@ export const extensions = [
   Placeholder.configure({
     emptyNodeClass: "is-editor-empty",
     placeholder: ({ node }) => {
+      console.log("node.type.name", node.type.name);
       switch (node.type.name) {
         case "heading":
           return `Heading ${node.attrs.level}`;
-        case "detailsSummary":
-          return "Section title";
+        case "orderedList":
+          return "List";
+        case "bulletList":
+          return "List";
+        case "blockquote":
+          return "Blockquote";
         case "codeBlock":
           // never show the placeholder when editing code
           return "";
@@ -49,6 +54,7 @@ export const extensions = [
       }
     },
     includeChildren: false,
+    emptyEditorClass: "is-editor-empty",
   }),
   TextAlign.configure({
     types: ["heading", "paragraph"],
