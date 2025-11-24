@@ -13,7 +13,6 @@ import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
 import { ProjectEmpty } from "./project-empty";
 import { ProjectItem } from "./project-item";
-import { ProjectLoading } from "./project-loading";
 
 type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
@@ -69,9 +68,7 @@ export function ProjectDashboard() {
       </Collapsible>
       {/* Content */}
       <div data-slot="content" className="pb-6">
-        {isLoading ? (
-          <ProjectLoading />
-        ) : projects.length === 0 ? (
+        {isLoading ? null : projects.length === 0 ? (
           <ProjectEmpty onAddProject={handleAddProject} />
         ) : (
           <ul className="flex flex-col">
@@ -96,7 +93,7 @@ function ProjectSort({ value, onValueChange }: ProjectSortProps) {
       variant="secondary"
       className="rounded-full px-4"
       value={value}
-      onValueChange={onValueChange}
+      onValueChange={(value) => onValueChange(value as SortByValue)}
       icon={<ArrowDownUp />}
       options={[
         {

@@ -13,7 +13,6 @@ import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
 import { GroupItem, TaskKanban } from "./kanban/task-kanban";
 import { TKanbanTask } from "./kanban/type";
-import { TaskLoading } from "./task-loading";
 
 const statusGroupItems: GroupItem[] = [
   {
@@ -93,9 +92,7 @@ export function TaskDashboard() {
 
       {/* Content */}
       <div data-slot="content" className="flex-1 min-h-0">
-        {isLoading ? (
-          <TaskLoading />
-        ) : (
+        {isLoading ? null : (
           <TaskKanban
             tasks={tasks}
             onTaskAdd={handleTaskAdd}

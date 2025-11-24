@@ -177,7 +177,7 @@ export function NoteItem({
                     <CollectionIcon className="size-4" />
                     Set Collection
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
+                  <DropdownMenuSubContent className="w-56">
                     <NoteCollectionPickerContent
                       value={collectionId}
                       onChange={handleChangeCollection}

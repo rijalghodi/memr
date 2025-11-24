@@ -13,7 +13,6 @@ import { DropdownFilter } from "../ui/drropdown-filter";
 import { ScrollArea } from "../ui/scroll-area";
 import { NoteEmpty } from "./note-empty";
 import { NoteItem } from "./note-item";
-import { NoteLoading } from "./note-loading";
 
 type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
@@ -93,9 +92,7 @@ export function NoteDashboard() {
 
       {/* Content */}
       <ScrollArea className="pb-6 flex-1 min-h-0">
-        {isLoading ? (
-          <NoteLoading />
-        ) : notes.length === 0 ? (
+        {isLoading ? null : notes.length === 0 ? (
           <NoteEmpty
             onAddNote={handleAddNote}
             onResetFilters={handleResetFilters}

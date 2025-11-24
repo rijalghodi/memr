@@ -13,7 +13,6 @@ import {
 
 import { GroupItem, TaskKanban } from "../tasks/kanban/task-kanban";
 import { TKanbanTask } from "../tasks/kanban/type";
-import { TaskLoading } from "../tasks/task-loading";
 import { Collapsible, CollapsibleContent } from "../ui";
 import { ProjectIcon } from "./project-icon";
 
@@ -142,9 +141,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
 
       {/* Content */}
       <div data-slot="content" className="flex-1 overflow-hidden h-full">
-        {isLoading ? (
-          <TaskLoading />
-        ) : (
+        {isLoading ? null : (
           <TaskKanban
             tasks={tasks}
             onTaskAdd={handleTaskAdd}
