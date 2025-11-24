@@ -3,6 +3,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 
 export function TaskLoading() {
+  return null;
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
       <div className="flex gap-0 h-full flex-1 px-6 overflow-x-auto">

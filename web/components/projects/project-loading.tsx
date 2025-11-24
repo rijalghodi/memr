@@ -1,6 +1,7 @@
 import { Skeleton } from "../ui/skeleton";
 
 export function ProjectLoading() {
+  return null;
   return (
     <ul className="flex flex-col">
       {Array.from({ length: 4 }).map((_, index) => (

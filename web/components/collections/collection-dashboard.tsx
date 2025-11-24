@@ -16,7 +16,6 @@ import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
 import { CollectionEmpty } from "./collection-empty";
 import { CollectionItem } from "./collection-item";
-import { CollectionLoading } from "./collection-loading";
 
 type SortByValue = "updatedAt" | "viewedAt" | "createdAt";
 
@@ -69,9 +68,7 @@ export function CollectionDashboard() {
       </Collapsible>
       {/* Content */}
       <div data-slot="content" className="pb-6">
-        {isLoading ? (
-          <CollectionLoading />
-        ) : collections.length === 0 ? (
+        {isLoading ? null : collections.length === 0 ? (
           <CollectionEmpty onAddCollection={handleAddCollection} />
         ) : (
           <ul className="flex flex-col">
@@ -87,7 +84,7 @@ export function CollectionDashboard() {
 
 type CollectionSortProps = {
   value: SortByValue;
-  onValueChange: (value: SortByValue) => void;
+  onValueChange: (value: string) => void;
 };
 
 function CollectionSort({ value, onValueChange }: CollectionSortProps) {
@@ -96,7 +93,7 @@ function CollectionSort({ value, onValueChange }: CollectionSortProps) {
       variant="secondary"
       className="rounded-full px-4"
       value={value}
-      onValueChange={onValueChange}
+      onValueChange={(value) => onValueChange(value as SortByValue)}
       icon={<ArrowDownUp />}
       options={[
         {
