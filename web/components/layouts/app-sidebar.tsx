@@ -18,6 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useLogout } from "@/hooks/use-logout";
+import { getRandomColor } from "@/lib/color";
 import {
   COLLECTION_TITLE_FALLBACK,
   NOTE_TITLE_FALLBACK,
@@ -47,7 +48,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui";
-import { getRandomColor } from "@/lib/color";
 
 export function AppSidebar() {
   const { navigate } = useBrowserNavigate();
