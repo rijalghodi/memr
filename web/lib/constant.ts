@@ -1,5 +1,9 @@
+// Auth cookie keys
 export const ACCESS_TOKEN_KEY = "memr.access-token";
 export const REFRESH_TOKEN_KEY = "memr.refresh-token";
+
+// Local storage keys
+export const SESSION_TABS_KEY = "memr.session-tabs";
 
 export const SYNC_INTERVAL = import.meta.env.VITE_SYNC_INTERVAL
   ? parseInt(import.meta.env.VITE_SYNC_INTERVAL)
