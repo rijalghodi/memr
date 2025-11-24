@@ -17,8 +17,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Spinner } from "@/components/ui/spinner";
+import { getRandomColor } from "@/lib/color";
 import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
-import { getRandomColor } from "@/lib/random-color";
 import { cn } from "@/lib/utils";
 import { useCreateProject, useGetProjects } from "@/service/local/api-project";
 
@@ -96,7 +96,7 @@ export const TaskProjectPickerContent = ({
       onClose?.();
       setSearch("");
     },
-    [onChange, onClose]
+    [onChange, onClose],
   );
 
   const { mutate: createProject, isLoading: isCreating } = useCreateProject({
@@ -112,7 +112,7 @@ export const TaskProjectPickerContent = ({
       projects?.filter((project) =>
         (project.title || PROJECT_TITLE_FALLBACK)
           .toLowerCase()
-          .includes(searchLower)
+          .includes(searchLower),
       ) ?? []
     );
   }, [projects, search]);
@@ -175,7 +175,7 @@ export const TaskProjectPickerContent = ({
                     <Check
                       className={cn(
                         "ml-auto size-4",
-                        value === project.id ? "opacity-100" : "opacity-0"
+                        value === project.id ? "opacity-100" : "opacity-0",
                       )}
                     />
                   </CommandItem>

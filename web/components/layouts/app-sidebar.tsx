@@ -152,7 +152,7 @@ export function SidebarEntityMenus() {
           })) ?? [],
       },
     ],
-    [notes, collections, projects],
+    [notes, collections, projects]
   );
 
   const { navigate } = useBrowserNavigate();
