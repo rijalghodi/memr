@@ -2,7 +2,7 @@
 
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import { ArrowLeftFromLine, ArrowRightFromLine, PanelLeftIcon, PanelRightIcon } from "lucide-react";
+import { ArrowLeftFromLine, ArrowRightFromLine } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
