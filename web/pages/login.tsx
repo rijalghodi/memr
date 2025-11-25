@@ -9,14 +9,14 @@ export function LoginPage() {
 
       {/* Centered content */}
       <div className="flex-1 flex items-center justify-center px-6">
-        <div className="w-full max-w-md space-y-8 text-center">
+        <div className="w-full max-w-md space-y-12 text-center">
           {/* Heading */}
           <div className="space-y-2">
             <div className="flex justify-center mb-4">
-              <img src="/logo.png" alt={BRAND.APP_NAME} width={150} height={60} />
+              <img src="/logo-long.png" alt={BRAND.APP_NAME} width={200} height={200} />
             </div>
             {/* Gradient heading from var(--brand-1) to var(--brand-2) */}
-            <h1 className="text-3xl font-semibold bg-linear-to-r from-brand-1 to-brand-2 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-semibold bg-linear-to-r from-brand-1 to-brand-2 bg-clip-text text-transparent">
               {BRAND.APP_TAGLINE}
             </h1>
           </div>
