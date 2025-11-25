@@ -15,21 +15,44 @@ export function LoginPage() {
             <div className="flex justify-center mb-4">
               <img src="/logo.png" alt={BRAND.APP_NAME} width={150} height={60} />
             </div>
-            <h1 className="text-2xl font-semibold text-foreground">{BRAND.APP_TAGLINE}</h1>
-            <p className="text-lg text-muted-foreground">Log in to your Memr account</p>
+            {/* Gradient heading from var(--brand-1) to var(--brand-2) */}
+            <h1 className="text-3xl font-semibold bg-linear-to-r from-brand-1 to-brand-2 bg-clip-text text-transparent">
+              {BRAND.APP_TAGLINE}
+            </h1>
           </div>
 
-          {/* Google Login Button */}
-          <Button
-            variant="outline-primary"
-            size="lg"
-            className="px-10! rounded-full"
-            type="button"
-            onClick={loginWithGoogle}
-          >
-            <IconGoogle size={20} />
-            Continue with Google
-          </Button>
+          <div className="space-y-4">
+            <p className="text-base">Log in to your Memr account</p>
+            {/* Google Login Button */}
+            <Button
+              variant="outline-primary"
+              size="lg"
+              className="px-10! rounded-full"
+              type="button"
+              onClick={loginWithGoogle}
+            >
+              <IconGoogle size={20} />
+              Continue with Google
+            </Button>
+          </div>
+
+          {/* Background gradient */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed right-0 top-0 z-0 translate-x-full sm:translate-x-1/2 -translate-y-1/2 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80"
+            style={{
+              background: "radial-gradient(circle at center, var(--brand-1) 0%, transparent 70%)",
+              filter: "blur(100px) drop-shadow(0 0 100px var(--brand-1))",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed left-0 bottom-0 z-0 -translate-x-full sm:-translate-x-1/2 translate-y-1/2 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80"
+            style={{
+              background: "radial-gradient(circle at center, var(--brand-2) 0%, transparent 70%)",
+              filter: "blur(100px) drop-shadow(0 0 100px var(--brand-2))",
+            }}
+          />
         </div>
       </div>
     </div>
