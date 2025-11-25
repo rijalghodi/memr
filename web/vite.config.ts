@@ -15,4 +15,7 @@ export default defineConfig({
   server: {
     port: parseInt(process.env.PORT || "3000", 10),
   },
+  esbuild: {
+    drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
+  },
 });
