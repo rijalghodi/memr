@@ -9,14 +9,20 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar-memr";
 import { useLogout } from "@/hooks/use-logout";
 import { getRandomColor } from "@/lib/color";
 import {
@@ -48,6 +54,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui";
+import { cn } from "@/lib/utils";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 
 export function AppSidebar() {
   const { navigate } = useBrowserNavigate();
@@ -65,23 +73,43 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="px-4 py-3 flex flex-col gap-0">
+      <SidebarHeader className="pt-3 flex flex-col gap-0">
         <ProfileButton />
-        <SidebarMenuButton size="default" onClick={handleAddNote}>
-          <SquarePen />
-          Add Note
-        </SidebarMenuButton>
-        <SidebarMenuButton asChild size="default">
-          <Link to={ROUTES.TASKS}>
-            <SquareCheckBig />
-            Todo
-          </Link>
-        </SidebarMenuButton>
       </SidebarHeader>
-      <SidebarContent className="px-4">
-        <SidebarEntityMenus />
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton size="default" onClick={handleAddNote}>
+                  <SquarePen />
+                  Add Note
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild size="default">
+                  <Link to={ROUTES.TASKS}>
+                    <SquareCheckBig />
+                    Todo
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarEntityMenus />
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem className="flex justify-end items-center">
+            <SidebarTrigger className="rounded-full" />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
@@ -100,6 +128,7 @@ export function SidebarEntityMenus() {
   const { data: notes } = useGetNotes({ sortBy: "updatedAt" });
   const { data: collections } = useGetCollections({ sortBy: "updatedAt" });
   const { data: projects } = useGetProjects({ sortBy: "updatedAt" });
+  const { open, setOpen } = useSidebar();
 
   const handleAddNote = useCallback(async () => {
     const note = await noteApi.create({});
@@ -168,68 +197,124 @@ export function SidebarEntityMenus() {
   );
 
   return (
-    <SidebarMenu className="gap-5">
+    <div className="space-y-3">
       {items.map((item, idx) => {
         return (
-          <Collapsible asChild key={`${idx}-entity-menu-collapsible`}>
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton size="sm" className="font-semibold group">
-                  <ChevronDown className="size-3 group-data-[state=open]:-rotate-180 transform transition-transform duration-200 ease-in-out" />
-                  <span className="truncate">{item.title}</span>
-                  <div
-                    className={buttonVariants({
-                      size: "sm-compact",
-                      variant: "ghost",
-                    })}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      item.onAdd?.();
-                    }}
+          <SidebarMenu key={`${idx}-entity-menu`}>
+            <Collapsible asChild key={`${idx}-entity-menu-collapsible`}>
+              <HoverCard openDelay={300} closeDelay={300}>
+                <SidebarMenuItem>
+                  {/* TRIGGERS */}
+                  <CollapsibleTrigger asChild>
+                    <HoverCardTrigger asChild>
+                      <SidebarMenuButton size="sm" className="font-semibold group/entity-menu">
+                        {open ? (
+                          <ChevronDown className="size-3 group-data-[state=open]/entity-menu:-rotate-180 transform transition-transform duration-200 ease-in-out" />
+                        ) : (
+                          item.icon
+                        )}
+                        <span className="truncate">{item.title}</span>
+                        <SidebarMenuAction
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            item.onAdd?.();
+                          }}
+                        >
+                          <Plus className="size-3.5" />
+                        </SidebarMenuAction>
+                      </SidebarMenuButton>
+                    </HoverCardTrigger>
+                  </CollapsibleTrigger>
+
+                  {/* COLLAPSIBLE CONTENT */}
+                  <CollapsibleContent className={cn(open ? "block" : "hidden")}>
+                    <SidebarMenuSub>
+                      {item.submenu?.length === 0 ? (
+                        <div className="text-xs text-muted-foreground flex items-center h-12 px-6">
+                          No {item.title.toLowerCase()}
+                        </div>
+                      ) : (
+                        <>
+                          {item.submenu?.map((subitem, idx) => {
+                            return (
+                              <SidebarMenuSubItem key={`${idx}-entity-menu-sub-item`}>
+                                <SidebarMenuSubButton
+                                  size="sm"
+                                  onClick={() => navigate(subitem.href)}
+                                >
+                                  {subitem.icon}
+                                  {subitem.title || NOTE_TITLE_FALLBACK}
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            );
+                          })}
+                        </>
+                      )}
+                      {item.seeAllHref && (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            size="sm"
+                            className="font-semibold w-fit"
+                            onClick={() => navigate(item.seeAllHref!)}
+                          >
+                            See All
+                            <ArrowRight />
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+
+                  {/* HOVER CARD CONTENT */}
+                  <HoverCardContent
+                    side="right"
+                    align="start"
+                    className={cn(open ? "hidden" : "block")}
                   >
-                    <Plus className="size-3.5" />
-                  </div>
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.submenu?.length === 0 ? (
-                    <div className="text-xs text-muted-foreground flex items-center h-12 px-6">
-                      No {item.title.toLowerCase()}
-                    </div>
-                  ) : (
-                    <>
-                      {item.submenu?.map((subitem, idx) => {
-                        return (
-                          <SidebarMenuSubItem key={`${idx}-entity-menu-sub-item`}>
-                            <SidebarMenuSubButton size="sm" onClick={() => navigate(subitem.href)}>
-                              {subitem.icon}
-                              {subitem.title || NOTE_TITLE_FALLBACK}
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        );
-                      })}
-                    </>
-                  )}
-                  {item.seeAllHref && (
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton
-                        size="sm"
-                        className="font-semibold w-fit"
-                        onClick={() => navigate(item.seeAllHref!)}
-                      >
-                        See All
-                        <ArrowRight />
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  )}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
+                    <SidebarGroupLabel>Recent {item.title}</SidebarGroupLabel>
+                    <SidebarMenuSub>
+                      {item.submenu?.length === 0 ? (
+                        <div className="text-xs text-muted-foreground flex items-center h-12 px-6">
+                          No {item.title.toLowerCase()}
+                        </div>
+                      ) : (
+                        <>
+                          {item.submenu?.map((subitem, idx) => {
+                            return (
+                              <SidebarMenuSubItem key={`${idx}-entity-menu-sub-item`}>
+                                <SidebarMenuSubButton
+                                  size="sm"
+                                  onClick={() => navigate(subitem.href)}
+                                >
+                                  {subitem.icon}
+                                  {subitem.title || NOTE_TITLE_FALLBACK}
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            );
+                          })}
+                        </>
+                      )}
+                      {item.seeAllHref && (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            size="sm"
+                            className="font-semibold w-fit"
+                            onClick={() => navigate(item.seeAllHref!)}
+                          >
+                            See All
+                            <ArrowRight />
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
+                    </SidebarMenuSub>
+                  </HoverCardContent>
+                </SidebarMenuItem>
+              </HoverCard>
+            </Collapsible>
+          </SidebarMenu>
         );
       })}
-    </SidebarMenu>
+    </div>
   );
 }
 
@@ -242,42 +327,46 @@ export function ProfileButton() {
   const userEmail = user?.data?.email || "";
   const userImage = user?.data?.googleImage;
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild className="data-[state=open]:bg-sidebar-accent">
-        <SidebarMenuButton size="default" className="mb-2">
-          <Avatar className="size-6">
-            <AvatarImage src={userImage} />
-            <AvatarFallback>{userName}</AvatarFallback>
-          </Avatar>
-          <span>{userName}</span>
-        </SidebarMenuButton>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[240px] rounded-lg" align="start">
-        <DropdownMenuLabel className="flex items-center gap-2">
-          <Avatar className="size-6">
-            <AvatarImage src={userImage} />
-            <AvatarFallback>{userName}</AvatarFallback>
-          </Avatar>
-          <div className="space-y-0.5">
-            <div className="text-xs font-medium">{userName}</div>
-            <div className="text-xs text-muted-foreground">{userEmail}</div>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer" onClick={logout}>
-          <LogOutIcon />
-          Logout
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs font-normal pt-2 pb-2">
-          Last synced:{" "}
-          {lastSyncTime
-            ? formatDate(new Date(lastSyncTime), undefined, {
-                includeTime: true,
-              })
-            : "Never"}
-        </DropdownMenuLabel>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild className="data-[state=open]:bg-sidebar-accent">
+            <SidebarMenuButton size="default">
+              <Avatar className="size-6">
+                <AvatarImage src={userImage} />
+                <AvatarFallback>{userName}</AvatarFallback>
+              </Avatar>
+              <span>{userName}</span>
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[240px] rounded-lg" align="start">
+            <DropdownMenuLabel className="flex items-center gap-2">
+              <Avatar className="size-6">
+                <AvatarImage src={userImage} />
+                <AvatarFallback>{userName}</AvatarFallback>
+              </Avatar>
+              <div className="space-y-0.5">
+                <div className="text-xs font-medium">{userName}</div>
+                <div className="text-xs text-muted-foreground">{userEmail}</div>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+              <LogOutIcon />
+              Logout
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs font-normal pt-2 pb-2">
+              Last synced:{" "}
+              {lastSyncTime
+                ? formatDate(new Date(lastSyncTime), undefined, {
+                    includeTime: true,
+                  })
+                : "Never"}
+            </DropdownMenuLabel>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 }
