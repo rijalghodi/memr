@@ -48,7 +48,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton size="default" onClick={handleAddNote}>
                   <SquarePen />
-                  Add Note
+                  Create Note
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
