@@ -64,7 +64,10 @@ export function CollectionDashboard() {
         </div>
       </Collapsible>
       {/* Content */}
-      <div data-slot="content" className="pb-6">
+      <div
+        data-slot="content"
+        className="pb-6 animate-in fade-in slide-in-from-bottom-3 duration-500"
+      >
         {isLoading ? null : collections.length === 0 ? (
           <CollectionEmpty onAddCollection={handleAddCollection} />
         ) : (
