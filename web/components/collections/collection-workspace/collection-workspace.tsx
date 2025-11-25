@@ -124,7 +124,10 @@ export function CollectionWorkspace({ collectionId }: { collectionId: string }) 
       </Collapsible>
 
       {/* Content */}
-      <div data-slot="content" className="pb-6">
+      <div
+        data-slot="content"
+        className="pb-6 animate-in fade-in slide-in-from-bottom-3 duration-500"
+      >
         {isLoadingNotes ? null : notes.length === 0 ? (
           <NoteEmpty
             isFiltered={isFiltered}

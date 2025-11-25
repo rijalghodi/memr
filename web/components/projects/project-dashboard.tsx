@@ -69,7 +69,10 @@ export function ProjectDashboard() {
         </div>
       </Collapsible>
       {/* Content */}
-      <div data-slot="content" className="pb-6">
+      <div
+        data-slot="content"
+        className="pb-6 animate-in fade-in slide-in-from-bottom-3 duration-500"
+      >
         {isLoading ? null : projects.length === 0 ? (
           <ProjectEmpty onAddProject={handleAddProject} />
         ) : (

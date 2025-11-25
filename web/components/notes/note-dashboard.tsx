@@ -83,7 +83,7 @@ export function NoteDashboard() {
       </Collapsible>
 
       {/* Content */}
-      <ScrollArea className="pb-6 flex-1 min-h-0">
+      <ScrollArea className="pb-6 flex-1 min-h-0 animate-in fade-in slide-in-from-bottom-3 duration-500">
         {isLoading ? null : notes.length === 0 ? (
           <NoteEmpty
             onAddNote={handleAddNote}

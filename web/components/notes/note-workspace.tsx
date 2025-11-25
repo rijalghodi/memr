@@ -42,7 +42,7 @@ export function NoteWorkspace({ noteId }: Props) {
         <NoteCollectionPicker noteId={noteId} collectionId={note.collectionId} />
       </div>
       <ScrollArea className="flex-1 min-h-0">
-        <div className="transition-all duration-500 animate-in fade-in slide-in-from-bottom-3">
+        <div className="duration-500 animate-in fade-in slide-in-from-bottom-3">
           <RichTextEditor value={note.content} onChange={handleContentChange} />
         </div>
       </ScrollArea>
