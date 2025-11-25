@@ -4,7 +4,7 @@ import { BRAND } from "@/lib/brand";
 
 export function LoginPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-sidebar">
+    <div className="min-h-screen flex flex-col">
       {/* Logo in top left corner */}
 
       {/* Centered content */}
@@ -36,10 +36,10 @@ export function LoginPage() {
             </Button>
           </div>
 
-          {/* Background gradient */}
+          {/* Background gradient with infinite up and down animation */}
           <div
             aria-hidden="true"
-            className="pointer-events-none fixed right-0 top-0 z-0 translate-x-full sm:translate-x-1/2 -translate-y-1/2 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80"
+            className="pointer-events-none fixed right-0 top-0 z-0 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80 animate-blob-1"
             style={{
               background: "radial-gradient(circle at center, var(--brand-1) 0%, transparent 70%)",
               filter: "blur(100px) drop-shadow(0 0 100px var(--brand-1))",
@@ -47,7 +47,7 @@ export function LoginPage() {
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none fixed left-0 bottom-0 z-0 -translate-x-full sm:-translate-x-1/2 translate-y-1/2 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80"
+            className="pointer-events-none fixed left-0 bottom-0 z-0 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80 animate-blob-2"
             style={{
               background: "radial-gradient(circle at center, var(--brand-2) 0%, transparent 70%)",
               filter: "blur(100px) drop-shadow(0 0 100px var(--brand-2))",

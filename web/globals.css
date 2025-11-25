@@ -225,6 +225,75 @@
   }
 }
 
+@keyframes bounceY1 {
+  0% {
+    transform: translate(100%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(100%, -50%) translateY(60px);
+  }
+  100% {
+    transform: translate(100%, -50%) translateY(0);
+  }
+}
+
+@keyframes bounceY1-sm {
+  0% {
+    transform: translate(50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(50%, -50%) translateY(60px);
+  }
+  100% {
+    transform: translate(50%, -50%) translateY(0);
+  }
+}
+
+@keyframes bounceY2 {
+  0% {
+    transform: translate(-100%, 50%) translateY(0);
+  }
+  50% {
+    transform: translate(-100%, 50%) translateY(-60px);
+  }
+  100% {
+    transform: translate(-100%, 50%) translateY(0);
+  }
+}
+
+@keyframes bounceY2-sm {
+  0% {
+    transform: translate(-50%, 50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, 50%) translateY(-60px);
+  }
+  100% {
+    transform: translate(-50%, 50%) translateY(0);
+  }
+}
+
+/* Blob animation classes */
+.animate-blob-1 {
+  animation: bounceY1 6s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+  .animate-blob-1 {
+    animation: bounceY1-sm 6s ease-in-out infinite;
+  }
+}
+
+.animate-blob-2 {
+  animation: bounceY2 6s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+  .animate-blob-2 {
+    animation: bounceY2-sm 6s ease-in-out infinite;
+  }
+}
+
 /* Animation classes */
 .animate-accordion-down {
   animation: accordion-down 0.2s ease-out;

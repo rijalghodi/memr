@@ -9,7 +9,7 @@ Manage project, todo, and resources in single app.
 - Next.js
 - Go Fiber
 - PostgreSQL
-- Object Storage: Cloudflare R2
+- IndexDB
 - REST API
 - Open AI
 
