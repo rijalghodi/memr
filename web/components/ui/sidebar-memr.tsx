@@ -6,7 +6,6 @@ import { ArrowLeftFromLine, ArrowRightFromLine } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -16,7 +15,6 @@ import { cn } from "@/lib/utils";
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "15rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3.5rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
@@ -134,7 +132,7 @@ function SidebarProvider({
 }
 
 function Sidebar({ className, children, ...props }: React.ComponentProps<"div">) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const { state } = useSidebar();
 
   return (
     <div
@@ -221,17 +219,6 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
     <main
       data-slot="sidebar-inset"
       className={cn("relative flex flex-1 flex-col overflow-auto", className)}
-      {...props}
-    />
-  );
-}
-
-function SidebarInput({ className, ...props }: React.ComponentProps<typeof Input>) {
-  return (
-    <Input
-      data-slot="sidebar-input"
-      data-sidebar="input"
-      className={cn("bg-background h-8 w-full shadow-none", className)}
       {...props}
     />
   );
