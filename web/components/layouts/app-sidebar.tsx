@@ -32,6 +32,7 @@ import {
 } from "@/lib/constant";
 import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
+import { cn } from "@/lib/utils";
 import { useGetCurrentUser } from "@/service/api-auth";
 import { collectionApi, useGetCollections } from "@/service/local/api-collection";
 import { noteApi, noteApiHook, useGetNotes } from "@/service/local/api-note";
@@ -46,7 +47,6 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  buttonVariants,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -54,7 +54,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui";
-import { cn } from "@/lib/utils";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 
 export function AppSidebar() {
@@ -183,7 +182,7 @@ export function SidebarEntityMenus() {
         title: "Projects",
         href: ROUTES.PROJECTS,
         seeAllHref: ROUTES.PROJECTS,
-        icon: <ProjectIcon />,
+        icon: <ProjectIcon className="size-4" />,
         onAdd: handleAddProject,
         submenu:
           projects?.slice(0, 5).map((project) => ({
