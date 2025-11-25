@@ -139,7 +139,7 @@ export function SidebarEntityMenus() {
                             item.onAdd?.();
                           }}
                         >
-                          <Plus className="size-3.5" />
+                          <Plus className="size-3" />
                         </SidebarMenuAction>
                       </SidebarMenuButton>
                     </HoverCardTrigger>
