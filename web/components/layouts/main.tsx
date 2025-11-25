@@ -5,6 +5,7 @@ import { ChatWidget } from "../chat/chat-widget";
 import { useAutoSync } from "../sync/use-auto-sync";
 import { Button } from "../ui";
 import { SessionTabs } from "./session-tabs";
+import MobileMenu from "./sidebar/mobile-menu";
 
 type Props = {
   children: React.ReactNode;
@@ -23,7 +24,11 @@ export function Main({ children }: Props) {
     <div className="flex flex-col h-screen">
       {/* Header */}
       <div className="h-11 flex items-center justify-between px-4">
-        <div />
+        <div>
+          <div className="block md:hidden">
+            <MobileMenu />
+          </div>
+        </div>
 
         <img src="/logo-long.png" alt="logo" width={80} height={24} />
 
