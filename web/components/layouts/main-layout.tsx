@@ -80,7 +80,7 @@ export function MainLayout({ children }: Props) {
         <div className="relative h-full w-full">
           <Button
             onClick={() => setIsChatOpen(false)}
-            className="absolute bg-background border -top-2 right-1 sm:-right-2 z-10 h-8 w-8 rounded-full shadow-lg"
+            className="absolute bg-background border -top-2 right-1 z-10 h-8 w-8 rounded-full shadow-lg"
             size="icon"
             variant="secondary"
           >
