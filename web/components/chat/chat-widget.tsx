@@ -175,21 +175,21 @@ export const ChatWidget = () => {
   }, [messages]);
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden rounded-xl border bg-background shadow-sm">
+    <div className="flex h-full w-full flex-col overflow-hidden rounded-t-xl bg-background shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-2">
+      <div className="flex items-center justify-between bg-muted/50 px-4 py-2">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-sm">Chat</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={handleResetChat}>
+          <Button variant="ghost" size="icon" onClick={handleResetChat} title="New Chat">
             <Plus />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" title="Chat History">
                 <History />
               </Button>
             </DropdownMenuTrigger>
