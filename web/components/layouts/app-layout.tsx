@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 
 import { AuthGuard } from "@/components/layouts/auth-guard";
-import { Main } from "@/components/layouts/main";
+import { MainLayout } from "@/components/layouts/main-layout";
 import { AppSidebar } from "@/components/layouts/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar-memr";
 
@@ -13,9 +13,9 @@ export function AppLayout() {
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset className="h-screen bg-sidebar">
-            <Main>
+            <MainLayout>
               <Outlet />
-            </Main>
+            </MainLayout>
           </SidebarInset>
         </SidebarProvider>
       </div>

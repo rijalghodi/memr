@@ -1,5 +1,5 @@
-import { RefreshCcw } from "lucide-react";
-import React, { useEffect } from "react";
+import { Bot, RefreshCcw, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 import { ChatWidget } from "../chat/chat-widget";
 import { useAutoSync } from "../sync/use-auto-sync";
@@ -11,8 +11,9 @@ type Props = {
   children: React.ReactNode;
 };
 
-export function Main({ children }: Props) {
+export function MainLayout({ children }: Props) {
   const { isSyncing, sync } = useAutoSync();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     // Sync on first load
@@ -48,10 +49,38 @@ export function Main({ children }: Props) {
           <div className="flex-1 min-h-0">{children}</div>
         </div>
 
-        <div className="bg-background rounded-t-2xl w-[380px]">
+        <div className="bg-background rounded-t-2xl w-[380px] hidden lg:block">
           <ChatWidget />
         </div>
       </div>
+
+      {/* Floating Chat Button - Only visible on smaller screens */}
+      {!isChatOpen && (
+        <Button
+          onClick={() => setIsChatOpen(true)}
+          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg lg:hidden"
+          size="icon"
+        >
+          <Bot className="size-6" />
+        </Button>
+      )}
+
+      {/* Floating Chat Widget - Bottom right corner */}
+      {isChatOpen && (
+        <div className="fixed bottom-4 right-4 z-50 w-[calc(100vw-2rem)] max-w-[380px] h-[600px] max-h-[calc(100vh-8rem)] lg:hidden rounded-xl shadow-2xl">
+          <div className="relative h-full w-full">
+            <Button
+              onClick={() => setIsChatOpen(false)}
+              className="absolute -top-2 -right-2 z-10 h-8 w-8 rounded-full shadow-lg"
+              size="icon"
+              variant="secondary"
+            >
+              <X className="size-4" />
+            </Button>
+            <ChatWidget />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
