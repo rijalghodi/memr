@@ -38,7 +38,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="pt-3 flex flex-col gap-0">
+      <SidebarHeader className="flex flex-col gap-0">
         <ProfileButton />
       </SidebarHeader>
       <SidebarContent>
