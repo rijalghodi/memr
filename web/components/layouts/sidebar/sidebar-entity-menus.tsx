@@ -1,18 +1,11 @@
 "use client";
 
-import { ArrowRight, ChevronDown, LogOutIcon, Plus, SquareCheckBig, SquarePen } from "lucide-react";
+import { ArrowRight, ChevronDown, Plus } from "lucide-react";
 import { JSX, useCallback, useMemo } from "react";
-import { Link } from "react-router-dom";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
@@ -20,100 +13,27 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar-memr";
-import { useLogout } from "@/hooks/use-logout";
 import { getRandomColor } from "@/lib/color";
 import {
   COLLECTION_TITLE_FALLBACK,
   NOTE_TITLE_FALLBACK,
   PROJECT_TITLE_FALLBACK,
 } from "@/lib/constant";
-import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import { useGetCurrentUser } from "@/service/api-auth";
 import { collectionApi, useGetCollections } from "@/service/local/api-collection";
-import { noteApi, noteApiHook, useGetNotes } from "@/service/local/api-note";
+import { noteApi, useGetNotes } from "@/service/local/api-note";
 import { projectApi, useGetProjects } from "@/service/local/api-project";
-import { useGetSetting } from "@/service/local/api-setting";
 
-import { useBrowserNavigate } from "../browser-navigation";
-import { CollectionIcon } from "../collections/collection-icon";
-import { NoteIcon } from "../notes/note-icon";
-import { ProjectIcon } from "../projects/project-icon";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
+import { useBrowserNavigate } from "../../browser-navigation";
+import { CollectionIcon } from "../../collections/collection-icon";
+import { NoteIcon } from "../../notes/note-icon";
+import { ProjectIcon } from "../../projects/project-icon";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../../ui/hover-card";
 
-export function AppSidebar() {
-  const { navigate } = useBrowserNavigate();
-
-  // handle add button
-  const { mutate: createNote } = noteApiHook.useCreateNote({
-    onSuccess: (data) => {
-      navigate(getRoute(ROUTES.NOTE, { noteId: data.id }));
-    },
-  });
-
-  const handleAddNote = () => {
-    createNote({});
-  };
-
-  return (
-    <Sidebar>
-      <SidebarHeader className="pt-3 flex flex-col gap-0">
-        <ProfileButton />
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton size="default" onClick={handleAddNote}>
-                  <SquarePen />
-                  Add Note
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild size="default">
-                  <Link to={ROUTES.TASKS}>
-                    <SquareCheckBig />
-                    Todo
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarEntityMenus />
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem className="flex justify-end items-center">
-            <SidebarTrigger className="rounded-full" />
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
-  );
-}
-
-type TEntityMenu = {
+export type TEntityMenu = {
   title: string;
   href: string;
   icon?: JSX.Element;
@@ -127,7 +47,7 @@ export function SidebarEntityMenus() {
   const { data: notes } = useGetNotes({ sortBy: "updatedAt" });
   const { data: collections } = useGetCollections({ sortBy: "updatedAt" });
   const { data: projects } = useGetProjects({ sortBy: "updatedAt" });
-  const { open, setOpen } = useSidebar();
+  const { open } = useSidebar();
 
   const handleAddNote = useCallback(async () => {
     const note = await noteApi.create({});
@@ -208,7 +128,7 @@ export function SidebarEntityMenus() {
                     <HoverCardTrigger asChild>
                       <SidebarMenuButton size="sm" className="font-semibold group/entity-menu">
                         {open ? (
-                          <ChevronDown className="size-3 group-data-[state=open]/entity-menu:-rotate-180 transform transition-transform duration-200 ease-in-out" />
+                          <ChevronDown className="size-3 group-data-[state=open]/entity-menu:-rotate-180 transition-all" />
                         ) : (
                           item.icon
                         )}
@@ -314,58 +234,5 @@ export function SidebarEntityMenus() {
         );
       })}
     </div>
-  );
-}
-
-export function ProfileButton() {
-  const { data: lastSyncTimeSetting } = useGetSetting("lastSyncTime");
-  const { logout } = useLogout();
-  const lastSyncTime = lastSyncTimeSetting?.value as string | undefined;
-  const { data: user } = useGetCurrentUser();
-  const userName = user?.data?.name || "User";
-  const userEmail = user?.data?.email || "";
-  const userImage = user?.data?.googleImage;
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild className="data-[state=open]:bg-sidebar-accent">
-            <SidebarMenuButton size="default">
-              <Avatar className="size-6">
-                <AvatarImage src={userImage} />
-                <AvatarFallback>{userName}</AvatarFallback>
-              </Avatar>
-              <span>{userName}</span>
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[240px] rounded-lg" align="start">
-            <DropdownMenuLabel className="flex items-center gap-2">
-              <Avatar className="size-6">
-                <AvatarImage src={userImage} />
-                <AvatarFallback>{userName}</AvatarFallback>
-              </Avatar>
-              <div className="space-y-0.5">
-                <div className="text-xs font-medium">{userName}</div>
-                <div className="text-xs text-muted-foreground">{userEmail}</div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={logout}>
-              <LogOutIcon />
-              Logout
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs font-normal pt-2 pb-2">
-              Last synced:{" "}
-              {lastSyncTime
-                ? formatDate(new Date(lastSyncTime), undefined, {
-                    includeTime: true,
-                  })
-                : "Never"}
-            </DropdownMenuLabel>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
   );
 }
