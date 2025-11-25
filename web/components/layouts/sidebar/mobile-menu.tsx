@@ -1,7 +1,15 @@
 "use client";
 
-import { ArrowRight, ChevronDown, LogOutIcon, Plus, SquareCheckBig, SquarePen } from "lucide-react";
-import { JSX, useCallback, useMemo } from "react";
+import {
+  ArrowRight,
+  ChevronDown,
+  ChevronRight,
+  LogOutIcon,
+  Plus,
+  SquareCheckBig,
+  SquarePen,
+} from "lucide-react";
+import { JSX, useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -14,6 +22,7 @@ import {
 } from "@/lib/constant";
 import { formatDate } from "@/lib/date";
 import { getRoute, ROUTES } from "@/lib/routes";
+import { cn } from "@/lib/utils";
 import { useGetCurrentUser } from "@/service/api-auth";
 import { collectionApi, useGetCollections } from "@/service/local/api-collection";
 import { noteApi, noteApiHook, useGetNotes } from "@/service/local/api-note";
@@ -46,6 +55,8 @@ export default function MobileMenu() {
   const userName = user?.data?.name || "User";
   const userEmail = user?.data?.email || "";
   const userImage = user?.data?.googleImage;
+
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="data-[state=open]:bg-sidebar-accent">
@@ -56,35 +67,54 @@ export default function MobileMenu() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-screen rounded-lg md:hidden" align="start">
+      <DropdownMenuContent
+        className="w-screen rounded-lg md:hidden border-none h-screen"
+        align="start"
+      >
         <DropdownMenuLabel className="flex items-center gap-2">
           <Avatar className="size-6">
             <AvatarImage src={userImage} />
             <AvatarFallback>{userName}</AvatarFallback>
           </Avatar>
-          <div className="space-y-0.5">
+          <div className="space-y-0.5 flex-1">
             <div className="text-xs font-medium">{userName}</div>
             <div className="text-xs text-muted-foreground">{userEmail}</div>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+          >
+            <ChevronRight
+              className={cn("size-4 transition-transform", profileMenuOpen ? "rotate-180" : "")}
+            />
+          </Button>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <MobileEntityShortcutMenu />
-        <DropdownMenuSeparator />
-        <MobileEntityMenus />
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer" onClick={logout}>
-          <LogOutIcon />
-          Logout
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs font-normal pt-2 pb-2">
-          Last synced:{" "}
-          {lastSyncTime
-            ? formatDate(new Date(lastSyncTime), undefined, {
-                includeTime: true,
-              })
-            : "Never"}
-        </DropdownMenuLabel>
+        {profileMenuOpen ? (
+          <>
+            <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+              <LogOutIcon />
+              Logout
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs font-normal pt-2 pb-2">
+              Last synced:{" "}
+              {lastSyncTime
+                ? formatDate(new Date(lastSyncTime), undefined, {
+                    includeTime: true,
+                  })
+                : "Never"}
+            </DropdownMenuLabel>
+          </>
+        ) : (
+          <>
+            <MobileEntityShortcutMenu />
+            <DropdownMenuSeparator />
+            <MobileEntityMenus />
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -203,7 +233,7 @@ function MobileEntityMenus() {
   return (
     <DropdownMenuGroup>
       {items.map((item, itemIdx) => (
-        <Collapsible key={item.title} defaultOpen={false}>
+        <Collapsible key={item.title} defaultOpen={true}>
           {/* Main category item with collapsible trigger */}
           <CollapsibleTrigger asChild>
             <Button variant="ghost" className="group/entity-menu w-full font-normal">
@@ -236,16 +266,16 @@ function MobileEntityMenus() {
                     {subitem.title || NOTE_TITLE_FALLBACK}
                   </DropdownMenuItem>
                 ))}
-                {item.seeAllHref && (
-                  <DropdownMenuItem inset onClick={() => navigate(item.seeAllHref!)}>
-                    See All
-                    <ArrowRight className="ml-auto" />
-                  </DropdownMenuItem>
-                )}
               </>
             ) : (
               <DropdownMenuItem inset disabled>
                 <span className="text-xs text-muted-foreground">No {item.title.toLowerCase()}</span>
+              </DropdownMenuItem>
+            )}
+            {item.seeAllHref && (
+              <DropdownMenuItem inset onClick={() => navigate(item.seeAllHref!)}>
+                See All
+                <ArrowRight className="ml-auto" />
               </DropdownMenuItem>
             )}
           </CollapsibleContent>
