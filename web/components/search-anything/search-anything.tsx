@@ -170,100 +170,104 @@ export function SearchAnything({ open, onOpenChange }: Props) {
             </DialogClose>
           </div>
         </DialogHeader>
-        <div className="flex flex-col h-full bg-background">
+        <div className="flex flex-col flex-1 min-h-0 bg-background">
           {/* Content Area */}
-          <div className="flex-1 grid min-h-0 max-w-7xl mx-auto grid-cols-1 lg:grid-cols-[1fr_500px] gap-0 w-full">
+          <div className="flex-1 grid min-h-0 max-w-7xl mx-auto grid-cols-1 lg:grid-cols-[1fr_500px] gap-4 w-full">
             {/* Notes List */}
-            <ScrollArea className="h-full min-w-0">
-              <div className="px-6 py-6 w-full">
-                {isLoading ? (
-                  <div className="text-center text-muted-foreground py-12">Loading...</div>
-                ) : groupedNotes.length === 0 ? (
-                  <div className="text-center text-muted-foreground py-12">
-                    {searchQuery ? "No notes found" : "No notes"}
-                  </div>
-                ) : (
-                  <div className="space-y-8">
-                    {groupedNotes.map((group) => (
-                      <div key={group.name} className="space-y-3">
-                        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                          {group.name}
-                        </h2>
-                        <div className="space-y-1">
-                          {group.notes.map((note) => {
-                            const displayTitle = note.title || NOTE_TITLE_FALLBACK;
-                            const displayContent = note.content
-                              ? markdownToText(note.content, 200)
-                              : NOTE_CONTENT_EXCERPT_FALLBACK;
-                            const noteCollection = collections?.find(
-                              (c) => c.id === note.collectionId
-                            );
-                            const isHovered = hoveredNoteId === note.id;
+            <div className="min-h-0 h-full">
+              <ScrollArea className="h-full">
+                <div className="px-6 py-6 w-full">
+                  {isLoading ? (
+                    <div className="text-center text-muted-foreground py-12">Loading...</div>
+                  ) : groupedNotes.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-12">
+                      {searchQuery ? "No notes found" : "No notes"}
+                    </div>
+                  ) : (
+                    <div className="space-y-8">
+                      {groupedNotes.map((group) => (
+                        <div key={group.name} className="space-y-3">
+                          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            {group.name}
+                          </h2>
+                          <div className="space-y-1">
+                            {group.notes.map((note) => {
+                              const displayTitle = note.title || NOTE_TITLE_FALLBACK;
+                              const displayContent = note.content
+                                ? markdownToText(note.content, 200)
+                                : NOTE_CONTENT_EXCERPT_FALLBACK;
+                              const noteCollection = collections?.find(
+                                (c) => c.id === note.collectionId
+                              );
+                              const isHovered = hoveredNoteId === note.id;
 
-                            return (
-                              <div
-                                key={note.id}
-                                className={cn(
-                                  "px-4 py-3 rounded-lg cursor-pointer transition-colors flex items-start gap-3",
-                                  isHovered ? "bg-muted" : "hover:bg-muted/50"
-                                )}
-                                onMouseEnter={() => setHoveredNoteId(note.id)}
-                                onClick={() => handleNoteClick(note.id)}
-                              >
-                                <FileText className="size-4 text-muted-foreground mt-0.5 shrink-0" />
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="text-base font-medium line-clamp-1">
-                                      {displayTitle}
-                                    </h3>
-                                    {noteCollection && (
-                                      <div
-                                        className="text-xs px-1.5 py-0.5 rounded-sm inline-flex items-center gap-1 shrink-0"
-                                        style={getCssColorStyle(noteCollection?.color ?? "")}
-                                      >
-                                        <CollectionIcon className="size-3" />
-                                        {noteCollection?.title}
-                                      </div>
-                                    )}
+                              return (
+                                <div
+                                  key={note.id}
+                                  className={cn(
+                                    "px-4 py-3 rounded-lg cursor-pointer transition-colors flex items-start gap-3",
+                                    isHovered ? "bg-muted" : "hover:bg-muted/50"
+                                  )}
+                                  onMouseEnter={() => setHoveredNoteId(note.id)}
+                                  onClick={() => handleNoteClick(note.id)}
+                                >
+                                  <FileText className="size-4 text-muted-foreground mt-0.5 shrink-0" />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <h3 className="text-base font-medium line-clamp-1">
+                                        {displayTitle}
+                                      </h3>
+                                      {noteCollection && (
+                                        <div
+                                          className="text-xs px-1.5 py-0.5 rounded-sm inline-flex items-center gap-1 shrink-0"
+                                          style={getCssColorStyle(noteCollection?.color ?? "")}
+                                        >
+                                          <CollectionIcon className="size-3" />
+                                          {noteCollection?.title}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <p className="text-sm text-muted-foreground line-clamp-1">
+                                      {displayContent}
+                                    </p>
                                   </div>
-                                  <p className="text-sm text-muted-foreground line-clamp-1">
-                                    {displayContent}
-                                  </p>
+                                  <div className="text-xs text-muted-foreground shrink-0 ml-2">
+                                    {formatDate(new Date(note.updatedAt), undefined, {
+                                      includeTime: false,
+                                    })}
+                                  </div>
                                 </div>
-                                <div className="text-xs text-muted-foreground shrink-0 ml-2">
-                                  {formatDate(new Date(note.updatedAt), undefined, {
-                                    includeTime: false,
-                                  })}
-                                </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
 
             {/* Note Preview Panel */}
             {hoveredNote && (
               <div
-                className="py-6 lg:block hidden"
+                className="py-6 lg:flex hidden min-h-0 h-full flex-col"
                 onMouseEnter={() => setHoveredNoteId(hoveredNote.id)}
               >
-                <div className="w-full bg-muted p-6 overflow-y-auto rounded-lg">
-                  <div className="space-y-4">
-                    <div className="prose prose-sm max-w-none">
-                      <p className="text-sm text-foreground whitespace-pre-wrap">
-                        {hoveredNote.content ? (
-                          <MarkdownViewer content={hoveredNote.content} />
-                        ) : (
-                          NOTE_CONTENT_EXCERPT_FALLBACK
-                        )}
-                      </p>
+                <div className="w-full flex-1 min-h-0 bg-muted rounded-lg">
+                  <ScrollArea className="h-full">
+                    <div className="p-6 space-y-4">
+                      <div className="prose prose-sm max-w-none">
+                        <p className="text-sm text-foreground whitespace-pre-wrap">
+                          {hoveredNote.content ? (
+                            <MarkdownViewer content={hoveredNote.content} />
+                          ) : (
+                            NOTE_CONTENT_EXCERPT_FALLBACK
+                          )}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </ScrollArea>
                 </div>
               </div>
             )}
