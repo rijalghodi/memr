@@ -21,7 +21,7 @@ export function NoteDashboard() {
   const [sortBy, setSortBy] = useState<SortByValue | undefined>();
   const [collectionId, setCollectionId] = useState<string | undefined>();
   const { navigate } = useBrowserNavigate();
-  const { data: notes, isLoading } = useGetNotes({ sortBy });
+  const { data: notes, isLoading } = useGetNotes({ sortBy, collectionId });
 
   const handleSortChange = React.useCallback((value: string) => {
     setSortBy(value as SortByValue);
