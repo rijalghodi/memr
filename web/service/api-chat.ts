@@ -198,6 +198,8 @@ export const useListChats = (
   return useQuery({
     queryKey: [LIST_CHATS_KEY, page, limit],
     queryFn: () => chatApi.listChats(page, limit),
+    staleTime: 0,
+    gcTime: 0,
   });
 };
 

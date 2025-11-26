@@ -52,7 +52,7 @@ export function NoteItem({ id, title, content = "", collectionId, updatedAt }: P
     },
   });
 
-  const { mutate: updateNote, isLoading: isUpdating } = useUpdateNote({
+  const { mutate: updateNote } = useUpdateNote({
     onSuccess: () => {
       // Note updated successfully
     },
