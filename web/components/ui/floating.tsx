@@ -93,18 +93,23 @@ function FloatingTrigger({
 function FloatingContent({
   className,
   sideOffset = 0,
+  position = "bottom-right",
   ...props
 }: React.ComponentProps<"div"> & {
   sideOffset?: number;
+  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
 }) {
   const { open } = useFloatingContext();
-
   return (
     <div
       data-slot="floating-content"
       data-state={open ? "open" : "closed"}
       className={cn(
-        "fixed bottom-0 inset-x-0 z-50 w-screen max-w-5xl h-screen lg:max-h-[calc(100svh-2.75rem)] lg:hidden rounded-xl shadow-2xl",
+        position === "bottom-right" && "fixed bottom-0 right-0 z-50",
+        position === "bottom-left" && "fixed bottom-0 left-0 z-50",
+        position === "top-right" && "fixed top-0 right-0 z-50",
+        position === "top-left" && "fixed top-0 left-0 z-50",
+        "rounded-xl shadow-2xl",
         "data-[state=open]:opacity-100 data-[state=open]:scale-100 data-[state=open]:pointer-events-auto",
         "data-[state=closed]:opacity-0 data-[state=closed]:scale-95 data-[state=closed]:pointer-events-none",
         "transition-all duration-300",
