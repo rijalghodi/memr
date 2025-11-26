@@ -1,11 +1,9 @@
-import { Bot, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
-
-import { cn } from "@/lib/utils";
+import { Bot } from "lucide-react";
+import React, { useEffect } from "react";
 
 import { ChatWidget } from "../chat/chat-widget";
 import { useAutoSync } from "../sync/use-auto-sync";
-import { Button } from "../ui";
+import { Button, Floating, FloatingContent, FloatingTrigger, useFloating } from "../ui";
 import { SessionTabs } from "./session-tabs";
 import MobileMenu from "./sidebar/mobile-menu";
 
@@ -13,9 +11,18 @@ type Props = {
   children: React.ReactNode;
 };
 
+function FloatingChatWidget() {
+  const { close } = useFloating();
+
+  return (
+    <div className="relative h-full w-full">
+      <ChatWidget withBackButton={true} onBackButtonClick={close} />
+    </div>
+  );
+}
+
 export function MainLayout({ children }: Props) {
   const { sync } = useAutoSync();
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     // Sync on first load
@@ -56,39 +63,20 @@ export function MainLayout({ children }: Props) {
         </div>
       </div>
 
-      {/* Floating Chat Button - Only visible on smaller screens */}
-      {!isChatOpen && (
-        <Button
-          onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg lg:hidden"
-          size="icon"
-        >
-          <Bot className="size-6" />
-        </Button>
-      )}
-
-      {/* Floating Chat Widget - Bottom right corner */}
-      <div
-        data-state={isChatOpen ? "open" : "closed"}
-        className={cn(
-          "fixed bottom-0 inset-x-0 z-50 w-screen max-w-screen-lg h-screen max-h-[calc(100vh-2.75rem)] lg:hidden rounded-xl shadow-2xl",
-          "data-[state=open]:opacity-100 data-[state=open]:scale-100 data-[state=open]:pointer-events-auto",
-          "data-[state=closed]:opacity-0 data-[state=closed]:scale-95 data-[state=closed]:pointer-events-none",
-          "transition-all duration-300"
-        )}
-      >
-        <div className="relative h-full w-full">
+      {/* Floating Chat - Only visible on smaller screens */}
+      <Floating>
+        <FloatingTrigger asChild>
           <Button
-            onClick={() => setIsChatOpen(false)}
-            className="absolute bg-background border -top-2 right-1 z-10 h-8 w-8 rounded-full shadow-lg"
+            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg lg:hidden"
             size="icon"
-            variant="secondary"
           >
-            <X className="size-4" />
+            <Bot className="size-6" />
           </Button>
-          <ChatWidget />
-        </div>
-      </div>
+        </FloatingTrigger>
+        <FloatingContent>
+          <FloatingChatWidget />
+        </FloatingContent>
+      </Floating>
     </div>
   );
 }
