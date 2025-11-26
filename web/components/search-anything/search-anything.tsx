@@ -1,6 +1,6 @@
 "use client";
 
-import { differenceInDays, isYesterday, startOfWeek } from "date-fns";
+import { differenceInDays, isToday, isYesterday, startOfWeek } from "date-fns";
 import { FileText, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -15,14 +15,24 @@ import { type NoteRes, useGetNotes } from "@/service/local/api-note";
 
 import { useBrowserNavigate } from "../browser-navigation";
 import { CollectionIcon } from "../collections/collection-icon";
-import { Dialog, DialogClose, DialogContent } from "../ui/dialog";
+import { MarkdownViewer } from "../ui/ai/markdown-viewer";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 
 const GROUP_NAMES = {
-  YESTERDAY: "YESTERDAY",
-  EARLIER_THIS_WEEK: "EARLIER THIS WEEK",
-  LAST_WEEK: "LAST WEEK",
-  OLDER: "OLDER",
+  TODAY: "Today",
+  YESTERDAY: "Yesterday",
+  EARLIER_THIS_WEEK: "Earlier This Week",
+  LAST_WEEK: "Last Week",
+  OLDER: "Older",
+  INVALID: "Invalid",
 } as const;
 
 type GroupedNote = {
@@ -30,78 +40,67 @@ type GroupedNote = {
   notes: NoteRes[];
 };
 
-function groupNotesByDate(notes: NoteRes[] | undefined): GroupedNote[] {
-  const now = new Date();
-  const yesterday: NoteRes[] = [];
-  const earlierThisWeek: NoteRes[] = [];
-  const lastWeek: NoteRes[] = [];
-  const older: NoteRes[] = [];
+function getNoteGroup(updatedAt: Date, now: Date): (typeof GROUP_NAMES)[keyof typeof GROUP_NAMES] {
+  if (isToday(updatedAt)) return GROUP_NAMES.TODAY;
+  if (isYesterday(updatedAt)) return GROUP_NAMES.YESTERDAY;
 
-  if (!notes) {
-    return [];
+  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+  const daysDiff = differenceInDays(now, updatedAt);
+
+  if (updatedAt >= weekStart && updatedAt < now && daysDiff >= 2) {
+    return GROUP_NAMES.EARLIER_THIS_WEEK;
   }
 
-  const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday
   const lastWeekStart = new Date(weekStart);
   lastWeekStart.setDate(lastWeekStart.getDate() - 7);
   const lastWeekEnd = new Date(weekStart);
   lastWeekEnd.setDate(lastWeekEnd.getDate() - 1);
 
+  if (updatedAt >= lastWeekStart && updatedAt <= lastWeekEnd) {
+    return GROUP_NAMES.LAST_WEEK;
+  }
+
+  if (daysDiff > 7) return GROUP_NAMES.OLDER;
+  return GROUP_NAMES.INVALID;
+}
+
+function groupNotesByDate(notes: NoteRes[] | undefined): GroupedNote[] {
+  if (!notes) return [];
+
+  const now = new Date();
+  const groups = new Map<string, NoteRes[]>();
+
   for (const note of notes) {
     try {
       const updatedAt = new Date(note.updatedAt);
+      const groupName = isNaN(updatedAt.getTime())
+        ? GROUP_NAMES.INVALID
+        : getNoteGroup(updatedAt, now);
 
-      // Check for invalid date (future dates)
-      if (isNaN(updatedAt.getTime())) {
-        continue;
+      if (!groups.has(groupName)) {
+        groups.set(groupName, []);
       }
-
-      // Check if yesterday
-      if (isYesterday(updatedAt)) {
-        yesterday.push(note);
-        continue;
-      }
-
-      const daysDiff = differenceInDays(now, updatedAt);
-
-      // Check if earlier this week (from start of week to day before yesterday)
-      if (updatedAt >= weekStart && updatedAt < now && daysDiff >= 2) {
-        earlierThisWeek.push(note);
-        continue;
-      }
-
-      // Check if last week (between last week start and end)
-      if (updatedAt >= lastWeekStart && updatedAt <= lastWeekEnd) {
-        lastWeek.push(note);
-        continue;
-      }
-
-      // Older than last week
-      if (daysDiff > 7) {
-        older.push(note);
-      }
+      groups.get(groupName)!.push(note);
     } catch {
-      // Invalid date format, skip
-      continue;
+      if (!groups.has(GROUP_NAMES.INVALID)) {
+        groups.set(GROUP_NAMES.INVALID, []);
+      }
+      groups.get(GROUP_NAMES.INVALID)!.push(note);
     }
   }
 
-  // Return array with groups that have notes, in order
-  const grouped: GroupedNote[] = [];
-  if (yesterday.length > 0) {
-    grouped.push({ name: GROUP_NAMES.YESTERDAY, notes: yesterday });
-  }
-  if (earlierThisWeek.length > 0) {
-    grouped.push({ name: GROUP_NAMES.EARLIER_THIS_WEEK, notes: earlierThisWeek });
-  }
-  if (lastWeek.length > 0) {
-    grouped.push({ name: GROUP_NAMES.LAST_WEEK, notes: lastWeek });
-  }
-  if (older.length > 0) {
-    grouped.push({ name: GROUP_NAMES.OLDER, notes: older });
-  }
+  const groupOrder = [
+    GROUP_NAMES.TODAY,
+    GROUP_NAMES.YESTERDAY,
+    GROUP_NAMES.EARLIER_THIS_WEEK,
+    GROUP_NAMES.LAST_WEEK,
+    GROUP_NAMES.OLDER,
+    GROUP_NAMES.INVALID,
+  ];
 
-  return grouped;
+  return groupOrder
+    .filter((name) => groups.has(name))
+    .map((name) => ({ name, notes: groups.get(name)! }));
 }
 
 type Props = {
@@ -117,12 +116,9 @@ export function SearchAnything({ open, onOpenChange }: Props) {
   const { navigate } = useBrowserNavigate();
 
   const filteredNotes = useMemo(() => {
-    if (!searchQuery.trim()) {
-      console.log("notes not filtered", notes);
-      return notes;
-    }
+    if (!searchQuery.trim()) return notes || [];
     const query = searchQuery.toLowerCase();
-    return notes.filter((note) => {
+    return (notes || []).filter((note) => {
       const title = (note.title || NOTE_TITLE_FALLBACK).toLowerCase();
       const content = markdownToText(note.content || "", 200).toLowerCase();
       return title.includes(query) || content.includes(query);
@@ -131,17 +127,9 @@ export function SearchAnything({ open, onOpenChange }: Props) {
 
   const groupedNotes = useMemo(() => groupNotesByDate(filteredNotes), [filteredNotes]);
 
-  console.log("groupedNotes", groupedNotes);
-
-  const hoveredNote = useMemo(() => {
-    if (!hoveredNoteId) return null;
-    return filteredNotes.find((note) => note.id === hoveredNoteId);
-  }, [filteredNotes, hoveredNoteId]);
-
-  const hoveredNoteCollection = useMemo(() => {
-    if (!hoveredNote?.collectionId) return null;
-    return collections?.find((c) => c.id === hoveredNote.collectionId);
-  }, [collections, hoveredNote]);
+  const hoveredNote = hoveredNoteId
+    ? filteredNotes.find((note) => note.id === hoveredNoteId)
+    : null;
 
   const handleNoteClick = (noteId: string) => {
     navigate(getRoute(ROUTES.NOTE, { noteId }));
@@ -154,7 +142,9 @@ export function SearchAnything({ open, onOpenChange }: Props) {
         className="max-w-screen sm:max-w-screen w-screen h-full max-h-full rounded-none p-0 gap-0 flex flex-col"
         showCloseButton={false}
       >
-        <div className="flex flex-col h-full bg-background">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Search Anything</DialogTitle>
+          <DialogDescription className="sr-only">Search Anything</DialogDescription>
           {/* Header with Search Bar */}
           <div className="relative flex items-center justify-center px-6 pt-8 pb-6 border-b border-border bg-sidebar">
             <div className="relative w-full max-w-3xl">
@@ -179,12 +169,13 @@ export function SearchAnything({ open, onOpenChange }: Props) {
               <X className="size-5" />
             </DialogClose>
           </div>
-
+        </DialogHeader>
+        <div className="flex flex-col h-full bg-background">
           {/* Content Area */}
-          <div className="flex-1 grid min-h-0 max-w-7xl mx-auto grid-cols-1 lg:grid-cols-[1fr_1fr] gap-0">
+          <div className="flex-1 grid min-h-0 max-w-7xl mx-auto grid-cols-1 lg:grid-cols-[1fr_500px] gap-0 w-full">
             {/* Notes List */}
-            <ScrollArea className="flex-1 min-w-0">
-              <div className="px-6 py-6">
+            <ScrollArea className="h-full min-w-0">
+              <div className="px-6 py-6 w-full">
                 {isLoading ? (
                   <div className="text-center text-muted-foreground py-12">Loading...</div>
                 ) : groupedNotes.length === 0 ? (
@@ -257,35 +248,19 @@ export function SearchAnything({ open, onOpenChange }: Props) {
 
             {/* Note Preview Panel */}
             {hoveredNote && (
-              <div className="py-6" onMouseEnter={() => setHoveredNoteId(hoveredNote.id)}>
+              <div
+                className="py-6 lg:block hidden"
+                onMouseEnter={() => setHoveredNoteId(hoveredNote.id)}
+              >
                 <div className="w-full bg-muted p-6 overflow-y-auto rounded-lg">
                   <div className="space-y-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <h2 className="text-xl font-semibold">
-                          {hoveredNote.title || NOTE_TITLE_FALLBACK}
-                        </h2>
-                        {hoveredNoteCollection && (
-                          <div
-                            className="text-xs px-2 py-1 rounded-sm inline-flex items-center gap-1"
-                            style={getCssColorStyle(hoveredNoteCollection?.color ?? "")}
-                          >
-                            <CollectionIcon className="size-3" />
-                            {hoveredNoteCollection?.title}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {formatDate(new Date(hoveredNote.updatedAt), undefined, {
-                          includeTime: false,
-                        })}
-                      </div>
-                    </div>
                     <div className="prose prose-sm max-w-none">
                       <p className="text-sm text-foreground whitespace-pre-wrap">
-                        {hoveredNote.content
-                          ? markdownToText(hoveredNote.content, 1000)
-                          : NOTE_CONTENT_EXCERPT_FALLBACK}
+                        {hoveredNote.content ? (
+                          <MarkdownViewer content={hoveredNote.content} />
+                        ) : (
+                          NOTE_CONTENT_EXCERPT_FALLBACK
+                        )}
                       </p>
                     </div>
                   </div>
