@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 import { toast } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
@@ -22,7 +22,7 @@ export function useAuthGuard() {
 }
 
 type AuthGuardProviderProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
@@ -33,7 +33,7 @@ export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
   return (
     <AuthGuardContext.Provider
       value={{
-        isAuthenticated: !!data?.data?.id,
+        isAuthenticated: !!data?.data?.id && !error,
         isLoading,
         error: error?.message,
         invalidate: () => {
@@ -50,7 +50,7 @@ export function AuthGuard({
   children,
   mustNotAuthenticated = false,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   mustNotAuthenticated?: boolean;
 }) {
   const { isAuthenticated, isLoading, error } = useAuthGuard();
@@ -84,7 +84,7 @@ export function AuthGuard({
 
   if (isLoading || (!mustNotAuthenticated && !isAuthenticated)) return <AuthGuardLoader />;
 
-  return <>{children}</>;
+  return <>{children ?? <Outlet />}</>;
 }
 
 export function AuthGuardLoader() {

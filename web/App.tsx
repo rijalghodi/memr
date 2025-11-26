@@ -25,15 +25,10 @@ function App() {
         <div className="font-inter antialiased">
           <Routes>
             {/* Auth routes */}
-            <Route
-              path={ROUTES.LOGIN}
-              element={
-                <AuthGuard mustNotAuthenticated>
-                  <LoginPage />
-                </AuthGuard>
-              }
-            />
-            <Route path={ROUTES.GOOGLE_SUCCESS} element={<GoogleSuccessPage />} />
+            <Route element={<AuthGuard mustNotAuthenticated />}>
+              <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+              <Route path={ROUTES.GOOGLE_SUCCESS} element={<GoogleSuccessPage />} />
+            </Route>
 
             {/* App routes with layout */}
             <Route element={<AppLayout />}>
