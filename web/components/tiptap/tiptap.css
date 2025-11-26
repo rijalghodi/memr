@@ -96,7 +96,7 @@
 .ProseMirror {
   caret-color: var(--editor-text-default);
   outline: none;
-  padding: var(--editor-spacing-1) var(--editor-spacing-8);
+  padding: 0 var(--editor-spacing-8);
   margin: 0 0;
   max-width: 76ch;
   font-family: var(--editor-font-sans);
@@ -388,7 +388,7 @@
 /* Mobile Optimizations */
 @media (max-width: 640px) {
   .ProseMirror {
-    padding: var(--editor-spacing-8) var(--editor-spacing-4);
+    padding: 0 var(--editor-spacing-4);
   }
 
   .ProseMirror h1 {
