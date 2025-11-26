@@ -190,7 +190,7 @@ export function SidebarEntityMenus() {
                   <HoverCardContent
                     side="right"
                     align="start"
-                    className={cn(open ? "hidden" : "block")}
+                    className={cn("bg-sidebar shadow-xl rounded-xl", open ? "hidden" : "block")}
                   >
                     <SidebarGroupLabel>Recent {item.title}</SidebarGroupLabel>
                     <SidebarMenuSub>
@@ -208,7 +208,9 @@ export function SidebarEntityMenus() {
                                   onClick={() => navigate(subitem.href)}
                                 >
                                   {subitem.icon}
-                                  {subitem.title || NOTE_TITLE_FALLBACK}
+                                  <span className="truncate">
+                                    {subitem.title || NOTE_TITLE_FALLBACK}
+                                  </span>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
                             );

@@ -263,7 +263,9 @@ function MobileEntityMenus() {
                     onClick={() => navigate(subitem.href)}
                   >
                     {subitem.icon}
-                    {subitem.title || NOTE_TITLE_FALLBACK}
+                    <span className="truncate text-ellipsis text-sm">
+                      {subitem.title || NOTE_TITLE_FALLBACK}
+                    </span>
                   </DropdownMenuItem>
                 ))}
               </>
