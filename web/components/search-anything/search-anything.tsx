@@ -145,28 +145,30 @@ export function SearchAnything({ open, onOpenChange }: Props) {
           <DialogTitle className="sr-only">Search Anything</DialogTitle>
           <DialogDescription className="sr-only">Search Anything</DialogDescription>
           {/* Header with Search Bar */}
-          <div className="relative flex items-center justify-center px-6 pt-8 pb-6 border-b border-border bg-sidebar">
-            <div className="relative w-full max-w-3xl">
-              <div className="relative flex items-center">
-                {/* Mem Logo/Icon */}
-                <Search className="size-4 text-muted-foreground absolute left-4" />
-                <input
-                  type="text"
-                  placeholder="Search anything in Memr"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-12 w-full rounded-full bg-background border border-transparent focus:border-primary focus:outline-none text-muted-foreground "
-                  autoFocus
-                />
+          <div className="relative flex items-center justify-center px-6 pt-8 pb-6 border-b border bg-sidebar">
+            <div className="flex items-center justify-center w-full">
+              <div className="relative w-full max-w-3xl">
+                <div className="relative flex items-center">
+                  {/* Mem Logo/Icon */}
+                  <Search className="size-4 text-muted-foreground absolute left-4" />
+                  <input
+                    type="text"
+                    placeholder="Search anything in Memr"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-12 h-12 w-full rounded-full bg-background border border-transparent focus:border-primary focus:outline-none text-muted-foreground "
+                    autoFocus
+                  />
+                </div>
               </div>
+              {/* Close Button */}
+              <DialogClose
+                className="lg:absolute lg:right-6 p-2 hover:bg-muted rounded-md transition-colors"
+                aria-label="Close"
+              >
+                <X className="size-5" />
+              </DialogClose>
             </div>
-            {/* Close Button */}
-            <DialogClose
-              className="absolute top-6 right-6 p-2 hover:bg-muted rounded-md transition-colors"
-              aria-label="Close"
-            >
-              <X className="size-5" />
-            </DialogClose>
           </div>
         </DialogHeader>
         <div className="flex flex-col flex-1 min-h-0 bg-background">
