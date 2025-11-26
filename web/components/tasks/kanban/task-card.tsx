@@ -40,7 +40,12 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
           onClick={(e) => {
             e.stopPropagation();
           }}
-          data-overdue={task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 2}
+          data-overdue={
+            task.dueDate &&
+            !isToday(new Date(task.dueDate)) &&
+            new Date(task.dueDate) < new Date() &&
+            task.status !== 2
+          }
           className={cn("border-muted-foreground mt-1 data-[overdue=true]:border-destructive")}
         />
 
