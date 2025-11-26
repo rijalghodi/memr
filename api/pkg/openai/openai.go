@@ -172,7 +172,7 @@ func (u *OpenAIClient) CreateChatCompletion(ctx context.Context, systemPrompt st
 
 	// Create chat completion request
 	params := openai.ChatCompletionNewParams{
-		Model:    openai.ChatModelGPT4oMini,
+		Model:    openai.ChatModelGPT5Mini,
 		Messages: chatMessages,
 	}
 
@@ -290,7 +290,7 @@ func (u *OpenAIClient) CreateChatCompletionStream(ctx context.Context, systemPro
 
 	// Create chat completion request (NewStreaming handles stream=true internally)
 	params := openai.ChatCompletionNewParams{
-		Model:    openai.ChatModelGPT4oMini,
+		Model:    openai.ChatModelGPT5Mini,
 		Messages: chatMessages,
 	}
 
