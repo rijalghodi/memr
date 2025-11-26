@@ -41,7 +41,7 @@ export function MainLayout({ children }: Props) {
         </div>
         <Button
           variant="ghost"
-          className="rounded-full max-w-3xl bg-sidebar-light hover:bg-sidebar-accent hover:text-primary text-muted-foreground flex-1 text-xs h-9 justify-start"
+          className="rounded-full max-w-3xl bg-background hover:bg-sidebar-accent hover:text-primary text-muted-foreground flex-1 text-xs h-9 justify-start"
           onClick={() => setIsSearchOpen(true)}
           title="Search"
         >
