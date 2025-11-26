@@ -11,6 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
 import { ScrollArea } from "../ui/scroll-area";
+import { NoteCollectionFilter } from "./note-collection-filter";
 import { NoteEmpty } from "./note-empty";
 import { NoteItem } from "./note-item";
 
@@ -18,6 +19,7 @@ type SortByValue = "updatedAt" | "createdAt";
 
 export function NoteDashboard() {
   const [sortBy, setSortBy] = useState<SortByValue | undefined>();
+  const [collectionId, setCollectionId] = useState<string | undefined>();
   const { navigate } = useBrowserNavigate();
   const { data: notes, isLoading } = useGetNotes({ sortBy });
 
@@ -58,7 +60,7 @@ export function NoteDashboard() {
             </div>
           </div>
           <CollapsibleContent>
-            <div className="flex items-center">
+            <div className="flex items-center gap-3">
               <DropdownFilter
                 variant="secondary"
                 className="rounded-full px-4"
@@ -77,6 +79,7 @@ export function NoteDashboard() {
                   },
                 ]}
               />
+              <NoteCollectionFilter value={collectionId} onValueChange={setCollectionId} />
             </div>
           </CollapsibleContent>
         </div>

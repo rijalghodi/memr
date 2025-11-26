@@ -76,12 +76,14 @@ export type NoteCollectionPickerContentProps = {
   value?: string;
   onChange?: (collectionId: string | undefined) => void;
   onClose?: () => void;
+  createOnEmpty?: boolean;
 };
 
 export const NoteCollectionPickerContent = ({
   value,
   onChange: onChange,
   onClose,
+  createOnEmpty = true,
 }: NoteCollectionPickerContentProps) => {
   const [search, setSearch] = useState("");
   const { data: collections, isLoading } = useGetCollections();
@@ -123,7 +125,7 @@ export const NoteCollectionPickerContent = ({
   };
 
   const handleCreateCollection = () => {
-    if (search.trim()) {
+    if (createOnEmpty && search.trim()) {
       createCollection({
         title: search.trim(),
         color: getRandomColor(),
@@ -170,12 +172,14 @@ export const NoteCollectionPickerContent = ({
               </CommandGroup>
             )}
             <CommandSeparator />
-            <CommandGroup>
-              <CommandItem onSelect={handleCreateCollection} disabled={isCreating}>
-                <Plus className="size-4" />
-                <span>Create collection &quot;{search.trim()}&quot;</span>
-              </CommandItem>
-            </CommandGroup>
+            {createOnEmpty && (
+              <CommandGroup>
+                <CommandItem onSelect={handleCreateCollection} disabled={isCreating}>
+                  <Plus className="size-4" />
+                  <span>Create collection &quot;{search.trim()}&quot;</span>
+                </CommandItem>
+              </CommandGroup>
+            )}
           </>
         )}
       </CommandList>
