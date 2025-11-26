@@ -1,7 +1,8 @@
-import { Bot } from "lucide-react";
-import React, { useEffect } from "react";
+import { Bot, Search } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 import { ChatWidget } from "../chat/chat-widget";
+import { SearchAnything } from "../search-anything/search-anything";
 import { useAutoSync } from "../sync/use-auto-sync";
 import { Button, Floating, FloatingContent, FloatingTrigger, useFloating } from "../ui";
 import { SessionTabs } from "./session-tabs";
@@ -23,6 +24,7 @@ function FloatingChatWidget() {
 
 export function MainLayout({ children }: Props) {
   const { sync } = useAutoSync();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     // Sync on first load
@@ -33,21 +35,22 @@ export function MainLayout({ children }: Props) {
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
-      <div className="h-11 flex items-center justify-between px-4">
-        <div>
-          <div className="block md:hidden">
-            <MobileMenu />
-          </div>
+      <div className="h-12 flex items-center justify-between gap-3">
+        <div className="block md:hidden pl-2">
+          <MobileMenu />
         </div>
-
-        <img src="/logo-long.png" alt="logo" width={80} height={24} />
-
-        {/* <Button variant="ghost-primary" size="icon" onClick={() => sync()} title="Sync">
-          <RefreshCcw
-            data-syncing={isSyncing}
-            className={"size-4 data-[syncing=true]:animate-spin"}
-          />
-        </Button> */}
+        <Button
+          variant="ghost"
+          className="rounded-full max-w-3xl bg-sidebar-light hover:bg-sidebar-accent hover:text-primary text-muted-foreground flex-1 text-xs h-9 justify-start"
+          onClick={() => setIsSearchOpen(true)}
+          title="Search"
+        >
+          <Search className="size-4" />
+          Search Anything...
+        </Button>
+        <div className="mr-4">
+          <img src="/logo-long.png" alt="logo" width={80} height={24} />
+        </div>
       </div>
       {/* Body */}
       <div className="flex flex-1 w-full min-h-0 gap-1.5">
@@ -77,6 +80,9 @@ export function MainLayout({ children }: Props) {
           <FloatingChatWidget />
         </FloatingContent>
       </Floating>
+
+      {/* Search Anything Dialog */}
+      <SearchAnything open={isSearchOpen} onOpenChange={setIsSearchOpen} />
     </div>
   );
 }
