@@ -69,7 +69,7 @@ export function TaskDashboard() {
       {/* Header */}
       <Collapsible key="note-filter-collapsible">
         <div className="px-6 pt-4 pb-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold">Tasks</h1>
             <div className="flex items-center gap-0">
               <CollapsibleTrigger asChild>
