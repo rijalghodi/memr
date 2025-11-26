@@ -3,14 +3,10 @@
 import { ListFilter } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { PROJECT_TITLE_FALLBACK } from "@/lib/constant";
-import { useGetProjects } from "@/service/local/api-project";
 import { taskApi, useGetTasks } from "@/service/local/api-task";
 
-import { ProjectIcon } from "../projects/project-icon";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui";
 import { Button } from "../ui/button";
-import { DropdownFilter } from "../ui/drropdown-filter";
 import { GroupItem, TaskKanban } from "./kanban/task-kanban";
 import { TKanbanTask } from "./kanban/type";
 import { TaskProjectFilter } from "./task-project-filter";

@@ -65,7 +65,7 @@ function ScrollBar({
       <ScrollAreaPrimitive.ScrollAreaThumb
         data-slot="scroll-area-thumb"
         className={cn(
-          "bg-ring/60 relative flex-1 rounded-full hover:bg-ring",
+          "bg-ring/50 relative flex-1 rounded-full hover:bg-ring",
           alwaysShow && "opacity-100!"
         )}
         style={alwaysShow ? { opacity: 1 } : undefined}
