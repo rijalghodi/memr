@@ -51,10 +51,10 @@ function groupNotesByDate(notes: NoteRes[] | undefined): GroupedNote[] {
     try {
       const updatedAt = parseISO(note.updatedAt);
 
-      // Check for invalid date (future dates)
-      if (isFuture(updatedAt) || isNaN(updatedAt.getTime())) {
-        continue;
-      }
+      //   // Check for invalid date (future dates)
+      //   if (isFuture(updatedAt) || isNaN(updatedAt.getTime())) {
+      //     continue;
+      //   }
 
       // Check if yesterday
       if (isYesterday(updatedAt)) {
@@ -118,6 +118,7 @@ export function SearchAnything({ open, onOpenChange }: Props) {
 
   const filteredNotes = useMemo(() => {
     if (!searchQuery.trim()) {
+      console.log("notes not filtered", notes);
       return notes;
     }
     const query = searchQuery.toLowerCase();
@@ -129,6 +130,8 @@ export function SearchAnything({ open, onOpenChange }: Props) {
   }, [notes, searchQuery]);
 
   const groupedNotes = useMemo(() => groupNotesByDate(filteredNotes), [filteredNotes]);
+
+  console.log("groupedNotes", groupedNotes);
 
   const hoveredNote = useMemo(() => {
     if (!hoveredNoteId) return null;
@@ -239,7 +242,9 @@ export function SearchAnything({ open, onOpenChange }: Props) {
                                   </p>
                                 </div>
                                 <div className="text-xs text-muted-foreground shrink-0 ml-2">
-                                  {formatDate(new Date(note.updatedAt), "EEE M/dd")}
+                                  {formatDate(new Date(note.updatedAt), undefined, {
+                                    includeTime: false,
+                                  })}
                                 </div>
                               </div>
                             );
@@ -273,7 +278,9 @@ export function SearchAnything({ open, onOpenChange }: Props) {
                         )}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {formatDate(new Date(hoveredNote.updatedAt), "EEE M/dd")}
+                        {formatDate(new Date(hoveredNote.updatedAt), undefined, {
+                          includeTime: false,
+                        })}
                       </div>
                     </div>
                     <div className="prose prose-sm max-w-none">
