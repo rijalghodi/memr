@@ -1,5 +1,6 @@
 export const BRAND = {
   AUTHOR: "Rijal Ghodi",
+  AUTHOR_URL: "https://github.com/rijalghodi",
   EMAIL: "rijalghodi.dev@gmail.com",
   SITE_NAME: "Memr, AI-powered second brain",
   APP_NAME: "Memr",
