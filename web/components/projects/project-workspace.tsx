@@ -99,9 +99,12 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
         <div className="px-6 pt-4 pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ProjectIcon className="size-8" style={{ color: project?.color }} />
+              <ProjectIcon
+                className="size-5 md:size-6 shrink-0"
+                style={{ color: project?.color }}
+              />
               <input
-                className="text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md"
+                className="text-2xl md:text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md w-full max-w-[300px]"
                 placeholder={PROJECT_TITLE_FALLBACK}
                 value={projectTitle}
                 onChange={handleTitleChange}
