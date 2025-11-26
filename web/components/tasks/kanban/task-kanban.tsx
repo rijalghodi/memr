@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { ReactSortable } from "react-sortablejs";
 
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { findMovedIndex } from "@/lib/find-move";
 import { generateBetweenRank } from "@/lib/fractional-idx";
 
@@ -128,7 +128,7 @@ export function TaskKanban({ tasks, onTaskUpdate, onTaskAdd, onTaskDelete, group
   }, [groups]);
 
   return (
-    <div id="kanban" className="h-full w-full flex flex-col overflow-hidden">
+    <div id="kanban" className="h-full flex-1 w-full flex flex-col overflow-auto">
       <ScrollArea className="flex-1 w-full h-full">
         <ReactSortable
           list={groupOrderState}
@@ -154,6 +154,7 @@ export function TaskKanban({ tasks, onTaskUpdate, onTaskAdd, onTaskDelete, group
             );
           })}
         </ReactSortable>
+        <ScrollBar orientation="horizontal" className="mb-0.5 h-3" alwaysShow={true} />
       </ScrollArea>
     </div>
   );
