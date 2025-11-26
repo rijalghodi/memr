@@ -35,26 +35,38 @@ export function LoginPage() {
               Continue with Google
             </Button>
           </div>
-
-          {/* Background gradient with infinite up and down animation */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none fixed right-0 top-0 z-0 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80 animate-blob-1"
-            style={{
-              background: "radial-gradient(circle at center, var(--brand-1) 0%, transparent 70%)",
-              filter: "blur(100px) drop-shadow(0 0 100px var(--brand-1))",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none fixed left-0 bottom-0 z-0 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80 animate-blob-2"
-            style={{
-              background: "radial-gradient(circle at center, var(--brand-2) 0%, transparent 70%)",
-              filter: "blur(100px) drop-shadow(0 0 100px var(--brand-2))",
-            }}
-          />
         </div>
       </div>
+
+      <div className="text-sm text-muted-foreground text-center px-6 py-12">
+        Made with 💪 by{" "}
+        <a
+          href={BRAND.AUTHOR_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-4"
+        >
+          {BRAND.AUTHOR}
+        </a>
+      </div>
+
+      {/* Background gradient with infinite up and down animation */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed right-0 top-0 z-0 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80 animate-blob-1"
+        style={{
+          background: "radial-gradient(circle at center, var(--brand-1) 0%, transparent 70%)",
+          filter: "blur(100px) drop-shadow(0 0 100px var(--brand-1))",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed left-0 bottom-0 z-0 h-[600px] w-[400px] rounded-full blur-[120px] opacity-80 animate-blob-2"
+        style={{
+          background: "radial-gradient(circle at center, var(--brand-2) 0%, transparent 70%)",
+          filter: "blur(100px) drop-shadow(0 0 100px var(--brand-2))",
+        }}
+      />
     </div>
   );
 }
