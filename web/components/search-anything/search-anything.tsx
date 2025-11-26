@@ -1,6 +1,6 @@
 "use client";
 
-import { differenceInDays, isFuture, isYesterday, parseISO, startOfWeek } from "date-fns";
+import { differenceInDays, isYesterday, startOfWeek } from "date-fns";
 import { FileText, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -49,12 +49,12 @@ function groupNotesByDate(notes: NoteRes[] | undefined): GroupedNote[] {
 
   for (const note of notes) {
     try {
-      const updatedAt = parseISO(note.updatedAt);
+      const updatedAt = new Date(note.updatedAt);
 
-      //   // Check for invalid date (future dates)
-      //   if (isFuture(updatedAt) || isNaN(updatedAt.getTime())) {
-      //     continue;
-      //   }
+      // Check for invalid date (future dates)
+      if (isNaN(updatedAt.getTime())) {
+        continue;
+      }
 
       // Check if yesterday
       if (isYesterday(updatedAt)) {
