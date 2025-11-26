@@ -1,10 +1,11 @@
-import { Bot, Search, Sparkles } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 import { ChatWidget } from "../chat/chat-widget";
 import { SearchAnything } from "../search-anything/search-anything";
 import { useAutoSync } from "../sync/use-auto-sync";
-import { Button, Floating, FloatingContent, FloatingTrigger, useFloating } from "../ui";
+import { Button, Floating, FloatingContent, FloatingTrigger } from "../ui";
+import { MobileTabs } from "./mobile-tabs";
 import { SessionTabs } from "./session-tabs";
 import MobileMenu from "./sidebar/mobile-menu";
 
@@ -12,20 +13,10 @@ type Props = {
   children: React.ReactNode;
 };
 
-function FloatingChatWidget() {
-  const { close } = useFloating();
-
-  return (
-    <div className="relative h-full w-full">
-      <ChatWidget withBackButton={true} onBackButtonClick={close} />
-    </div>
-  );
-}
-
 export function MainLayout({ children }: Props) {
   const { sync } = useAutoSync();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-
+  const [aiOpen, setAiOpen] = useState(false);
   useEffect(() => {
     // Sync on first load
     sync();
@@ -53,10 +44,13 @@ export function MainLayout({ children }: Props) {
         </div>
       </div>
       {/* Body */}
-      <div className="flex flex-1 w-full min-h-0 gap-1.5">
+      <div className="flex flex-1 w-full min-h-0 gap-1.5 lg:pb-0">
         <div className="bg-background rounded-t-2xl flex-1 shadow-xl flex flex-col overflow-hidden">
-          <div className="shrink-0 h-10.5 grow-0">
+          <div className="shrink-0 h-10.5 grow-0 hidden md:block">
             <SessionTabs />
+          </div>
+          <div className="shrink-0 h-10.5 grow-0 block md:hidden">
+            <MobileTabs />
           </div>
           <div className="flex-1 min-h-0">{children}</div>
         </div>
@@ -67,12 +61,9 @@ export function MainLayout({ children }: Props) {
       </div>
 
       {/* Floating Chat - Only visible on smaller screens */}
-      <Floating>
+      <Floating open={aiOpen} onOpenChange={setAiOpen}>
         <FloatingTrigger asChild>
-          <Button
-            className="fixed bottom-6 right-6 z-50 h-11 rounded-full shadow-lg lg:hidden"
-            // size="icon"
-          >
+          <Button className="fixed bottom-6 right-6 z-50 h-11 rounded-full shadow-lg lg:hidden">
             <Sparkles /> Ask AI
           </Button>
         </FloatingTrigger>
@@ -80,7 +71,7 @@ export function MainLayout({ children }: Props) {
           position="bottom-right"
           className="fixed inset-x-0 bottom-0 h-svh z-50 lg:hidden"
         >
-          <FloatingChatWidget />
+          <ChatWidget withBackButton={true} onBackButtonClick={() => setAiOpen(false)} />
         </FloatingContent>
       </Floating>
 

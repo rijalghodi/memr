@@ -1,8 +1,9 @@
 "use client";
 
-import { SquareCheckBig, SquarePen } from "lucide-react";
+import { ListTodo } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { NoteIcon } from "@/components/notes/note-icon";
 import {
   Sidebar,
   SidebarContent,
@@ -46,16 +47,18 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton size="default" onClick={handleAddNote}>
-                  <SquarePen />
-                  Create Note
+                <SidebarMenuButton asChild size="default">
+                  <Link to={ROUTES.NOTES}>
+                    <NoteIcon />
+                    Notes
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild size="default">
                   <Link to={ROUTES.TASKS}>
-                    <SquareCheckBig />
-                    Todo
+                    <ListTodo />
+                    Tasks
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
