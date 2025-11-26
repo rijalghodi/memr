@@ -69,12 +69,14 @@ export type TaskProjectPickerContentProps = {
   value?: string;
   onChange?: (projectId: string | undefined) => void;
   onClose?: () => void;
+  createOnEmpty?: boolean;
 };
 
 export const TaskProjectPickerContent = ({
   value,
   onChange: onChange,
   onClose,
+  createOnEmpty = true,
 }: TaskProjectPickerContentProps) => {
   const [search, setSearch] = useState("");
   const { data: projects, isLoading } = useGetProjects();
@@ -116,7 +118,7 @@ export const TaskProjectPickerContent = ({
   };
 
   const handleCreateProject = () => {
-    if (search.trim()) {
+    if (createOnEmpty && search.trim()) {
       createProject({
         title: search.trim(),
         color: getRandomColor(),
@@ -163,12 +165,14 @@ export const TaskProjectPickerContent = ({
               </CommandGroup>
             )}
             <CommandSeparator />
-            <CommandGroup>
-              <CommandItem onSelect={handleCreateProject} disabled={isCreating}>
-                <Plus />
-                <span>Create project &quot;{search.trim()}&quot;</span>
-              </CommandItem>
-            </CommandGroup>
+            {createOnEmpty && (
+              <CommandGroup>
+                <CommandItem onSelect={handleCreateProject} disabled={isCreating}>
+                  <Plus />
+                  <span>Create project &quot;{search.trim()}&quot;</span>
+                </CommandItem>
+              </CommandGroup>
+            )}
           </>
         )}
       </CommandList>

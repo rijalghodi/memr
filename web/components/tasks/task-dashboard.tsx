@@ -13,6 +13,7 @@ import { Button } from "../ui/button";
 import { DropdownFilter } from "../ui/drropdown-filter";
 import { GroupItem, TaskKanban } from "./kanban/task-kanban";
 import { TKanbanTask } from "./kanban/type";
+import { TaskProjectFilter } from "./task-project-filter";
 
 const statusGroupItems: GroupItem[] = [
   {
@@ -34,7 +35,7 @@ const statusGroupItems: GroupItem[] = [
 ];
 
 export function TaskDashboard() {
-  const [projectId, setProjectId] = useState<string>("");
+  const [projectId, setProjectId] = useState<string | undefined>();
   const { data: dexieTasks, isLoading } = useGetTasks({
     sortBy: "sortOrder",
     projectId: projectId,
@@ -83,8 +84,8 @@ export function TaskDashboard() {
             </div>
           </div>
           <CollapsibleContent>
-            <div className="flex items-center py-2">
-              <ProjectFilter value={projectId} onValueChange={setProjectId} />
+            <div className="flex items-center gap-3 pt-2">
+              <TaskProjectFilter value={projectId} onValueChange={setProjectId} />
             </div>
           </CollapsibleContent>
         </div>
