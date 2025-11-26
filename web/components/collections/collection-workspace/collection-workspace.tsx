@@ -85,17 +85,16 @@ export function CollectionWorkspace({ collectionId }: { collectionId: string }) 
                   }
                 }}
               />
-            </div>
-
-            <div className="flex items-center gap-0">
-              <Button variant="ghost" size="icon" onClick={handleAddNote}>
-                <Plus />
-              </Button>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <ListFilter />
                 </Button>
               </CollapsibleTrigger>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="default" className="rounded-full" onClick={handleAddNote}>
+                <Plus /> New Note
+              </Button>
             </div>
           </div>
           <CollapsibleContent>

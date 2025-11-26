@@ -1,4 +1,4 @@
-import { Bot, Search } from "lucide-react";
+import { Bot, Search, Sparkles } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 import { ChatWidget } from "../chat/chat-widget";
@@ -70,10 +70,10 @@ export function MainLayout({ children }: Props) {
       <Floating>
         <FloatingTrigger asChild>
           <Button
-            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg lg:hidden"
-            size="icon"
+            className="fixed bottom-6 right-6 z-50 h-11 rounded-full shadow-lg lg:hidden"
+            // size="icon"
           >
-            <Bot className="size-6" />
+            <Sparkles /> Ask AI
           </Button>
         </FloatingTrigger>
         <FloatingContent
