@@ -107,18 +107,18 @@ export function NoteItem({ id, title, content = "", collectionId, updatedAt }: P
           <div className="flex items-center justify-start">
             <NoteIcon className="size-4 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-semibold line-clamp-1 text-ellipsis">
-            {displayTitle}
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-base font-medium line-clamp-1">{displayTitle}</h3>
             {currentCollection && (
               <div
-                className="text-xs px-1 py-1 rounded-sm ml-2 inline-flex items-center gap-1"
+                className="text-xs px-1.5 py-0.5 rounded-sm inline-flex items-center gap-1 shrink-0"
                 style={getCssColorStyle(currentCollection?.color ?? "")}
               >
-                <CollectionIcon className="size-3 inline-block" />
+                <CollectionIcon className="size-3" />
                 {currentCollection?.title}
               </div>
             )}
-          </h3>
+          </div>
           <p className="text-sm text-muted-foreground col-start-2 line-clamp-1 text-ellipsis">
             {displayContent}
           </p>

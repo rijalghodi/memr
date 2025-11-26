@@ -70,9 +70,12 @@ export function CollectionWorkspace({ collectionId }: { collectionId: string }) 
         <div className="px-6 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CollectionIcon className="size-6" style={{ color: collection?.color }} />
+              <CollectionIcon
+                className="size-5 md:size-6 shrink-0"
+                style={{ color: collection?.color }}
+              />
               <input
-                className="text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md"
+                className="text-2xl md:text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md w-full max-w-[300px]"
                 placeholder={COLLECTION_TITLE_FALLBACK}
                 value={collection?.title || ""}
                 onChange={handleTitleUpdate}
