@@ -56,8 +56,13 @@ export function ProjectDashboard() {
               </CollapsibleTrigger>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="default" className="rounded-full" onClick={handleAddProject}>
-                <Plus /> New Project
+              <Button
+                variant="default"
+                size="icon"
+                className="rounded-full"
+                onClick={handleAddProject}
+              >
+                <Plus />
               </Button>
             </div>
           </div>

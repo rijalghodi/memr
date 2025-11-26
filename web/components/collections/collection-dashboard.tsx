@@ -53,8 +53,13 @@ export function CollectionDashboard() {
               </CollapsibleTrigger>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="default" className="rounded-full" onClick={handleAddCollection}>
-                <Plus /> New Collection
+              <Button
+                variant="default"
+                size="icon"
+                className="rounded-full"
+                onClick={handleAddCollection}
+              >
+                <Plus />
               </Button>
             </div>
           </div>
