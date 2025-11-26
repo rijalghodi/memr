@@ -7,11 +7,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { getCssColorStyle } from "@/lib/color";
 import { useGetProjects } from "@/service/local/api-project";
 
-import { CollectionIcon } from "../collections/collection-icon";
+import { ProjectIcon } from "../projects/project-icon";
 import { Button } from "../ui";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { TaskProjectPickerContent } from "./kanban/task-project-picker";
-import { ProjectIcon } from "../projects/project-icon";
 
 export function TaskProjectFilter({
   value,
