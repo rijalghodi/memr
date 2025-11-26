@@ -109,33 +109,3 @@ export function TaskDashboard() {
     </div>
   );
 }
-
-function ProjectFilter({
-  value,
-  onValueChange,
-}: {
-  value: string;
-  onValueChange: (value: string) => void;
-}) {
-  const { data: projects } = useGetProjects();
-  return (
-    <DropdownFilter
-      variant="secondary"
-      className="rounded-full px-4"
-      value={value}
-      onValueChange={onValueChange}
-      icon={<ProjectIcon />}
-      size="sm"
-      options={[
-        {
-          label: "All Projects",
-          value: "",
-        },
-        ...(projects ?? []).map((project) => ({
-          label: project.title || PROJECT_TITLE_FALLBACK,
-          value: project.id,
-        })),
-      ]}
-    />
-  );
-}
