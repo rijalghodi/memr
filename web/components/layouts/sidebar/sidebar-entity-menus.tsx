@@ -162,7 +162,9 @@ export function SidebarEntityMenus() {
                                   onClick={() => navigate(subitem.href)}
                                 >
                                   {subitem.icon}
-                                  {subitem.title || NOTE_TITLE_FALLBACK}
+                                  <span className="truncate">
+                                    {subitem.title || NOTE_TITLE_FALLBACK}
+                                  </span>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
                             );
