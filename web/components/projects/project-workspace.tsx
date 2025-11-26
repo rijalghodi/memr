@@ -93,10 +93,10 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div className="pt-4 space-y-4">
+    <div className="flex flex-col h-full">
       {/* Header */}
       <Collapsible key="project-filter-collapsible">
-        <div className="px-6 space-y-3">
+        <div className="px-6 pt-4 pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ProjectIcon className="size-8" style={{ color: project?.color }} />
@@ -130,7 +130,10 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
       </Collapsible>
 
       {/* Content */}
-      <div data-slot="content" className="flex-1 overflow-hidden h-full">
+      <div
+        data-slot="content"
+        className="flex-1 w-full min-h-0 animate-in fade-in slide-in-from-bottom-3 duration-500"
+      >
         {isLoading ? null : (
           <TaskKanban
             tasks={tasks}
