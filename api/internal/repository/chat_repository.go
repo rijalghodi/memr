@@ -194,3 +194,19 @@ func (r *ChatRepository) GetLatestMessageTimestamp(ctx context.Context, chatID s
 
 	return &latestTime, nil
 }
+
+// CountUserMessages counts all user messages for a user
+func (r *ChatRepository) CountUserMessages(ctx context.Context, userID string) (int64, error) {
+	var count int64
+	err := r.db.WithContext(ctx).
+		Model(&model.Message{}).
+		Where("user_id = ? AND role = ?", userID, "user").
+		Count(&count).Error
+
+	if err != nil {
+		logger.Log.Error("Failed to count user messages", zap.Error(err), zap.String("userID", userID))
+		return 0, err
+	}
+
+	return count, nil
+}

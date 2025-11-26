@@ -72,6 +72,27 @@ func (u *ChatUsecase) SendMessage(ctx context.Context, chatID, userID, message s
 		return nil, err
 	}
 
+	// Check message limit: months since user creation * 30
+	userMessageCount, err := u.chatRepo.CountUserMessages(ctx, userID)
+	if err != nil {
+		logger.Log.Error("Failed to count user messages", zap.Error(err))
+		return nil, err
+	}
+
+	// Calculate months since user creation
+	monthsSinceCreation := calculateMonthsSince(user.CreatedAt, time.Now())
+	maxMessages := monthsSinceCreation * 30
+
+	if userMessageCount > int64(maxMessages) {
+		logger.Log.Warn("User message limit exceeded",
+			zap.String("userID", userID),
+			zap.Int64("messageCount", userMessageCount),
+			zap.Int("maxMessages", maxMessages),
+			zap.Int("monthsSinceCreation", monthsSinceCreation),
+		)
+		return nil, fiber.NewError(fiber.StatusForbidden, "Message limit exceeded. You have reached your monthly message limit.")
+	}
+
 	// Load chat history
 	messages, err := u.chatRepo.GetChatHistory(ctx, chatID)
 	if err != nil {
@@ -183,6 +204,33 @@ func (u *ChatUsecase) SendMessageStream(ctx context.Context, chatID, userID, mes
 	if err != nil {
 		logger.Log.Error("Failed to create user message", zap.Error(err))
 		return err
+	}
+
+	// Check message limit: months since user creation * 30
+	userMessageCount, err := u.chatRepo.CountUserMessages(ctx, userID)
+	if err != nil {
+		logger.Log.Error("Failed to count user messages", zap.Error(err))
+		return err
+	}
+
+	// Calculate months since user creation
+	monthsSinceCreation := calculateMonthsSince(user.CreatedAt, time.Now())
+	maxMessages := monthsSinceCreation * 30
+
+	if userMessageCount > int64(maxMessages) {
+		logger.Log.Warn("User message limit exceeded",
+			zap.String("userID", userID),
+			zap.Int64("messageCount", userMessageCount),
+			zap.Int("maxMessages", maxMessages),
+			zap.Int("monthsSinceCreation", monthsSinceCreation),
+		)
+		// Send error chunk
+		errorChunk := contract.ChatStreamChunk{
+			Error: "Message limit exceeded. You have reached your monthly message limit.",
+			Done:  true,
+		}
+		writer.WriteChunk(errorChunk)
+		return fiber.NewError(fiber.StatusForbidden, "Message limit exceeded. You have reached your monthly message limit.")
 	}
 
 	// Load chat history
@@ -429,4 +477,29 @@ func (u *ChatUsecase) getSystemPrompt(userName, userEmail string) (string, error
 	prompt = strings.ReplaceAll(prompt, "{{user_email}}", userEmail)
 
 	return prompt, nil
+}
+
+// calculateMonthsSince calculates the number of months between two dates
+// Returns at least 1 month (minimum) to ensure users always have at least 30 messages
+func calculateMonthsSince(from, to time.Time) int {
+	if from.After(to) {
+		return 1 // Minimum 1 month
+	}
+
+	years := to.Year() - from.Year()
+	months := int(to.Month()) - int(from.Month())
+
+	totalMonths := years*12 + months
+
+	// If the day of month in 'to' is before 'from', we haven't completed a full month
+	if to.Day() < from.Day() {
+		totalMonths--
+	}
+
+	// Ensure at least 1 month
+	if totalMonths < 1 {
+		return 1
+	}
+
+	return totalMonths
 }
