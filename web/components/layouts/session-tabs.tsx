@@ -18,13 +18,7 @@ import { Button } from "../ui";
 import { useConfirmation } from "../ui/confirmation-dialog";
 
 export function SessionTabs() {
-  const {
-    sessionTabs: rawSessionTabs,
-    activeTab,
-    pathname,
-    closeTab,
-    closeAllTabs,
-  } = useSessionTabs();
+  const { sessionTabs: rawSessionTabs, pathname, closeAllTabs } = useSessionTabs();
   const sessionTabs = rawSessionTabs.filter((tab) => tab.pathname !== ROUTES.HOME);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -43,16 +37,6 @@ export function SessionTabs() {
 
   const handleHomeClick = () => {
     navigateTo(ROUTES.HOME);
-  };
-
-  const handleCloseTab = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const tabIndex = sessionTabs.findIndex((tab) => tab.pathname === pathname);
-    const isActive = activeTab?.pathname === pathname;
-
-    closeTab(pathname);
-
-    // If closing active tab, navigate to previous tab (or next if no previous)
   };
 
   const checkScrollability = () => {
