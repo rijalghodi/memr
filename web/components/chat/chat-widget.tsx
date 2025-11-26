@@ -1,5 +1,5 @@
 import { parseISO } from "date-fns";
-import { History, Plus } from "lucide-react";
+import { ArrowLeft, History, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -29,6 +29,11 @@ const INITIAL_MESSAGES = [
   "What are my tasks for today?",
 ];
 
+type Props = {
+  withBackButton?: boolean;
+  onBackButtonClick?: () => void;
+};
+
 type ChatMessage = {
   id: string;
   content: string;
@@ -39,7 +44,7 @@ type ChatMessage = {
   isStreaming?: boolean;
 };
 
-export const ChatWidget = () => {
+export const ChatWidget = ({ withBackButton = false, onBackButtonClick }: Props) => {
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -178,7 +183,12 @@ export const ChatWidget = () => {
     <div className="flex h-full w-full flex-col overflow-hidden rounded-t-xl bg-background shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between bg-muted/50 px-4 py-2">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          {withBackButton && (
+            <Button variant="ghost" size="icon" onClick={onBackButtonClick} title="Back">
+              <ArrowLeft />
+            </Button>
+          )}
           <div className="flex items-center gap-2">
             <span className="font-semibold text-sm">Chat</span>
           </div>
