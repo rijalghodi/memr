@@ -93,7 +93,7 @@ export function TaskDashboard() {
       {/* Content */}
       <div
         data-slot="content"
-        className="flex-1 min-h-0 animate-in fade-in slide-in-from-bottom-3 duration-500"
+        className="flex-1 w-full min-h-0 animate-in fade-in slide-in-from-bottom-3 duration-500"
       >
         {isLoading ? null : (
           <TaskKanban
