@@ -35,8 +35,8 @@ func (e *ToolExecutor) SearchNotesTool(ctx context.Context, userID string, argum
 	if v, ok := arguments["limit"].(float64); ok {
 		limit = int(v)
 	}
-	if limit > 10 {
-		limit = 10
+	if limit > 3 {
+		limit = 3
 	} else if limit < 1 {
 		limit = 1
 	}
@@ -245,9 +245,9 @@ func GetToolDefinitions() []openai.ChatTool {
 						},
 						"limit": map[string]interface{}{
 							"type":        "integer",
-							"description": "Maximum number of results (default: 3)",
+							"description": "Maximum number of results (default: 1)",
 							"minimum":     1,
-							"maximum":     10,
+							"maximum":     3,
 						},
 						"collection_id": map[string]interface{}{
 							"type":        "string",
