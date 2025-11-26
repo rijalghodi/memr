@@ -168,13 +168,13 @@ export function MarkdownViewer({ content }: { content: string }) {
           </blockquote>
         ),
         h1: ({ children }) => (
-          <h1 className="text-xl font-bold mb-2 mt-4 first:mt-0">{children}</h1>
+          <h1 className="text-xl font-semibold mb-2 mt-4 first:mt-0">{children}</h1>
         ),
         h2: ({ children }) => (
-          <h2 className="text-lg font-bold mb-2 mt-4 first:mt-0">{children}</h2>
+          <h2 className="text-lg font-semibold mb-2 mt-4 first:mt-0">{children}</h2>
         ),
         h3: ({ children }) => (
-          <h3 className="text-base font-bold mb-2 mt-4 first:mt-0">{children}</h3>
+          <h3 className="text-base font-semibold mb-2 mt-4 first:mt-0">{children}</h3>
         ),
       }}
     >
