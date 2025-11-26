@@ -30,7 +30,7 @@ const GROUP_NAMES = {
   TODAY: "Today",
   YESTERDAY: "Yesterday",
   EARLIER_THIS_WEEK: "Earlier This Week",
-  LAST_WEEK: "Last Week",
+  LAST_WEEK: "This Week",
   OLDER: "Older",
   INVALID: "Invalid",
 } as const;
@@ -60,8 +60,7 @@ function getNoteGroup(updatedAt: Date, now: Date): (typeof GROUP_NAMES)[keyof ty
     return GROUP_NAMES.LAST_WEEK;
   }
 
-  if (daysDiff > 7) return GROUP_NAMES.OLDER;
-  return GROUP_NAMES.INVALID;
+  return GROUP_NAMES.OLDER;
 }
 
 function groupNotesByDate(notes: NoteRes[] | undefined): GroupedNote[] {
