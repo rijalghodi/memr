@@ -1,7 +1,7 @@
 "use client";
 
 import { differenceInDays, isYesterday, startOfWeek } from "date-fns";
-import { FileText, X } from "lucide-react";
+import { FileText, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { getCssColorStyle } from "@/lib/color";
@@ -160,15 +160,13 @@ export function SearchAnything({ open, onOpenChange }: Props) {
             <div className="relative w-full max-w-3xl">
               <div className="relative flex items-center">
                 {/* Mem Logo/Icon */}
-                <div className="absolute left-4 z-10 flex items-center justify-center">
-                  <img src="/logo.png" alt="logo" width={24} height={24} />
-                </div>
+                <Search className="size-4 text-muted-foreground absolute left-4" />
                 <input
                   type="text"
                   placeholder="Search anything in Memr"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-13 h-12 w-full rounded-full bg-background border border-transparent focus:border-primary focus:outline-none text-muted-foreground "
+                  className="pl-12 h-12 w-full rounded-full bg-background border border-transparent focus:border-primary focus:outline-none text-muted-foreground "
                   autoFocus
                 />
               </div>
