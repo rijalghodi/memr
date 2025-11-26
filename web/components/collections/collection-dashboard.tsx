@@ -44,16 +44,18 @@ export function CollectionDashboard() {
       <Collapsible key="collection-filter-collapsible">
         <div className="px-6 space-y-3">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-semibold">Collections</h1>
-            <div className="flex items-center gap-0">
-              <Button variant="ghost" size="icon" onClick={handleAddCollection}>
-                <Plus />
-              </Button>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-semibold">Collections</h1>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <ListFilter />
                 </Button>
               </CollapsibleTrigger>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="default" className="rounded-full" onClick={handleAddCollection}>
+                <Plus /> New Collection
+              </Button>
             </div>
           </div>
           <CollapsibleContent>

@@ -47,16 +47,18 @@ export function NoteDashboard() {
       <Collapsible key="note-filter-collapsible">
         <div className="px-6 space-y-3">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-semibold">Notes</h1>
-            <div className="flex items-center gap-0">
-              <Button variant="ghost" size="icon" onClick={handleAddNote}>
-                <Plus />
-              </Button>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-semibold">Notes</h1>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <ListFilter />
                 </Button>
               </CollapsibleTrigger>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="default" className="rounded-full" onClick={handleAddNote}>
+                <Plus /> New Note
+              </Button>
             </div>
           </div>
           <CollapsibleContent>

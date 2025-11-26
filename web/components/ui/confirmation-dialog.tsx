@@ -95,14 +95,14 @@ export function ConfirmationProvider({ children }: { children: React.ReactNode }
           </AlertDialogHeader>
           <AlertDialogFooter className="flex w-full">
             <AlertDialogCancel
-              className="flex-1 rounded-sm"
+              className="flex-1 rounded-full"
               onClick={handleCancel}
               disabled={loading}
             >
               {options?.cancelLabel || "Cancel"}
             </AlertDialogCancel>
             <Button
-              className="flex-1"
+              className="flex-1 rounded-full"
               variant={variant === "destructive" ? "destructive" : "default"}
               onClick={handleConfirm}
               disabled={loading}

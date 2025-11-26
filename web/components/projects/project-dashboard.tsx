@@ -49,16 +49,16 @@ export function ProjectDashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h1 className="text-3xl font-semibold">Projects</h1>
-            </div>
-            <div className="flex items-center gap-0">
-              <Button variant="ghost" size="icon" onClick={handleAddProject}>
-                <Plus />
-              </Button>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <ListFilter />
                 </Button>
               </CollapsibleTrigger>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="default" className="rounded-full" onClick={handleAddProject}>
+                <Plus /> New Project
+              </Button>
             </div>
           </div>
           <CollapsibleContent>
