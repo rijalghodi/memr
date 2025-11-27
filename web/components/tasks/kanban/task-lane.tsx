@@ -18,6 +18,7 @@ type Props = {
   onTaskAdd: (groupId: string, taskData: TKanbanTask) => void;
   onTaskUpdate?: (id: string, data: Partial<TKanbanTask>) => void;
   onTaskDelete?: (id: string) => void;
+  defaultProjectId?: string;
 };
 
 export function TaskLane({
@@ -28,6 +29,7 @@ export function TaskLane({
   onTaskAdd,
   onTaskUpdate,
   onTaskDelete,
+  defaultProjectId,
 }: Props) {
   const previousTasksRef = useRef<TKanbanTask[]>(tasks);
   const [open, setOpen] = useState(false);
@@ -75,6 +77,7 @@ export function TaskLane({
                   groupId: groupId,
                 } as TKanbanTask);
               }}
+              defaultProjectId={defaultProjectId}
             />
           </CollapsibleContent>
         </header>
