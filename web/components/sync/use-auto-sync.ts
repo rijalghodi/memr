@@ -23,52 +23,97 @@ export function useAutoSync() {
       try {
         console.log("pushChanges onSuccess", response.data);
         // Insert all changes to Dexie
-        for (const change of response.data?.changes ?? []) {
+        for (const serverChange of response.data?.changes ?? []) {
           // Handle upsert
-          if (change.type === "task") {
+          if (serverChange.type === "task") {
+            // compare updatedAt of change with updatedAt of task in Dexie
+            const task = await taskApi.getById(serverChange.entityId);
+            if (
+              task &&
+              new Date(task.updatedAt).getTime() > new Date(serverChange.updatedAt).getTime()
+            ) {
+              await taskApi.upsert({
+                ...task,
+                syncedAt: response.data?.lastSyncTime, // only update syncedAt
+              });
+              continue;
+            }
             await taskApi.upsert({
-              id: change.entityId,
-              projectId: change.projectId,
-              title: change.title,
-              description: change.description,
-              status: change.status,
-              sortOrder: change.sortOrder,
-              dueDate: change.dueDate,
-              updatedAt: change.updatedAt,
-              createdAt: change.createdAt,
-              deletedAt: change.deletedAt,
+              id: serverChange.entityId,
+              projectId: serverChange.projectId,
+              title: serverChange.title,
+              description: serverChange.description,
+              status: serverChange.status,
+              sortOrder: serverChange.sortOrder,
+              dueDate: serverChange.dueDate,
+              updatedAt: serverChange.updatedAt,
+              createdAt: serverChange.createdAt,
+              deletedAt: serverChange.deletedAt,
               syncedAt: response.data?.lastSyncTime,
             });
-          } else if (change.type === "project") {
+          } else if (serverChange.type === "project") {
+            const project = await projectApi.getById(serverChange.entityId);
+            if (
+              project &&
+              new Date(project.updatedAt).getTime() > new Date(serverChange.updatedAt).getTime()
+            ) {
+              await projectApi.upsert({
+                ...project,
+                syncedAt: response.data?.lastSyncTime, // only update syncedAt
+              });
+              continue;
+            }
             await projectApi.upsert({
-              id: change.entityId,
-              title: change.title,
-              description: change.description,
-              color: change.color,
-              updatedAt: change.updatedAt,
-              createdAt: change.createdAt,
-              deletedAt: change.deletedAt,
+              id: serverChange.entityId,
+              title: serverChange.title,
+              description: serverChange.description,
+              color: serverChange.color,
+              updatedAt: serverChange.updatedAt,
+              createdAt: serverChange.createdAt,
+              deletedAt: serverChange.deletedAt,
               syncedAt: response.data?.lastSyncTime,
             });
-          } else if (change.type === "note") {
+          } else if (serverChange.type === "note") {
+            const note = await noteApi.getById(serverChange.entityId);
+            if (
+              note &&
+              new Date(note.updatedAt).getTime() > new Date(serverChange.updatedAt).getTime()
+            ) {
+              await noteApi.upsert({
+                ...note,
+                syncedAt: response.data?.lastSyncTime, // only update syncedAt
+              });
+              continue;
+            }
             await noteApi.upsert({
-              id: change.entityId,
-              collectionId: change.collectionId,
-              content: change.content,
-              updatedAt: change.updatedAt,
-              createdAt: change.createdAt,
-              deletedAt: change.deletedAt,
+              id: serverChange.entityId,
+              collectionId: serverChange.collectionId,
+              content: serverChange.content,
+              updatedAt: serverChange.updatedAt,
+              createdAt: serverChange.createdAt,
+              deletedAt: serverChange.deletedAt,
               syncedAt: response.data?.lastSyncTime,
             });
-          } else if (change.type === "collection") {
+          } else if (serverChange.type === "collection") {
+            const collection = await collectionApi.getById(serverChange.entityId);
+            if (
+              collection &&
+              new Date(collection.updatedAt).getTime() > new Date(serverChange.updatedAt).getTime()
+            ) {
+              await collectionApi.upsert({
+                ...collection,
+                syncedAt: response.data?.lastSyncTime, // only update syncedAt
+              });
+              continue;
+            }
             await collectionApi.upsert({
-              id: change.entityId,
-              title: change.title,
-              description: change.description,
-              color: change.color,
-              updatedAt: change.updatedAt,
-              createdAt: change.createdAt,
-              deletedAt: change.deletedAt,
+              id: serverChange.entityId,
+              title: serverChange.title,
+              description: serverChange.description,
+              color: serverChange.color,
+              updatedAt: serverChange.updatedAt,
+              createdAt: serverChange.createdAt,
+              deletedAt: serverChange.deletedAt,
               syncedAt: response.data?.lastSyncTime,
             });
           }
@@ -112,6 +157,7 @@ export function useAutoSync() {
           type: "task",
           title: task.title,
           description: task.description,
+          projectId: task.projectId,
           status: task.status,
           sortOrder: task.sortOrder,
           dueDate: task.dueDate,

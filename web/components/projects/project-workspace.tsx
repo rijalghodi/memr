@@ -71,8 +71,9 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
     taskApi.update({
       ...task,
       id,
-      projectId: task.projectId ?? projectId,
-      status: task.status ?? (task.groupId ? Number(task.groupId) : undefined),
+      projectId: task.projectId || projectId,
+      status:
+        task.status === undefined ? (task.groupId ? Number(task.groupId) : undefined) : task.status,
     });
   };
 
