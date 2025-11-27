@@ -8,8 +8,6 @@ export type Change = {
   collectionId?: string; // Note-only
   color?: string; // Project and collection-only
   content?: string;
-  createdAt?: string;
-  deletedAt?: string;
   description?: string;
   dueDate?: string;
   projectId?: string; // Task-only
@@ -17,7 +15,9 @@ export type Change = {
   status?: number;
   title?: string;
   type: "task" | "project" | "note" | "collection";
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
 };
 
 export type SyncReq = {

@@ -6,6 +6,10 @@ export function ProjectWorkspacePage() {
   const params = useParams();
   const projectId = params.projectId as string;
 
+  if (!projectId) {
+    return null;
+  }
+
   return (
     <>
       <ProjectWorkspace projectId={projectId} />
