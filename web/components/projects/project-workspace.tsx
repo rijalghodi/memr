@@ -62,6 +62,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
   const handleTaskAdd = (groupId: string, task: TKanbanTask) => {
     createTask({
       ...task,
+      projectId: task.projectId ?? projectId,
       status: task.status ?? (groupId ? Number(groupId) : undefined),
     });
   };
@@ -70,6 +71,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
     taskApi.update({
       ...task,
       id,
+      projectId: task.projectId ?? projectId,
       status: task.status ?? (task.groupId ? Number(task.groupId) : undefined),
     });
   };
