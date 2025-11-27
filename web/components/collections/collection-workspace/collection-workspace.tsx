@@ -80,7 +80,7 @@ export function CollectionWorkspace({ collectionId }: { collectionId: string }) 
                 value={collection?.title || ""}
                 onChange={handleTitleUpdate}
                 onBlur={handleTitleUpdate}
-                autoFocus
+                autoFocus={!collection?.title}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
