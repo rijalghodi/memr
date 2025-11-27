@@ -7,7 +7,7 @@ export const BRAND = {
   APP_TAGLINE: "AI-powered second brain",
   OG_IMAGE_URL: `https://memr-ai.vercel.app/opengraph-image.png`,
   SITE_DESCRIPTION:
-    "Memr is an AI-powered second brain that captures your notes, organizes your projects, and manages your tasks automatically. It connects ideas, generates structure, and keeps everything searchable so you can focus on thinking, not organizing.",
+    "Memr is an AI-powered knowledge management application that helps you organize your thoughts, tasks, and resources in a single, intelligent workspace.",
   KEYWORDS: [
     "Memr",
     "Memories",
