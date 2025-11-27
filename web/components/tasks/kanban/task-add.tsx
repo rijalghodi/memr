@@ -39,7 +39,7 @@ export function TaskAdd({ onSubmit, defaultProjectId }: Props) {
           setData({
             title: "",
             dueDate: undefined,
-            projectId: undefined,
+            projectId: defaultProjectId,
           });
         }
       }}
