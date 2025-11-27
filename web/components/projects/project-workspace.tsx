@@ -109,7 +109,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
                 value={projectTitle}
                 onChange={handleTitleChange}
                 onBlur={handleTitleBlur}
-                autoFocus
+                autoFocus={!project?.title}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
