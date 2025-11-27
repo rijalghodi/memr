@@ -2,7 +2,8 @@
 
 AI-powered second brain.
 
-Memr is a local-first, AI-powered knowledge management application that helps you organize your thoughts, tasks, and resources in a single, intelligent workspace. It combines the flexibility of Notion-like note-taking with AI assistance that understands your context, making it easier to capture, organize, and retrieve information.
+Memr is a local-first, notion-like, AI-powered knowledge manager that unifies notes, tasks, and resources. It uses context-aware AI to help you capture, organize, and retrieve information efficiently.
+
 
 ## What It Solves
 
