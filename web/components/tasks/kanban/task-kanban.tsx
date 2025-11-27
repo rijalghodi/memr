@@ -31,10 +31,18 @@ type Props = {
   onTaskAdd: (groupId: string, data: TKanbanTask) => void;
   onTaskDelete: (id: string) => void;
   groups: GroupItem[];
+  defaultProjectId?: string;
 };
 
 // Main Kanban component
-export function TaskKanban({ tasks, onTaskUpdate, onTaskAdd, onTaskDelete, groups }: Props) {
+export function TaskKanban({
+  tasks,
+  onTaskUpdate,
+  onTaskAdd,
+  onTaskDelete,
+  groups,
+  defaultProjectId,
+}: Props) {
   // Group tasks by group
   const tasksByGroup = useMemo(() => {
     return groupTasksByGroup(tasks);
@@ -150,6 +158,7 @@ export function TaskKanban({ tasks, onTaskUpdate, onTaskAdd, onTaskDelete, group
                 onTaskAdd={handleTaskAdd}
                 onTaskUpdate={onTaskUpdate}
                 onTaskDelete={onTaskDelete}
+                defaultProjectId={defaultProjectId}
               />
             );
           })}

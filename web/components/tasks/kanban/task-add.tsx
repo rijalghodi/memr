@@ -11,15 +11,17 @@ import { TKanbanTask } from "./type";
 
 type Props = {
   onSubmit?: (data: Pick<TKanbanTask, "title" | "dueDate" | "projectId">) => void;
+  defaultProjectId?: string;
 };
 
-export function TaskAdd({ onSubmit }: Props) {
+export function TaskAdd({ onSubmit, defaultProjectId }: Props) {
   const [data, setData] = useState<{
     title: string;
     dueDate?: Date;
     projectId?: string;
   }>({
     title: "",
+    projectId: defaultProjectId,
   });
 
   return (

@@ -144,6 +144,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
             onTaskUpdate={handleTaskUpdate}
             onTaskDelete={handleTaskDelete}
             groups={statusGroupItems}
+            defaultProjectId={projectId}
           />
         )}
       </div>
