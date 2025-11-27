@@ -75,12 +75,12 @@ export function CollectionWorkspace({ collectionId }: { collectionId: string }) 
                 style={{ color: collection?.color }}
               />
               <input
-                className="text-2xl md:text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md w-full max-w-[300px]"
+                className="text-2xl md:text-3xl font-semibold focus:outline-none focus:ring-0 p-2 hover:bg-muted focus:bg-muted rounded-md w-full max-w-[300px]"
                 placeholder={COLLECTION_TITLE_FALLBACK}
                 value={collection?.title || ""}
                 onChange={handleTitleUpdate}
                 onBlur={handleTitleUpdate}
-                autoFocus={!collection?.title}
+                // autoFocus={!collection?.title}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();

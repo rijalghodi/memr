@@ -104,12 +104,12 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
                 style={{ color: project?.color }}
               />
               <input
-                className="text-2xl md:text-3xl font-semibold focus:outline-none focus:ring-0 p-2 focus:bg-muted rounded-md w-full max-w-[300px]"
+                className="text-2xl md:text-3xl font-semibold focus:outline-none focus:ring-0 p-2 hover:bg-muted focus:bg-muted rounded-md w-full max-w-[300px]"
                 placeholder={PROJECT_TITLE_FALLBACK}
                 value={projectTitle}
                 onChange={handleTitleChange}
                 onBlur={handleTitleBlur}
-                autoFocus={!project?.title}
+                // autoFocus={!project?.title}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
