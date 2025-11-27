@@ -1,6 +1,6 @@
 # Memr API
 
-![Go Version](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go)
+![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=flat&logo=go)
 
 RESTful API for Memr - Second brain that understands you. Built with Go Fiber and PostgreSQL.
 
@@ -40,6 +40,7 @@ cp .env-example .env
 - **Sending email**: SMTP email support with Google Mail
 - **Environment variables**: using [Viper](https://github.com/joho/godotenv)
 - **Authentication**: Firebase Authentication and JWT
+- **AI Integration**: OpenAI API for AI-powered features
 - **Security**: HTTP headers, CORS, rate limiting
 - **Docker support**
 
