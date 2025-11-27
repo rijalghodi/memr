@@ -34,13 +34,13 @@ Memr is a local-first, AI-powered knowledge management application that helps yo
 - **React Query** (data fetching)
 - **Dexie** (IndexedDB for local storage)
 - **React Router** (routing)
-- **Firebase** (authentication)
+- **Google OAuth** (authentication)
 
 ### Backend (`api/`)
 
 - **Go** 1.24+ with **Fiber** (web framework)
 - **PostgreSQL** with **GORM**
-- **Firebase Authentication** + **JWT**
+- **Google OAuth** + **JWT**
 - **OpenAI API** (AI features)
 - **Zap** (logging)
 - **Swagger** (API documentation)
