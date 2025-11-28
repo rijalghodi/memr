@@ -1,10 +1,6 @@
 import { useMutation, useQuery, useQueryClient, UseQueryResult } from "@tanstack/react-query";
-import { useEffect } from "react";
-
-import { CURRENT_USER_ID_KEY } from "@/lib/constant";
 
 import { apiClient } from "./api-client";
-import { settingApi } from "./local/api-setting";
 import type { GErrorResponse, GResponse } from "./type";
 
 export type GoogleOAuthReq = {
@@ -103,22 +99,8 @@ export const useGetCurrentUser = (
   const queryResult = useQuery<GetCurrentUserApiRes, GErrorResponse>({
     queryKey: [GET_CURRENT_USER_KEY],
     queryFn: () => authApi.getCurrentUser(),
-    enabled,
+    enabled: enabled,
   });
-
-  // Store userId in settings when user is successfully fetched
-  useEffect(() => {
-    if (queryResult.data?.data?.id) {
-      settingApi
-        .upsert({
-          name: CURRENT_USER_ID_KEY,
-          value: queryResult.data.data.id,
-        })
-        .catch((error: unknown) => {
-          console.error("Failed to store currentUserId:", error);
-        });
-    }
-  }, [queryResult.data?.data?.id]);
 
   return queryResult;
 };
