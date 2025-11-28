@@ -4,7 +4,6 @@ AI-powered second brain.
 
 Memr is a local-first, notion-like, AI-powered knowledge manager that unifies notes, tasks, and resources. It uses context-aware AI to help you capture, organize, and retrieve information efficiently.
 
-
 ## What It Solves
 
 - **Information Overload**: Centralize all your notes, tasks, and projects in one place
@@ -18,7 +17,8 @@ Memr is a local-first, notion-like, AI-powered knowledge manager that unifies no
 - **Notion-like note taking**: Rich text editor with markdown support and formatting
 - **Note collection management**: Organize notes into collections for better structure
 - **Simple task management**: Create and track tasks with due dates
-- **Local first app**: Data stored locally in IndexedDB with cloud sync
+- **Local-first architecture**: Data is stored safely in your browser (IndexedDB) and seamlessly syncs to the cloud when online
+- **Progressive Web App**: Works offline and can be installed on any device
 - **AI assistant with note and task context**: Get intelligent help based on your content
 - **[TODO] Auto organize notes and tasks**: AI-powered automatic categorization and organization
 - **[TODO] Transcribe speech to text input**: Voice input for hands-free note creation
@@ -36,6 +36,7 @@ Memr is a local-first, notion-like, AI-powered knowledge manager that unifies no
 - **Dexie** (IndexedDB for local storage)
 - **React Router** (routing)
 - **Google OAuth** (authentication)
+- **PWA**
 
 ### Backend (`api/`)
 
