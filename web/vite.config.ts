@@ -17,6 +17,51 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,ttf}"],
         runtimeCaching: [
           {
+            // HTML files - NetworkFirst to allow updates, fallback to cache for offline
+            urlPattern: /\.html$/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "html-cache",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            // JS files - NetworkFirst to allow updates, fallback to cache for offline
+            urlPattern: /\.js$/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "js-cache",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            // CSS files - CacheFirst for better performance
+            urlPattern: /\.css$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "css-cache",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
             urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*/i,
             handler: "CacheFirst",
             options: {
