@@ -33,14 +33,14 @@ const maskablePath = join(outputDir, "icon-maskable-512x512.png");
 await sharp(inputLogo)
   .resize(384, 384, {
     fit: "contain",
-    background: { r: 255, g: 255, b: 255, alpha: 0 },
+    background: { r: 255, g: 255, b: 255, alpha: 1 },
   })
   .extend({
     top: 64,
     bottom: 64,
     left: 64,
     right: 64,
-    background: { r: 255, g: 255, b: 255, alpha: 0 },
+    background: { r: 255, g: 255, b: 255, alpha: 1 },
   })
   .png()
   .toFile(maskablePath);
