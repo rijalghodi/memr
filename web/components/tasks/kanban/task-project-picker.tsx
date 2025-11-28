@@ -21,7 +21,7 @@ import { useCreateProject, useGetProjects } from "@/service/local/api-project";
 
 export type Props = {
   value?: string | null;
-  onChange?: (projectId: string | null) => void;
+  onChange?: (projectId?: string | null) => void;
   disabled?: boolean;
   className?: string;
 };
@@ -77,7 +77,7 @@ export type TaskProjectPickerContentProps = {
 
 export const TaskProjectPickerContent = ({
   value,
-  onChange: onChange,
+  onChange,
   onClose,
   createOnEmpty = true,
 }: TaskProjectPickerContentProps) => {

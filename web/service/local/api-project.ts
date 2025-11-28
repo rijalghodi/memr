@@ -1,7 +1,9 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 
+import { useAuthGuard } from "@/components/layouts/auth-guard";
 import { db, type Project } from "@/lib/dexie";
+import { getCurrentUserIdFromSettings } from "@/lib/user-id";
 
 export type CreateProjectReq = {
   title?: string;
@@ -33,9 +35,14 @@ export type ProjectRes = Project & {
 
 export const projectApi = {
   create: async (data: CreateProjectReq): Promise<ProjectRes> => {
+    const userId = await getCurrentUserIdFromSettings();
+    if (!userId) {
+      throw new Error("User ID not available. Please login again.");
+    }
     const now = new Date().toISOString();
     const project: Project = {
       id: crypto.randomUUID(),
+      userId,
       title: data.title,
       description: data.description,
       color: data.color,
@@ -49,11 +56,13 @@ export const projectApi = {
   getAll: async (params?: {
     sortBy?: "updatedAt" | "createdAt";
     unsynced?: boolean;
+    userId?: string;
   }): Promise<ProjectRes[]> => {
     console.log("params in api project", params);
-    const { sortBy, unsynced } = params ?? {};
+    const { sortBy, unsynced, userId } = params ?? {};
     const projects = await db.projects
       .filter((project) => !project.deletedAt)
+      .filter((project) => !userId || project.userId === userId)
       .filter(
         (project) =>
           !unsynced ||
@@ -110,12 +119,13 @@ export const projectApi = {
     return updated;
   },
 
-  upsert: async (data: UpsertProjectReq): Promise<ProjectRes> => {
+  upsert: async (data: UpsertProjectReq, userId: string): Promise<ProjectRes> => {
     const existing = await db.projects.get(data.id);
     if (!existing || existing.deletedAt) {
       const now = new Date().toISOString();
       const project: Project = {
         id: data.id,
+        userId,
         title: data.title,
         description: data.description,
         color: data.color,
@@ -131,6 +141,7 @@ export const projectApi = {
     const updated: Project = {
       ...existing,
       ...data,
+      userId: existing.userId, // Preserve existing userId
       updatedAt: data.updatedAt ?? new Date().toISOString(),
       deletedAt: data.deletedAt,
     };
@@ -159,11 +170,20 @@ export const useCreateProject = ({
   onError?: (error: string) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { userId } = useAuthGuard();
+  const getCurrentUserId = useCallback(async () => {
+    if (userId) return userId;
+    return await getCurrentUserIdFromSettings();
+  }, [userId]);
 
   const mutate = useCallback(
     async (data: CreateProjectReq) => {
       setIsLoading(true);
       try {
+        const currentUserId = await getCurrentUserId();
+        if (!currentUserId) {
+          throw new Error("User ID not available");
+        }
         const result = await projectApi.create(data);
         onSuccess?.(result);
         return result;
@@ -175,7 +195,7 @@ export const useCreateProject = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError, getCurrentUserId]
   );
 
   return { mutate, isLoading };
@@ -186,10 +206,12 @@ export const useGetProjects = (params?: {
   unsynced?: boolean;
 }) => {
   const { sortBy = "updatedAt", unsynced } = params ?? {};
+  const { userId } = useAuthGuard();
   const projects = useLiveQuery(async () => {
     console.log("params in useGetProjects", sortBy, unsynced);
-    return await projectApi.getAll({ sortBy, unsynced });
-  }, [sortBy, unsynced]);
+    const currentUserId = userId || (await getCurrentUserIdFromSettings());
+    return await projectApi.getAll({ sortBy, unsynced, userId: currentUserId });
+  }, [sortBy, unsynced, userId]);
 
   return {
     data: projects ?? [],

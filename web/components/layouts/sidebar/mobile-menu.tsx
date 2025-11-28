@@ -17,6 +17,7 @@ import { useLogout } from "@/hooks/use-logout";
 import { getRandomColor } from "@/lib/color";
 import {
   COLLECTION_TITLE_FALLBACK,
+  LAST_SYNC_TIME_KEY,
   NOTE_TITLE_FALLBACK,
   PROJECT_TITLE_FALLBACK,
 } from "@/lib/constant";
@@ -48,7 +49,7 @@ import {
 } from "../../ui";
 
 export default function MobileMenu() {
-  const { data: lastSyncTimeSetting } = useGetSetting("lastSyncTime");
+  const { data: lastSyncTimeSetting } = useGetSetting(LAST_SYNC_TIME_KEY);
   const { logout } = useLogout();
   const lastSyncTime = lastSyncTimeSetting?.value as string | undefined;
   const { data: user } = useGetCurrentUser();

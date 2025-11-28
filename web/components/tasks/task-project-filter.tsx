@@ -16,8 +16,8 @@ export function TaskProjectFilter({
   value,
   onValueChange,
 }: {
-  value: string | undefined;
-  onValueChange: (value: string | undefined) => void;
+  value?: string;
+  onValueChange: (value?: string) => void;
 }) {
   const { data: projects } = useGetProjects();
   const [open, setOpen] = useState(false);
@@ -28,8 +28,8 @@ export function TaskProjectFilter({
   }, [projects, value]);
 
   const handleChange = useCallback(
-    (newProjectId: string | undefined) => {
-      onValueChange(newProjectId);
+    (newProjectId?: string | null) => {
+      onValueChange(newProjectId ?? undefined);
     },
     [onValueChange]
   );

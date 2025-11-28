@@ -28,7 +28,7 @@ export function NoteCollectionPicker({
   collectionId,
 }: {
   noteId: string;
-  collectionId: string | null;
+  collectionId?: string | null;
 }) {
   const { data: collections } = useGetCollections();
   const [open, setOpen] = useState(false);

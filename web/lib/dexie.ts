@@ -2,6 +2,7 @@ import Dexie, { type Table } from "dexie";
 
 export type Task = {
   id: string;
+  userId: string;
   projectId?: string | null;
   title?: string;
   description?: string;
@@ -16,6 +17,7 @@ export type Task = {
 
 export type Project = {
   id: string;
+  userId: string;
   title?: string;
   description?: string;
   color?: string;
@@ -28,6 +30,7 @@ export type Project = {
 
 export type Note = {
   id: string;
+  userId: string;
   collectionId?: string | null;
   content?: string;
   createdAt: string;
@@ -39,6 +42,7 @@ export type Note = {
 
 export type Collection = {
   id: string;
+  userId: string;
   title?: string;
   description?: string;
   color?: string;
@@ -92,6 +96,56 @@ class MemrDatabase extends Dexie {
       // changes: "id, entityId, type, deletedAt",
       settings: "name, createdAt",
     });
+    this.version(2)
+      .stores({
+        tasks: "id, userId, projectId, deletedAt",
+        projects: "id, userId, deletedAt",
+        notes: "id, userId, collectionId, deletedAt",
+        collections: "id, userId, deletedAt",
+        settings: "name, createdAt",
+      })
+      .upgrade(async (tx) => {
+        // Migration: Add userId to all existing entities
+        // For existing data, we'll set userId to empty string or a default
+        // In practice, this should be handled by the app logic
+        const defaultUserId = "";
+
+        await tx
+          .table("tasks")
+          .toCollection()
+          .modify((task) => {
+            if (!task.userId) {
+              task.userId = defaultUserId;
+            }
+          });
+
+        await tx
+          .table("projects")
+          .toCollection()
+          .modify((project) => {
+            if (!project.userId) {
+              project.userId = defaultUserId;
+            }
+          });
+
+        await tx
+          .table("notes")
+          .toCollection()
+          .modify((note) => {
+            if (!note.userId) {
+              note.userId = defaultUserId;
+            }
+          });
+
+        await tx
+          .table("collections")
+          .toCollection()
+          .modify((collection) => {
+            if (!collection.userId) {
+              collection.userId = defaultUserId;
+            }
+          });
+      });
   }
 }
 

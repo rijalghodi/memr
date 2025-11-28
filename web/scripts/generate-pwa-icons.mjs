@@ -1,13 +1,13 @@
+import { mkdir } from "fs/promises";
+import { dirname, join } from "path";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-import { mkdir, writeFile } from "fs/promises";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
-const inputLogo = join(__dirname, "../public/logo.png");
+const inputLogo = join(__dirname, "../public/logo-pwa.png");
 const outputDir = join(__dirname, "../public/icons");
 
 // Create icons directory
