@@ -6,7 +6,7 @@ export const REFRESH_TOKEN_KEY = "memr.refresh-token";
 export const SESSION_TABS_KEY = "memr.session-tabs";
 
 // IndexDB settings keys
-export const CURRENT_USER_ID_KEY = "currentUserId";
+export const CURRENT_USER_KEY = "currentUser";
 export const LAST_SYNC_TIME_KEY = "lastSyncTime";
 
 // Sync interval

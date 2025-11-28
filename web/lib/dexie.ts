@@ -73,7 +73,7 @@ export type Collection = {
 
 export type Settings = {
   name: string;
-  value: string | number | boolean | object;
+  value: string | number | boolean | object | any;
   createdAt: string;
   updatedAt: string;
 };
