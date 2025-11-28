@@ -15,7 +15,7 @@ export type UpsertSettingReq = {
 
 export type SettingRes = Settings;
 
-const settingApi = {
+export const settingApi = {
   create: async (data: CreateSettingReq): Promise<SettingRes> => {
     const now = new Date().toISOString();
     const setting: Settings = {

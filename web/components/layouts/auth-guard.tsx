@@ -1,13 +1,15 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 import { toast } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
+import { getCurrentUserIdFromSettings } from "@/lib/user-id";
 import { cn } from "@/lib/utils";
 import { authApiHook } from "@/service/api-auth";
 
 type AuthGuardContextType = {
   isAuthenticated: boolean;
+  userId?: string;
   isLoading: boolean;
   error?: string;
   invalidate: () => void;
@@ -27,14 +29,56 @@ type AuthGuardProviderProps = {
 
 export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
   const { data, isLoading, error, refetch } = authApiHook.useGetCurrentUser();
+  const [offlineUserId, setOfflineUserId] = useState<string | undefined>(undefined);
+  const [isCheckingOffline, setIsCheckingOffline] = useState(false);
 
-  if (isLoading && !data) return <AuthGuardLoader />;
+  // Check offline authentication when online check fails or when offline
+  useEffect(() => {
+    const checkOfflineAuth = async () => {
+      const isOnline = navigator.onLine;
+      const hasOnlineAuth = !!data?.data?.id && !error;
+
+      // If online and authenticated, use online auth
+      if (isOnline && hasOnlineAuth) {
+        setOfflineUserId(undefined);
+        setIsCheckingOffline(false);
+        return;
+      }
+
+      // If offline or online auth failed, check settings
+      if (!isOnline || (!hasOnlineAuth && error)) {
+        setIsCheckingOffline(true);
+        try {
+          const userId = await getCurrentUserIdFromSettings();
+          setOfflineUserId(userId);
+        } catch (err) {
+          console.error("Failed to get offline userId:", err);
+          setOfflineUserId(undefined);
+        } finally {
+          setIsCheckingOffline(false);
+        }
+      }
+    };
+
+    checkOfflineAuth();
+  }, [data?.data?.id, error, isLoading]);
+
+  // Determine authentication state
+  const isOnline = navigator.onLine;
+  const hasOnlineAuth = !!data?.data?.id && !error;
+  const hasOfflineAuth = !!offlineUserId;
+  const isAuthenticated = isOnline ? hasOnlineAuth : hasOfflineAuth;
+  const userId = isOnline ? data?.data?.id : offlineUserId;
+  const finalIsLoading = isLoading || (isCheckingOffline && !isOnline);
+
+  if (finalIsLoading && !data && !offlineUserId) return <AuthGuardLoader />;
 
   return (
     <AuthGuardContext.Provider
       value={{
-        isAuthenticated: !!data?.data?.id && !error,
-        isLoading,
+        isAuthenticated,
+        userId,
+        isLoading: finalIsLoading,
         error: error?.message,
         invalidate: () => {
           refetch();

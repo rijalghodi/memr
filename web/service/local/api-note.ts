@@ -1,8 +1,10 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 
+import { useAuthGuard } from "@/components/layouts/auth-guard";
 import { db, type Note } from "@/lib/dexie";
 import { extractFirstLineFromContent } from "@/lib/string";
+import { getCurrentUserIdFromSettings } from "@/lib/user-id";
 
 export type CreateNoteReq = {
   collectionId?: string;
@@ -34,9 +36,14 @@ export type NoteRes = Note & {
 
 export const noteApi = {
   create: async (data: CreateNoteReq): Promise<NoteRes> => {
+    const userId = await getCurrentUserIdFromSettings();
+    if (!userId) {
+      throw new Error("User ID not available. Please login again.");
+    }
     const now = new Date().toISOString();
     const note: Note = {
       id: crypto.randomUUID(),
+      userId,
       collectionId: data.collectionId,
       content: data.content,
       createdAt: now,
@@ -50,10 +57,12 @@ export const noteApi = {
     collectionId?: string;
     sortBy?: "updatedAt" | "createdAt" | "viewedAt";
     unsynced?: boolean;
+    userId?: string;
   }): Promise<NoteRes[]> => {
-    const { collectionId, sortBy, unsynced } = params ?? {};
+    const { collectionId, sortBy, unsynced, userId } = params ?? {};
     let notes = await db.notes
       .filter((note) => !note.deletedAt)
+      .filter((note) => !userId || note.userId === userId)
       .filter(
         (note) =>
           !unsynced ||
@@ -107,12 +116,13 @@ export const noteApi = {
     return updated;
   },
 
-  upsert: async (data: UpsertNoteReq): Promise<NoteRes> => {
+  upsert: async (data: UpsertNoteReq, userId: string): Promise<NoteRes> => {
     const existing = await db.notes.get(data.id);
     if (!existing || existing.deletedAt) {
       const now = new Date().toISOString();
       const note: Note = {
         id: data.id,
+        userId,
         collectionId: data.collectionId,
         content: data.content,
         createdAt: data.createdAt ?? now,
@@ -127,6 +137,7 @@ export const noteApi = {
     const updated: Note = {
       ...existing,
       ...data,
+      userId: existing.userId, // Preserve existing userId
       updatedAt: data.updatedAt ?? new Date().toISOString(),
       deletedAt: data.deletedAt,
     };
@@ -155,11 +166,20 @@ export const useCreateNote = ({
   onError?: (error: string) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { userId } = useAuthGuard();
+  const getCurrentUserId = useCallback(async () => {
+    if (userId) return userId;
+    return await getCurrentUserIdFromSettings();
+  }, [userId]);
 
   const mutate = useCallback(
     async (data: CreateNoteReq) => {
       setIsLoading(true);
       try {
+        const currentUserId = await getCurrentUserId();
+        if (!currentUserId) {
+          throw new Error("User ID not available");
+        }
         const result = await noteApi.create(data);
         onSuccess?.(result);
         return result;
@@ -171,7 +191,7 @@ export const useCreateNote = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError, getCurrentUserId]
   );
 
   return { mutate, isLoading };
@@ -183,9 +203,11 @@ export const useGetNotes = (params?: {
   unsynced?: boolean;
 }) => {
   const { collectionId, sortBy = "updatedAt", unsynced } = params ?? {};
+  const { userId } = useAuthGuard();
   const notes = useLiveQuery(async () => {
-    return await noteApi.getAll({ collectionId, sortBy, unsynced });
-  }, [collectionId, sortBy, unsynced]);
+    const currentUserId = userId || (await getCurrentUserIdFromSettings());
+    return await noteApi.getAll({ collectionId, sortBy, unsynced, userId: currentUserId });
+  }, [collectionId, sortBy, unsynced, userId]);
 
   return {
     data: notes ?? [],

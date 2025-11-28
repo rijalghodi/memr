@@ -4,6 +4,7 @@ import { LogOutIcon } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar-memr";
 import { useLogout } from "@/hooks/use-logout";
+import { LAST_SYNC_TIME_KEY } from "@/lib/constant";
 import { formatDate } from "@/lib/date";
 import { useGetCurrentUser } from "@/service/api-auth";
 import { useGetSetting } from "@/service/local/api-setting";
@@ -21,7 +22,7 @@ import {
 } from "../../ui";
 
 export function ProfileButton() {
-  const { data: lastSyncTimeSetting } = useGetSetting("lastSyncTime");
+  const { data: lastSyncTimeSetting } = useGetSetting(LAST_SYNC_TIME_KEY);
   const { logout } = useLogout();
   const lastSyncTime = lastSyncTimeSetting?.value as string | undefined;
   const { data: user } = useGetCurrentUser();

@@ -18,7 +18,7 @@ export function TaskAdd({ onSubmit, defaultProjectId }: Props) {
   const [data, setData] = useState<{
     title: string;
     dueDate?: Date;
-    projectId?: string;
+    projectId?: string | null;
   }>({
     title: "",
     projectId: defaultProjectId,

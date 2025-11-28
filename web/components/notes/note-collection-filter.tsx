@@ -17,7 +17,7 @@ export function NoteCollectionFilter({
   onValueChange,
 }: {
   value: string | undefined;
-  onValueChange: (value: string | undefined) => void;
+  onValueChange: (value: string | null) => void;
 }) {
   const { data: collections } = useGetCollections();
   const [open, setOpen] = useState(false);
@@ -28,7 +28,7 @@ export function NoteCollectionFilter({
   }, [collections, value]);
 
   const handleChange = useCallback(
-    (newCollectionId: string | undefined) => {
+    (newCollectionId: string | null) => {
       onValueChange(newCollectionId);
     },
     [onValueChange]

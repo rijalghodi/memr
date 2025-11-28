@@ -1,8 +1,10 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 
+import { useAuthGuard } from "@/components/layouts/auth-guard";
 import { type Collection, db } from "@/lib/dexie";
 import { cleanUndefinedValue } from "@/lib/object";
+import { getCurrentUserIdFromSettings } from "@/lib/user-id";
 
 export type CreateCollectionReq = {
   title?: string;
@@ -34,9 +36,14 @@ export type CollectionRes = Collection & {
 
 export const collectionApi = {
   create: async (data: CreateCollectionReq): Promise<CollectionRes> => {
+    const userId = await getCurrentUserIdFromSettings();
+    if (!userId) {
+      throw new Error("User ID not available. Please login again.");
+    }
     const now = new Date().toISOString();
     const collection: Collection = {
       id: crypto.randomUUID(),
+      userId,
       title: data.title,
       description: data.description,
       color: data.color,
@@ -50,10 +57,12 @@ export const collectionApi = {
   getAll: async (params?: {
     sortBy?: "updatedAt" | "createdAt" | "viewedAt";
     unsynced?: boolean;
+    userId?: string;
   }): Promise<CollectionRes[]> => {
-    const { sortBy = "updatedAt", unsynced } = params ?? {};
+    const { sortBy = "updatedAt", unsynced, userId } = params ?? {};
     const collections = await db.collections
       .filter((collection) => !collection.deletedAt)
+      .filter((collection) => !userId || collection.userId === userId)
       .filter(
         (collection) =>
           !unsynced ||
@@ -104,12 +113,13 @@ export const collectionApi = {
     return updated;
   },
 
-  upsert: async (data: UpsertCollectionReq): Promise<CollectionRes> => {
+  upsert: async (data: UpsertCollectionReq, userId: string): Promise<CollectionRes> => {
     const existing = await db.collections.get(data.id);
     if (!existing || existing.deletedAt) {
       const now = new Date().toISOString();
       const collection: Collection = {
         id: data.id,
+        userId,
         title: data.title,
         description: data.description,
         color: data.color,
@@ -125,6 +135,7 @@ export const collectionApi = {
     const updated: Collection = {
       ...existing,
       ...data,
+      userId: existing.userId, // Preserve existing userId
       updatedAt: data.updatedAt ?? new Date().toISOString(),
       deletedAt: data.deletedAt,
     };
@@ -153,11 +164,20 @@ export const useCreateCollection = ({
   onError?: (error: string) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { userId } = useAuthGuard();
+  const getCurrentUserId = useCallback(async () => {
+    if (userId) return userId;
+    return await getCurrentUserIdFromSettings();
+  }, [userId]);
 
   const mutate = useCallback(
     async (data: CreateCollectionReq) => {
       setIsLoading(true);
       try {
+        const currentUserId = await getCurrentUserId();
+        if (!currentUserId) {
+          throw new Error("User ID not available");
+        }
         const result = await collectionApi.create(data);
         onSuccess?.(result);
         return result;
@@ -169,7 +189,7 @@ export const useCreateCollection = ({
         setIsLoading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError, getCurrentUserId]
   );
 
   return { mutate, isLoading };
@@ -180,9 +200,11 @@ export const useGetCollections = (params?: {
   unsynced?: boolean;
 }) => {
   const { sortBy = "updatedAt", unsynced } = params ?? {};
+  const { userId } = useAuthGuard();
   const collections = useLiveQuery(async () => {
-    return await collectionApi.getAll({ sortBy, unsynced });
-  }, [sortBy, unsynced]);
+    const currentUserId = userId || (await getCurrentUserIdFromSettings());
+    return await collectionApi.getAll({ sortBy, unsynced, userId: currentUserId });
+  }, [sortBy, unsynced, userId]);
 
   return {
     data: collections ?? [],

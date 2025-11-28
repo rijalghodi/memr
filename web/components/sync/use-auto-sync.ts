@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useAuthGuard } from "@/components/layouts/auth-guard";
 import { SYNC_INTERVAL } from "@/lib/constant";
+import { getCurrentUserIdFromSettings } from "@/lib/user-id";
 import type { Change } from "@/service/api-sync";
 import { useSync } from "@/service/api-sync";
 import { collectionApi } from "@/service/local/api-collection";
@@ -16,6 +18,7 @@ export function useAutoSync() {
   const [isSyncing, setIsSyncing] = useState(false);
   const { data: lastSyncTimeSetting } = useGetSetting("lastSyncTime");
   const { mutate: updateSetting } = useUpsertSetting({});
+  const { userId } = useAuthGuard();
   const lastSyncTime = lastSyncTimeSetting?.value as string | undefined;
 
   const { mutate: pushChanges } = useSync({
@@ -32,90 +35,162 @@ export function useAutoSync() {
               task &&
               new Date(task.updatedAt).getTime() > new Date(serverChange.updatedAt).getTime()
             ) {
-              await taskApi.upsert({
-                ...task,
-                syncedAt: response.data?.lastSyncTime, // only update syncedAt
-              });
+              // Get userId from existing task or from settings
+              const currentUserId = task.userId || (await getCurrentUserIdFromSettings());
+              if (!currentUserId) {
+                console.error("No userId available for sync");
+                continue;
+              }
+              await taskApi.upsert(
+                {
+                  ...task,
+                  syncedAt: response.data?.lastSyncTime, // only update syncedAt
+                },
+                currentUserId
+              );
               continue;
             }
-            await taskApi.upsert({
-              id: serverChange.entityId,
-              projectId: serverChange.projectId,
-              title: serverChange.title,
-              description: serverChange.description,
-              status: serverChange.status,
-              sortOrder: serverChange.sortOrder,
-              dueDate: serverChange.dueDate,
-              updatedAt: serverChange.updatedAt,
-              createdAt: serverChange.createdAt,
-              deletedAt: serverChange.deletedAt,
-              syncedAt: response.data?.lastSyncTime,
-            });
+            // Get userId from auth context or settings
+            const currentUserId = await getCurrentUserIdFromSettings();
+            if (!currentUserId) {
+              console.error("No userId available for sync");
+              continue;
+            }
+            await taskApi.upsert(
+              {
+                id: serverChange.entityId,
+                projectId: serverChange.projectId,
+                title: serverChange.title,
+                description: serverChange.description,
+                status: serverChange.status,
+                sortOrder: serverChange.sortOrder,
+                dueDate: serverChange.dueDate,
+                updatedAt: serverChange.updatedAt,
+                createdAt: serverChange.createdAt,
+                deletedAt: serverChange.deletedAt,
+                syncedAt: response.data?.lastSyncTime,
+              },
+              currentUserId
+            );
           } else if (serverChange.type === "project") {
             const project = await projectApi.getById(serverChange.entityId);
             if (
               project &&
               new Date(project.updatedAt).getTime() > new Date(serverChange.updatedAt).getTime()
             ) {
-              await projectApi.upsert({
-                ...project,
-                syncedAt: response.data?.lastSyncTime, // only update syncedAt
-              });
+              // Get userId from existing project or from settings
+              const currentUserId = project.userId || (await getCurrentUserIdFromSettings());
+              if (!currentUserId) {
+                console.error("No userId available for sync");
+                continue;
+              }
+              await projectApi.upsert(
+                {
+                  ...project,
+                  syncedAt: response.data?.lastSyncTime, // only update syncedAt
+                },
+                currentUserId
+              );
               continue;
             }
-            await projectApi.upsert({
-              id: serverChange.entityId,
-              title: serverChange.title,
-              description: serverChange.description,
-              color: serverChange.color,
-              updatedAt: serverChange.updatedAt,
-              createdAt: serverChange.createdAt,
-              deletedAt: serverChange.deletedAt,
-              syncedAt: response.data?.lastSyncTime,
-            });
+            // Get userId from auth context or settings
+            const currentUserId = await getCurrentUserIdFromSettings();
+            if (!currentUserId) {
+              console.error("No userId available for sync");
+              continue;
+            }
+            await projectApi.upsert(
+              {
+                id: serverChange.entityId,
+                title: serverChange.title,
+                description: serverChange.description,
+                color: serverChange.color,
+                updatedAt: serverChange.updatedAt,
+                createdAt: serverChange.createdAt,
+                deletedAt: serverChange.deletedAt,
+                syncedAt: response.data?.lastSyncTime,
+              },
+              currentUserId
+            );
           } else if (serverChange.type === "note") {
             const note = await noteApi.getById(serverChange.entityId);
             if (
               note &&
               new Date(note.updatedAt).getTime() > new Date(serverChange.updatedAt).getTime()
             ) {
-              await noteApi.upsert({
-                ...note,
-                syncedAt: response.data?.lastSyncTime, // only update syncedAt
-              });
+              // Get userId from existing note or from settings
+              const currentUserId = note.userId || (await getCurrentUserIdFromSettings());
+              if (!currentUserId) {
+                console.error("No userId available for sync");
+                continue;
+              }
+              await noteApi.upsert(
+                {
+                  ...note,
+                  syncedAt: response.data?.lastSyncTime, // only update syncedAt
+                },
+                currentUserId
+              );
               continue;
             }
-            await noteApi.upsert({
-              id: serverChange.entityId,
-              collectionId: serverChange.collectionId,
-              content: serverChange.content,
-              updatedAt: serverChange.updatedAt,
-              createdAt: serverChange.createdAt,
-              deletedAt: serverChange.deletedAt,
-              syncedAt: response.data?.lastSyncTime,
-            });
+            // Get userId from auth context or settings
+            const currentUserId = await getCurrentUserIdFromSettings();
+            if (!currentUserId) {
+              console.error("No userId available for sync");
+              continue;
+            }
+            await noteApi.upsert(
+              {
+                id: serverChange.entityId,
+                collectionId: serverChange.collectionId,
+                content: serverChange.content,
+                updatedAt: serverChange.updatedAt,
+                createdAt: serverChange.createdAt,
+                deletedAt: serverChange.deletedAt,
+                syncedAt: response.data?.lastSyncTime,
+              },
+              currentUserId
+            );
           } else if (serverChange.type === "collection") {
             const collection = await collectionApi.getById(serverChange.entityId);
             if (
               collection &&
               new Date(collection.updatedAt).getTime() > new Date(serverChange.updatedAt).getTime()
             ) {
-              await collectionApi.upsert({
-                ...collection,
-                syncedAt: response.data?.lastSyncTime, // only update syncedAt
-              });
+              // Get userId from existing collection or from settings
+              const currentUserId = collection.userId || (await getCurrentUserIdFromSettings());
+              if (!currentUserId) {
+                console.error("No userId available for sync");
+                continue;
+              }
+              await collectionApi.upsert(
+                {
+                  ...collection,
+                  syncedAt: response.data?.lastSyncTime, // only update syncedAt
+                },
+                currentUserId
+              );
               continue;
             }
-            await collectionApi.upsert({
-              id: serverChange.entityId,
-              title: serverChange.title,
-              description: serverChange.description,
-              color: serverChange.color,
-              updatedAt: serverChange.updatedAt,
-              createdAt: serverChange.createdAt,
-              deletedAt: serverChange.deletedAt,
-              syncedAt: response.data?.lastSyncTime,
-            });
+            // Get userId from auth context or settings
+            const currentUserId = await getCurrentUserIdFromSettings();
+            if (!currentUserId) {
+              console.error("No userId available for sync");
+              continue;
+            }
+            await collectionApi.upsert(
+              {
+                id: serverChange.entityId,
+                title: serverChange.title,
+                description: serverChange.description,
+                color: serverChange.color,
+                updatedAt: serverChange.updatedAt,
+                createdAt: serverChange.createdAt,
+                deletedAt: serverChange.deletedAt,
+                syncedAt: response.data?.lastSyncTime,
+              },
+              currentUserId
+            );
           }
         }
 
@@ -141,13 +216,29 @@ export function useAutoSync() {
 
   const performSync = useCallback(async () => {
     console.log("useAutoSync useEffect");
+
+    // Only sync when online
+    if (!navigator.onLine) {
+      console.log("Skipping sync: device is offline");
+      return;
+    }
+
     try {
       setIsSyncing(true);
-      // Fetch all entities from Dexie
-      const allProjects = await projectApi.getAll({ unsynced: true });
-      const allTasks = await taskApi.getAll({ unsynced: true });
-      const allCollections = await collectionApi.getAll({ unsynced: true });
-      const allNotes = await noteApi.getAll({ unsynced: true });
+
+      // Get userId from auth context or settings
+      const currentUserId = userId || (await getCurrentUserIdFromSettings());
+      if (!currentUserId) {
+        console.error("No userId available for sync");
+        setIsSyncing(false);
+        return;
+      }
+
+      // Fetch all entities from Dexie filtered by userId
+      const allProjects = await projectApi.getAll({ unsynced: true, userId: currentUserId });
+      const allTasks = await taskApi.getAll({ unsynced: true, userId: currentUserId });
+      const allCollections = await collectionApi.getAll({ unsynced: true, userId: currentUserId });
+      const allNotes = await noteApi.getAll({ unsynced: true, userId: currentUserId });
 
       const allChanges: Change[] = [];
 
@@ -157,7 +248,7 @@ export function useAutoSync() {
           type: "task",
           title: task.title,
           description: task.description,
-          projectId: task.projectId,
+          projectId: task.projectId ?? undefined,
           status: task.status,
           sortOrder: task.sortOrder,
           dueDate: task.dueDate,
@@ -198,7 +289,7 @@ export function useAutoSync() {
           entityId: note.id,
           type: "note",
           content: note.content,
-          collectionId: note.collectionId,
+          collectionId: note.collectionId ?? undefined,
           updatedAt: note.updatedAt,
           createdAt: note.createdAt,
           deletedAt: note.deletedAt,
@@ -230,8 +321,9 @@ export function useAutoSync() {
       }
     } catch (error) {
       console.error("Error during sync:", error);
+      setIsSyncing(false);
     }
-  }, [pushChanges, lastSyncTime]);
+  }, [pushChanges, lastSyncTime, userId]);
 
   useEffect(() => {
     intervalRef.current = setInterval(performSync, SYNC_INTERVAL);

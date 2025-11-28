@@ -18,7 +18,7 @@ export function TaskUpdate({ task, onTaskUpdate }: TaskUpdateProps) {
   const [dueDate, setDueDate] = useState<Date | undefined>(
     task.dueDate ? new Date(task.dueDate) : undefined
   );
-  const [projectId, setProjectId] = useState<string | undefined>(task.projectId);
+  const [projectId, setProjectId] = useState<string | null | undefined>(task.projectId);
   const isUserEditingRef = useRef(false);
 
   // Update state when task changes externally (only if user is not editing)
@@ -60,11 +60,11 @@ export function TaskUpdate({ task, onTaskUpdate }: TaskUpdateProps) {
   };
 
   // Update task when projectId changes
-  const handleProjectChange = (selectedProjectId: string | undefined) => {
+  const handleProjectChange = (selectedProjectId?: string | null) => {
     setProjectId(selectedProjectId);
     if (onTaskUpdate) {
       onTaskUpdate(task.id, {
-        projectId: selectedProjectId ?? undefined,
+        projectId: selectedProjectId,
       });
     }
   };

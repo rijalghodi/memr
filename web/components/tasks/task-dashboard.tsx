@@ -34,7 +34,7 @@ export function TaskDashboard() {
   const [projectId, setProjectId] = useState<string | undefined>();
   const { data: dexieTasks, isLoading } = useGetTasks({
     sortBy: "sortOrder",
-    projectId: projectId,
+    projectId: projectId ?? undefined,
   });
 
   const tasks: TKanbanTask[] = useMemo(() => {
