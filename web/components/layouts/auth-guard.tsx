@@ -132,10 +132,6 @@ export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
         },
       }}
     >
-      <div className="z-100 fixed top-0 left-0 bg-black text-white p-2 rounded-md">
-        {isOnline ? "Online" : "Offline"} <br />
-        userId: {offlineUserId}
-      </div>
       {children}
     </AuthGuardContext.Provider>
   );

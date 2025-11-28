@@ -15,7 +15,8 @@ Frontend application for Memr - AI-Powered Second Brain.
 - **React Hook Form** (form handling)
 - **Dexie** (IndexedDB for local storage)
 - **React Router** (routing)
-- **Firebase** (authentication)
+- **Google OAuth** (authentication)
+- **PWA** (Progressive Web App)
 
 ## Installation
 

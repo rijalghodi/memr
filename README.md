@@ -1,4 +1,4 @@
-# Memr
+# Memr 🧠
 
 AI-powered second brain.
 
