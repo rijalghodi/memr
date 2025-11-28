@@ -148,39 +148,44 @@ export const TaskProjectPickerContent = ({
           <>
             {value && (
               <>
-                <CommandItem value="open" onSelect={() => handleOpenProject()}>
-                  <ArrowUpRight className="size-4" />
-                  <span>Open project</span>
-                </CommandItem>
-                <CommandItem value="remove" onSelect={() => handleSelect("")}>
-                  <X className="size-4" />
-                  <span>Remove project</span>
-                </CommandItem>
+                <CommandGroup>
+                  <CommandItem value="open" onSelect={() => handleOpenProject()}>
+                    <ArrowUpRight className="size-4" />
+                    <span>Open project</span>
+                  </CommandItem>
+                  <CommandItem value="remove" onSelect={() => handleSelect("")}>
+                    <X className="size-4" />
+                    <span>Remove project</span>
+                  </CommandItem>
+                </CommandGroup>
+                <CommandSeparator />
               </>
             )}
             {filteredProjects.length > 0 && (
               <>
-                {filteredProjects.map((project) => (
-                  <CommandItem
-                    key={project.id}
-                    value={project.id}
-                    onSelect={() => handleSelect(project.id)}
-                  >
-                    <ProjectIcon className="size-4" style={{ color: project.color }} />
-                    <span className="text-ellipsis line-clamp-1">
-                      {project.title || PROJECT_TITLE_FALLBACK}
-                    </span>
-                    <Check
-                      className={cn(
-                        "ml-auto size-4",
-                        value === project.id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
+                <CommandGroup>
+                  {filteredProjects.map((project) => (
+                    <CommandItem
+                      key={project.id}
+                      value={project.id}
+                      onSelect={() => handleSelect(project.id)}
+                    >
+                      <ProjectIcon className="size-4" style={{ color: project.color }} />
+                      <span className="text-ellipsis line-clamp-1">
+                        {project.title || PROJECT_TITLE_FALLBACK}
+                      </span>
+                      <Check
+                        className={cn(
+                          "ml-auto size-4",
+                          value === project.id ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                <CommandSeparator />
               </>
             )}
-            <CommandSeparator />
             {createOnEmpty && (
               <CommandGroup>
                 <CommandItem onSelect={handleCreateProject} disabled={isCreating}>

@@ -83,7 +83,7 @@ export function TaskLane({
         </header>
       </Collapsible>
 
-      <ScrollArea className="flex-1 flex items-stretch overflow-y-auto px-2">
+      <ScrollArea className="flex-1 overflow-y-auto px-2">
         <ReactSortable
           list={tasks}
           setList={handleSetList}

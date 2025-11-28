@@ -1,7 +1,8 @@
 "use client";
 
-import { Check, Plus, X } from "lucide-react";
+import { ArrowUpRight, Check, Plus, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { getCssColorStyle, getRandomColor } from "@/lib/color";
 import { COLLECTION_TITLE_FALLBACK } from "@/lib/constant";
@@ -27,7 +28,7 @@ export function NoteCollectionPicker({
   collectionId,
 }: {
   noteId: string;
-  collectionId: string | undefined;
+  collectionId: string | null;
 }) {
   const { data: collections } = useGetCollections();
   const [open, setOpen] = useState(false);
@@ -37,7 +38,7 @@ export function NoteCollectionPicker({
   }, [collections, collectionId]);
 
   const handleChange = useCallback(
-    (newCollectionId: string | undefined) => {
+    (newCollectionId: string | null) => {
       noteApi.update({
         id: noteId,
         collectionId: newCollectionId,
@@ -73,8 +74,8 @@ export function NoteCollectionPicker({
 }
 
 export type NoteCollectionPickerContentProps = {
-  value?: string;
-  onChange?: (collectionId: string | undefined) => void;
+  value?: string | null;
+  onChange?: (collectionId: string | null) => void;
   onClose?: () => void;
   createOnEmpty?: boolean;
 };
@@ -87,7 +88,7 @@ export const NoteCollectionPickerContent = ({
 }: NoteCollectionPickerContentProps) => {
   const [search, setSearch] = useState("");
   const { data: collections, isLoading } = useGetCollections();
-
+  const navigate = useNavigate();
   const handleCreateSuccess = useCallback(
     (newCollection: { id: string }) => {
       onChange?.(newCollection.id);
@@ -115,9 +116,9 @@ export const NoteCollectionPickerContent = ({
 
   const handleSelect = (collectionId: string) => {
     if (collectionId === "") {
-      onChange?.(undefined);
+      onChange?.(null);
     } else {
-      const newValue = collectionId === value ? undefined : collectionId;
+      const newValue = collectionId === value ? null : collectionId;
       onChange?.(newValue);
     }
     onClose?.();
@@ -133,6 +134,13 @@ export const NoteCollectionPickerContent = ({
     }
   };
 
+  const handleOpenCollection = () => {
+    if (value) {
+      navigate(`/collections/${value}`);
+      onClose?.();
+    }
+  };
+
   return (
     <Command shouldFilter={false}>
       <CommandInput placeholder="Search collections..." value={search} onValueChange={setSearch} />
@@ -143,35 +151,46 @@ export const NoteCollectionPickerContent = ({
           </div>
         ) : (
           <>
-            {filteredCollections.length > 0 && (
-              <CommandGroup>
-                {value && (
+            {value && (
+              <>
+                <CommandGroup>
+                  <CommandItem value="open" onSelect={() => handleOpenCollection()}>
+                    <ArrowUpRight className="size-4" />
+                    <span>Open collection</span>
+                  </CommandItem>
                   <CommandItem value="remove" onSelect={() => handleSelect("")}>
                     <X className="size-4" />
                     <span>Remove collection</span>
                   </CommandItem>
-                )}
-                {filteredCollections.map((collection) => (
-                  <CommandItem
-                    key={collection.id}
-                    value={collection.id}
-                    onSelect={() => handleSelect(collection.id)}
-                  >
-                    <CollectionIcon className="size-4" style={{ color: collection.color }} />
-                    <span className="text-ellipsis line-clamp-1">
-                      {collection.title || COLLECTION_TITLE_FALLBACK}
-                    </span>
-                    <Check
-                      className={cn(
-                        "ml-auto size-4",
-                        value === collection.id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+                </CommandGroup>
+                <CommandSeparator />
+              </>
             )}
-            <CommandSeparator />
+            {filteredCollections.length > 0 && (
+              <>
+                <CommandGroup>
+                  {filteredCollections.map((collection) => (
+                    <CommandItem
+                      key={collection.id}
+                      value={collection.id}
+                      onSelect={() => handleSelect(collection.id)}
+                    >
+                      <CollectionIcon className="size-4" style={{ color: collection.color }} />
+                      <span className="text-ellipsis line-clamp-1">
+                        {collection.title || COLLECTION_TITLE_FALLBACK}
+                      </span>
+                      <Check
+                        className={cn(
+                          "ml-auto size-4",
+                          value === collection.id ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                <CommandSeparator />
+              </>
+            )}
             {createOnEmpty && (
               <CommandGroup>
                 <CommandItem onSelect={handleCreateCollection} disabled={isCreating}>

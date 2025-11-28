@@ -136,7 +136,7 @@ export function TaskKanban({
   }, [groups]);
 
   return (
-    <div id="kanban" className="h-full flex-1 w-full flex flex-col overflow-auto">
+    <div id="kanban" className="h-full flex-1 w-full flex flex-col">
       <ScrollArea className="flex-1 w-full h-full">
         <ReactSortable
           list={groupOrderState}

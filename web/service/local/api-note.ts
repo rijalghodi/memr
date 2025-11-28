@@ -12,14 +12,14 @@ export type CreateNoteReq = {
 
 export type UpdateNoteReq = {
   id: string;
-  collectionId?: string;
+  collectionId?: string | null;
   title?: string;
   content?: string;
 };
 
 export type UpsertNoteReq = {
   id: string;
-  collectionId?: string;
+  collectionId?: string | null;
   // title?: string;
   content?: string;
   updatedAt?: string;

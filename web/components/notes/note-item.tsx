@@ -32,7 +32,7 @@ type Props = {
   id: string;
   title?: string;
   content?: string;
-  collectionId?: string;
+  collectionId?: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -87,7 +87,7 @@ export function NoteItem({ id, title, content = "", collectionId, updatedAt }: P
     navigate(getRoute(ROUTES.NOTE, { noteId: id }));
   };
 
-  const handleChangeCollection = (collectionId: string | undefined) => {
+  const handleChangeCollection = (collectionId: string | null) => {
     updateNote({
       id: id,
       collectionId: collectionId,
