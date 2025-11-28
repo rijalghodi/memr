@@ -24,4 +24,9 @@ export const BRAND = {
     "Note-taking",
     "Project Management",
   ],
+  // PWA Configuration
+  PWA_THEME_COLOR: "#8360d5",
+  PWA_DISPLAY: "standalone" as const,
+  PWA_START_URL: "/",
+  PWA_SCOPE: "/",
 };

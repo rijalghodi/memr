@@ -11,6 +11,7 @@ export function htmlMetaPlugin(): Plugin {
         `<meta name="keywords" content="${BRAND.KEYWORDS.join(", ")}" />`,
         `<meta name="author" content="${BRAND.AUTHOR}" />`,
         `<meta name="author_url" content="${BRAND.AUTHOR_URL}" />`,
+        `<meta name="theme-color" content="${BRAND.PWA_THEME_COLOR}" />`,
         `<meta property="og:type" content="website" />`,
         `<meta property="og:site_name" content="${BRAND.SITE_NAME}" />`,
         `<meta property="og:title" content="${BRAND.APP_NAME} - ${BRAND.APP_TAGLINE}" />`,
