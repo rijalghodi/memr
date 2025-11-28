@@ -4,10 +4,10 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronRight,
+  FileText,
+  ListTodo,
   LogOutIcon,
   Plus,
-  SquareCheckBig,
-  SquarePen,
 } from "lucide-react";
 import { JSX, useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -136,13 +136,13 @@ function MobileEntityShortcutMenu() {
   return (
     <DropdownMenuGroup>
       <DropdownMenuItem onClick={handleAddNote} className="h-10">
-        <SquarePen />
-        Add Note
+        <FileText />
+        Notes
       </DropdownMenuItem>
       <DropdownMenuItem asChild className="h-10">
         <Link to={ROUTES.TASKS}>
-          <SquareCheckBig />
-          Todo
+          <ListTodo />
+          Tasks
         </Link>
       </DropdownMenuItem>
     </DropdownMenuGroup>
