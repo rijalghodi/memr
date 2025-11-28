@@ -10,7 +10,7 @@ import { authApiHook } from "@/service/api-auth";
 import { settingApi } from "@/service/local/api-setting";
 
 // Verify network status on mount - use a request that bypasses service worker cache
-const verifyNetworkStatus = async (onSuccess: () => void, onError: () => void) => {
+const verifyNetworkStatus = async (onSuccess: (res: boolean) => void, onError: () => void) => {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
@@ -22,7 +22,7 @@ const verifyNetworkStatus = async (onSuccess: () => void, onError: () => void) =
     });
 
     clearTimeout(timeoutId);
-    onSuccess();
+    onSuccess(response.ok);
   } catch {
     onError();
   }
@@ -94,7 +94,7 @@ export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
   // Network status listeners
   useEffect(() => {
     verifyNetworkStatus(
-      () => setIsOnline(true),
+      (res) => setIsOnline(res),
       () => setIsOnline(false)
     );
 
