@@ -4,10 +4,9 @@ import { LogOutIcon } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar-memr";
 import { useLogout } from "@/hooks/use-logout";
-import { LAST_SYNC_TIME_KEY } from "@/lib/constant";
 import { formatDate } from "@/lib/date";
 import { useGetCurrentUser } from "@/service/api-auth";
-import { useGetSetting } from "@/service/local/api-setting";
+import { useGetLastSyncTime, useGetOfflineCurrentUser } from "@/service/local/api-setting";
 
 import {
   Avatar,
@@ -20,15 +19,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../../ui";
+import { useAuthGuard } from "../auth-guard";
 
 export function ProfileButton() {
-  const { data: lastSyncTimeSetting } = useGetSetting(LAST_SYNC_TIME_KEY);
+  const { isOnline } = useAuthGuard();
+  const { value: lastSyncTime } = useGetLastSyncTime();
   const { logout } = useLogout();
-  const lastSyncTime = lastSyncTimeSetting?.value as string | undefined;
   const { data: user } = useGetCurrentUser();
-  const userName = user?.data?.name || "User";
-  const userEmail = user?.data?.email || "";
-  const userImage = user?.data?.googleImage;
+  const { value: offlineUser } = useGetOfflineCurrentUser();
+
+  const userName = isOnline ? user?.data?.name || "User" : offlineUser?.name || "User";
+  const userEmail = isOnline ? user?.data?.email || "" : offlineUser?.email || "";
+  const userImage = isOnline ? user?.data?.googleImage : offlineUser?.googleImage || "";
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>

@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
-import { toast } from "@/components/ui";
-import { CURRENT_USER_ID_KEY } from "@/lib/constant";
+import { CURRENT_USER_KEY } from "@/lib/constant";
 import { ROUTES } from "@/lib/routes";
 import { getCurrentUserIdFromSettings } from "@/lib/user-id";
 import { cn } from "@/lib/utils";
@@ -29,6 +28,7 @@ const verifyNetworkStatus = async (onSuccess: (res: boolean) => void, onError: (
 };
 
 type AuthGuardContextType = {
+  isOnline: boolean;
   isAuthenticated: boolean;
   userId?: string;
   isLoading: boolean;
@@ -49,7 +49,7 @@ type AuthGuardProviderProps = {
 };
 
 export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
-  const [isOnline, setIsOnline] = useState(false);
+  const [isOnline, setIsOnline] = useState(() => navigator.onLine);
   const [offlineUserId, setOfflineUserId] = useState<string | undefined>(undefined);
   const [isCheckingOffline, setIsCheckingOffline] = useState(false);
 
@@ -60,9 +60,14 @@ export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
   useEffect(() => {
     if (data?.data?.id && isOnline) {
       settingApi
-        .upsert({ name: CURRENT_USER_ID_KEY, value: data.data.id })
+        .upsert({
+          name: CURRENT_USER_KEY,
+          value: data.data,
+        })
         .catch((err) => console.error("Failed to store currentUserId:", err));
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.data?.id, isOnline]);
 
   // Check offline auth when needed
@@ -123,6 +128,7 @@ export function AuthGuardProvider({ children }: AuthGuardProviderProps) {
   return (
     <AuthGuardContext.Provider
       value={{
+        isOnline,
         isAuthenticated,
         userId,
         isLoading: finalIsLoading,
@@ -156,9 +162,6 @@ export function AuthGuard({
     }
 
     if (!isAuthenticated) {
-      toast.error("You are not authenticated", {
-        description: "Please login to continue",
-      });
       navigate(ROUTES.LOGIN);
       return;
     }
