@@ -1,5 +1,6 @@
-import { Check, Plus, X } from "lucide-react";
+import { ArrowUpRight, Check, Plus, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { ProjectIcon } from "@/components/projects/project-icon";
 import { Button } from "@/components/ui/button";
@@ -19,12 +20,13 @@ import { cn } from "@/lib/utils";
 import { useCreateProject, useGetProjects } from "@/service/local/api-project";
 
 export type Props = {
-  value?: string;
-  onChange?: (projectId: string | undefined) => void;
+  value?: string | null;
+  onChange?: (projectId: string | null) => void;
   disabled?: boolean;
+  className?: string;
 };
 
-export const TaskProjectPicker = ({ value: value, onChange: onChange, disabled }: Props) => {
+export const TaskProjectPicker = ({ value, onChange, disabled, className }: Props) => {
   const [open, setOpen] = useState(false);
   const { data: projects } = useGetProjects();
 
@@ -41,6 +43,7 @@ export const TaskProjectPicker = ({ value: value, onChange: onChange, disabled }
           variant="ghost"
           size="sm-compact"
           disabled={disabled}
+          className={cn("text-muted-foreground", className)}
         >
           {selectedProject ? (
             <span className="flex items-center gap-1">
@@ -66,8 +69,8 @@ export const TaskProjectPicker = ({ value: value, onChange: onChange, disabled }
 };
 
 export type TaskProjectPickerContentProps = {
-  value?: string;
-  onChange?: (projectId: string | undefined) => void;
+  value?: string | null;
+  onChange?: (projectId: string | null) => void;
   onClose?: () => void;
   createOnEmpty?: boolean;
 };
@@ -80,6 +83,7 @@ export const TaskProjectPickerContent = ({
 }: TaskProjectPickerContentProps) => {
   const [search, setSearch] = useState("");
   const { data: projects, isLoading } = useGetProjects();
+  const navigate = useNavigate();
 
   const handleCreateSuccess = useCallback(
     (newProject: { id: string }) => {
@@ -108,9 +112,9 @@ export const TaskProjectPickerContent = ({
 
   const handleSelect = (projectId: string) => {
     if (projectId === "") {
-      onChange?.(undefined);
+      onChange?.(null);
     } else {
-      const newValue = projectId === value ? undefined : projectId;
+      const newValue = projectId === value ? null : projectId;
       onChange?.(newValue);
     }
     onClose?.();
@@ -126,6 +130,12 @@ export const TaskProjectPickerContent = ({
     }
   };
 
+  const handleOpenProject = () => {
+    if (value) {
+      navigate(`/projects/${value}`);
+    }
+  };
+
   return (
     <Command shouldFilter={false}>
       <CommandInput placeholder="Search projects..." value={search} onValueChange={setSearch} />
@@ -136,14 +146,20 @@ export const TaskProjectPickerContent = ({
           </div>
         ) : (
           <>
+            {value && (
+              <>
+                <CommandItem value="open" onSelect={() => handleOpenProject()}>
+                  <ArrowUpRight className="size-4" />
+                  <span>Open project</span>
+                </CommandItem>
+                <CommandItem value="remove" onSelect={() => handleSelect("")}>
+                  <X className="size-4" />
+                  <span>Remove project</span>
+                </CommandItem>
+              </>
+            )}
             {filteredProjects.length > 0 && (
-              <CommandGroup>
-                {value && (
-                  <CommandItem value="remove" onSelect={() => handleSelect("")}>
-                    <X className="size-4" />
-                    <span>Remove project</span>
-                  </CommandItem>
-                )}
+              <>
                 {filteredProjects.map((project) => (
                   <CommandItem
                     key={project.id}
@@ -162,7 +178,7 @@ export const TaskProjectPickerContent = ({
                     />
                   </CommandItem>
                 ))}
-              </CommandGroup>
+              </>
             )}
             <CommandSeparator />
             {createOnEmpty && (

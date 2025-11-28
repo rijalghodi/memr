@@ -6,7 +6,7 @@ import { db, type Task } from "@/lib/dexie";
 import { cleanUndefinedValue } from "@/lib/object";
 
 export type CreateTaskReq = {
-  projectId?: string;
+  projectId?: string | null;
   title?: string;
   description?: string;
   status?: number;
@@ -16,7 +16,7 @@ export type CreateTaskReq = {
 
 export type UpdateTaskReq = {
   id: string;
-  projectId?: string;
+  projectId?: string | null;
   title?: string;
   description?: string;
   status?: number;
@@ -26,7 +26,7 @@ export type UpdateTaskReq = {
 
 export type UpsertTaskReq = {
   id: string;
-  projectId?: string;
+  projectId?: string | null;
   title?: string;
   description?: string;
   status?: number;

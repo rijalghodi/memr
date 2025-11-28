@@ -32,7 +32,11 @@ type Props = {
 export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
   const [moreOpen, setMoreOpen] = useState(false);
   return (
-    <div className="has-[*[data-state=open]]:bg-muted group/task-card relative bg-card border border-border rounded-sm px-3 py-3 space-y-1 hover:bg-muted transition-colors cursor-move shadow-sm">
+    <div
+      className={cn(
+        "has-[*[data-state=open]]:bg-muted group/task-card relative bg-card border border-border rounded-sm px-3 py-3 space-y-1 hover:bg-muted transition-colors cursor-move shadow-sm"
+      )}
+    >
       <div className="flex items-start gap-2">
         <Checkbox
           checked={task.status === 2}
@@ -64,8 +68,9 @@ export function TaskCard({ task, onTaskUpdate, onTaskDelete }: Props) {
             }
           }}
           className={cn(
-            "w-full text-sm font-medium text-foreground/90 border-none p-0.5 shadow-none rounded-xs outline-none ring-0",
-            "focus:bg-accent"
+            "w-full text-sm font-medium border-none p-0.5 shadow-none rounded-xs outline-none ring-0",
+            "focus:bg-accent",
+            task.status === 2 && "line-through text-muted-foreground"
           )}
           placeholder={TASK_TITLE_FALLBACK}
         />

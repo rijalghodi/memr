@@ -2,7 +2,7 @@ import Dexie, { type Table } from "dexie";
 
 export type Task = {
   id: string;
-  projectId?: string;
+  projectId?: string | null;
   title?: string;
   description?: string;
   status: number; // 0, 1, 2, -1
@@ -28,7 +28,7 @@ export type Project = {
 
 export type Note = {
   id: string;
-  collectionId?: string;
+  collectionId?: string | null;
   content?: string;
   createdAt: string;
   updatedAt: string;
