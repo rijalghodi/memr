@@ -12,6 +12,13 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	// CRON_INTERVAL defines how often the hello endpoint is hit
+	// Format: "second minute hour day month weekday"
+	// "59 */14 * * * *" means every 14 minutes at 59 seconds
+	CRON_INTERVAL = "59 */14 * * * *"
+)
+
 type HelloCron struct {
 	cron *cron.Cron
 }
@@ -24,7 +31,7 @@ func NewHelloCron(ctx context.Context) *HelloCron {
 	}
 
 	// Schedule job to run every 1 minute
-	_, err := c.AddFunc("0 * * * * *", helloCron.hitHelloEndpoint)
+	_, err := c.AddFunc(CRON_INTERVAL, helloCron.hitHelloEndpoint)
 	if err != nil {
 		logger.Log.Error("Failed to schedule hello cron job", zap.Error(err))
 		return helloCron
