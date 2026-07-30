@@ -46,3 +46,16 @@ type GoogleLoginRes struct {
 	TokenRes
 	UserRes
 }
+
+// FirebaseLoginReq is used for any Firebase-authenticated sign-in method
+// (email/password, email link "magic link", etc). The client authenticates
+// with Firebase directly, then exchanges the resulting ID token here for
+// this app's own access/refresh token pair.
+type FirebaseLoginReq struct {
+	IDToken string `json:"idToken" validate:"required"`
+}
+
+type FirebaseLoginRes struct {
+	TokenRes
+	UserRes
+}

@@ -2,6 +2,7 @@ export const ROUTES = {
   HOME: "/",
   LOGIN: "/login",
   GOOGLE_SUCCESS: "/google-success",
+  MAGIC_LINK_FINISH: "/magic-link-finish",
   NOTES: "/notes",
   NOTE: "/notes/:noteId",
   // NOTE: (id: string) => `/notes/${id}`,

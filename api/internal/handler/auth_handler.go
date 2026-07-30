@@ -17,17 +17,21 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/oauth2"
+
+	firebasepkg "app/pkg/firebase"
 )
 
 type AuthHandler struct {
-	authUsecase *usecase.AuthUsecase
-	userUsecase *usecase.UserUsecase
+	authUsecase     *usecase.AuthUsecase
+	userUsecase     *usecase.UserUsecase
+	firebaseUsecase *firebasepkg.FirebaseUsecase
 }
 
-func NewAuthHandler(authUsecase *usecase.AuthUsecase, userUsecase *usecase.UserUsecase) *AuthHandler {
+func NewAuthHandler(authUsecase *usecase.AuthUsecase, userUsecase *usecase.UserUsecase, firebaseUsecase *firebasepkg.FirebaseUsecase) *AuthHandler {
 	return &AuthHandler{
-		authUsecase: authUsecase,
-		userUsecase: userUsecase,
+		authUsecase:     authUsecase,
+		userUsecase:     userUsecase,
+		firebaseUsecase: firebaseUsecase,
 	}
 }
 
@@ -36,6 +40,7 @@ func (h *AuthHandler) RegisterRoutes(app *fiber.App) {
 	app.Post("/v1/auth/refresh-token", h.RefreshToken)
 	app.Get("/v1/auth/google/login", h.GoogleLogin)
 	app.Get("/v1/auth/google/callback", h.GoogleCallback)
+	app.Post("/v1/auth/firebase-login", h.FirebaseLogin)
 }
 
 // @Tags Auth
@@ -185,4 +190,68 @@ func (h *AuthHandler) GoogleCallback(c *fiber.Ctx) error {
 		config.Env.GoogleOAuth.ClientCallbackURI, res.TokenRes.AccessToken, res.TokenRes.RefreshToken)
 
 	return c.Status(fiber.StatusSeeOther).Redirect(googleLoginURL)
+}
+
+// @Tags Auth
+// @Summary Login with a Firebase ID token
+// @Description Exchanges a Firebase ID token (obtained client-side via email/password
+// @Description or an email sign-in link / "magic link") for this app's access and
+// @Description refresh tokens. Creates the user on first login.
+// @Accept json
+// @Produce json
+// @Param request body contract.FirebaseLoginReq true "Firebase login request"
+// @Success 200 {object} util.BaseResponse{data=contract.FirebaseLoginRes}
+// @Failure 401 {object} util.BaseResponse
+// @Router /v1/auth/firebase-login [post]
+func (h *AuthHandler) FirebaseLogin(c *fiber.Ctx) error {
+	if h.firebaseUsecase == nil {
+		logger.Log.Error("Firebase login attempted but Firebase is not configured (FIREBASE_SERVICE_ACCOUNT_KEY_PATH)")
+		return fiber.NewError(fiber.StatusServiceUnavailable, "Email login is not configured on the server")
+	}
+
+	var req contract.FirebaseLoginReq
+	if err := c.BodyParser(&req); err != nil {
+		logger.Log.Warn("Failed to parse request body: %v", err)
+		return err
+	}
+
+	if err := util.ValidateStruct(&req); err != nil {
+		logger.Log.Warn("Validation error: %v", err)
+		return err
+	}
+
+	tokenInfo, err := h.firebaseUsecase.VerifyGoogleToken(c.Context(), req.IDToken)
+	if err != nil {
+		logger.Log.Warn("Failed to verify Firebase ID token: %v", err)
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or expired token")
+	}
+
+	if tokenInfo.Email == "" {
+		return fiber.NewError(fiber.StatusUnauthorized, "Token does not contain an email")
+	}
+
+	name := tokenInfo.Name
+	if name == "" {
+		// Email/password and email-link sign-ins usually don't set a display name.
+		name = tokenInfo.Email
+	}
+
+	loginReq := &contract.GoogleLoginReq{
+		Name:          name,
+		Email:         tokenInfo.Email,
+		VerifiedEmail: tokenInfo.EmailVerified == "true",
+		Picture:       tokenInfo.Picture,
+	}
+
+	res, err := h.authUsecase.LoginGoogleUser(c, loginReq)
+	if err != nil {
+		return err
+	}
+
+	firebaseRes := &contract.FirebaseLoginRes{
+		TokenRes: res.TokenRes,
+		UserRes:  res.UserRes,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(util.ToSuccessResponse(firebaseRes))
 }

@@ -47,13 +47,39 @@ export type UserRes = {
   updatedAt: string;
 };
 
+export type FirebaseLoginReq = {
+  idToken: string;
+};
+
+export type FirebaseLoginRes = {
+  accessToken: string;
+  accessTokenExpiresAt: string;
+  createdAt: string;
+  email: string;
+  id: string;
+  isVerified: boolean;
+  name: string;
+  refreshToken: string;
+  refreshTokenExpiresAt: string;
+  updatedAt: string;
+};
+
 export type GoogleOAuthApiRes = GResponse<GoogleOAuthRes>;
 export type RefreshTokenApiRes = GResponse<RefreshTokenRes>;
 export type GetCurrentUserApiRes = GResponse<UserRes>;
+export type FirebaseLoginApiRes = GResponse<FirebaseLoginRes>;
 
 export const authApi = {
   googleOAuth: async (data: GoogleOAuthReq): Promise<GoogleOAuthApiRes> => {
     const response = await apiClient.post("/v1/auth/google", data);
+    return response.data;
+  },
+
+  // Used for email/password login and magic-link (email sign-in link) login.
+  // The client authenticates with Firebase first, then exchanges the
+  // resulting ID token here for this app's own access/refresh tokens.
+  firebaseLogin: async (data: FirebaseLoginReq): Promise<FirebaseLoginApiRes> => {
+    const response = await apiClient.post("/v1/auth/firebase-login", data);
     return response.data;
   },
 
@@ -128,8 +154,32 @@ export const useRefreshToken = ({
   });
 };
 
+export const useFirebaseLogin = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess?: (data: FirebaseLoginApiRes) => void;
+  onError?: (error: string) => void;
+}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: FirebaseLoginReq) => authApi.firebaseLogin(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [GET_CURRENT_USER_KEY],
+      });
+      onSuccess?.(data);
+    },
+    onError: (error: GErrorResponse) => {
+      onError?.(error.response?.data?.message || "An error occurred");
+    },
+  });
+};
+
 export const authApiHook = {
   useGoogleOAuth,
   useGetCurrentUser,
   useRefreshToken,
+  useFirebaseLogin,
 };

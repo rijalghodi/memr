@@ -1,16 +1,23 @@
-"use client";
-
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import { Button, Input, toast } from "@/components/ui";
 import { auth } from "@/lib/firebase";
+import { ROUTES } from "@/lib/routes";
+
+import { completeFirebaseLogin } from "./firebase-login";
 
 type Props = {};
 
 export function LoginForm({}: Props) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [idToken, setIdToken] = useState<string | null>(null);
+  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,12 +27,18 @@ export function LoginForm({}: Props) {
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
-      setIdToken(token);
+      const userCredential =
+        mode === "sign-in"
+          ? await signInWithEmailAndPassword(auth, email, password)
+          : await createUserWithEmailAndPassword(auth, email, password);
+
+      await completeFirebaseLogin(userCredential);
+
+      toast.success("Successfully logged in!");
+      navigate(ROUTES.HOME);
+      window.location.reload();
     } catch (err: any) {
-      setError(err.message || "Failed to login");
-    } finally {
+      setError(mapFirebaseError(err));
       setLoading(false);
     }
   };
@@ -37,13 +50,12 @@ export function LoginForm({}: Props) {
           <label htmlFor="email" className="block text-sm font-medium mb-1">
             Email
           </label>
-          <input
+          <Input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="you@example.com"
           />
         </div>
@@ -52,13 +64,13 @@ export function LoginForm({}: Props) {
           <label htmlFor="password" className="block text-sm font-medium mb-1">
             Password
           </label>
-          <input
+          <Input
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            minLength={6}
             placeholder="••••••••"
           />
         </div>
@@ -69,26 +81,47 @@ export function LoginForm({}: Props) {
           </div>
         )}
 
+        <Button type="submit" disabled={loading} className="w-full" size="lg">
+          {loading
+            ? mode === "sign-in"
+              ? "Logging in..."
+              : "Creating account..."
+            : mode === "sign-in"
+              ? "Log in"
+              : "Create account"}
+        </Button>
+
         <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          type="button"
+          className="w-full text-center text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
+          onClick={() => {
+            setError(null);
+            setMode(mode === "sign-in" ? "sign-up" : "sign-in");
+          }}
         >
-          {loading ? "Logging in..." : "Login"}
+          {mode === "sign-in"
+            ? "Don't have an account? Sign up"
+            : "Already have an account? Log in"}
         </button>
       </form>
-
-      {idToken && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-md">
-          <h3 className="text-sm font-semibold text-green-800 mb-2">Login Successful!</h3>
-          <div className="text-xs text-green-700">
-            <p className="font-medium mb-1">ID Token:</p>
-            <p className="break-all font-mono bg-white p-2 rounded border border-green-300">
-              {idToken}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
+}
+
+function mapFirebaseError(err: any): string {
+  const code = err?.code as string | undefined;
+  switch (code) {
+    case "auth/email-already-in-use":
+      return "An account with this email already exists. Try logging in instead.";
+    case "auth/invalid-credential":
+    case "auth/wrong-password":
+    case "auth/user-not-found":
+      return "Incorrect email or password.";
+    case "auth/weak-password":
+      return "Password should be at least 6 characters.";
+    case "auth/invalid-email":
+      return "That doesn't look like a valid email address.";
+    default:
+      return err?.message || "Failed to log in";
+  }
 }

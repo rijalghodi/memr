@@ -10,6 +10,7 @@ import { CollectionWorkspacePage } from "@/pages/collections_collectionId";
 import { GoogleSuccessPage } from "@/pages/google-success";
 import { HomePage } from "@/pages/home";
 import { LoginPage } from "@/pages/login";
+import { MagicLinkFinishPage } from "@/pages/magic-link-finish";
 import { NotesPage } from "@/pages/notes";
 import { NoteEditorPage } from "@/pages/notes_noteId";
 import { ProjectsDashboardPage } from "@/pages/projects";
@@ -28,6 +29,7 @@ function App() {
             <Route element={<AuthGuard mustNotAuthenticated />}>
               <Route path={ROUTES.LOGIN} element={<LoginPage />} />
               <Route path={ROUTES.GOOGLE_SUCCESS} element={<GoogleSuccessPage />} />
+              <Route path={ROUTES.MAGIC_LINK_FINISH} element={<MagicLinkFinishPage />} />
             </Route>
 
             {/* App routes with layout */}
