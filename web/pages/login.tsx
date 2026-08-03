@@ -1,4 +1,3 @@
-import { LoginWithMagicLink } from "@/components/auth/login-w-magic-link";
 import { Button } from "@/components/ui/button";
 import { IconGoogle } from "@/components/ui/icon-google";
 import { BRAND } from "@/lib/brand";
@@ -36,7 +35,7 @@ export function LoginPage() {
               Continue with Google
             </Button>
 
-            <div className="relative">
+            {/* <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border"></div>
               </div>
@@ -47,7 +46,7 @@ export function LoginPage() {
 
             <div className="text-left">
               <LoginWithMagicLink />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
