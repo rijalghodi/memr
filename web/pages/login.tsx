@@ -26,7 +26,7 @@ export function LoginPage() {
             <p className="text-base">Log in to your Memr account</p>
             {/* Google Login Button */}
             <Button
-              variant="outline"
+              variant="outline-primary"
               size="lg"
               className="w-full justify-center h-12 rounded-full"
               type="button"

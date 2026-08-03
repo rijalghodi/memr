@@ -5,16 +5,12 @@ import { Button, Input } from "@/components/ui";
 import { auth } from "@/lib/firebase";
 import { ROUTES } from "@/lib/routes";
 
-import { Label } from "../ui/label";
-
 // Firebase remembers the email locally so the completion page (opened from
 // the emailed link, possibly in a different tab/session) doesn't have to
 // ask the user to retype it.
 const MAGIC_LINK_EMAIL_KEY = "memr.magic-link-email";
 
-type Props = {};
-
-export function LoginWithMagicLink({}: Props) {
+export function LoginWithMagicLink() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,16 +48,13 @@ export function LoginWithMagicLink({}: Props) {
     <div className="w-full">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="magic-link-email" className="mb-2">
-            Email
-          </Label>
           <Input
             id="magic-link-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full h-12 bg-background border-border rounded-full"
+            className="w-full h-12 bg-background border-border rounded-full text-center"
             placeholder="Your email"
           />
         </div>
