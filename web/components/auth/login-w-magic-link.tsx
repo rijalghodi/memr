@@ -54,8 +54,8 @@ export function LoginWithMagicLink() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full h-12 bg-background border-border rounded-full text-center"
-            placeholder="Your email"
+            className="w-full h-12 text-base bg-background border-border rounded-full text-center"
+            placeholder="Enter your email"
           />
         </div>
 
