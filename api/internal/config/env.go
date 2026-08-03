@@ -62,7 +62,7 @@ type SMTPGoogle struct {
 }
 
 type Firebase struct {
-	ServiceAccountKeyPath string `env:"FIREBASE_SERVICE_ACCOUNT_KEY_PATH"`
+	ServiceAccount string `env:"FIREBASE_SERVICE_ACCOUNT"`
 }
 
 type OpenAI struct {

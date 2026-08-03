@@ -13,12 +13,12 @@ type FirebaseUsecase struct {
 	auth *auth.Client
 }
 
-func NewFirebaseUsecase(ctx context.Context, serviceKeyPath string) (*FirebaseUsecase, error) {
+func NewFirebaseUsecase(ctx context.Context, serviceAccountJSON string) (*FirebaseUsecase, error) {
 	var app *firebase.App
 	var err error
 
-	if serviceKeyPath != "" {
-		app, err = firebase.NewApp(ctx, nil, option.WithCredentialsFile(serviceKeyPath))
+	if serviceAccountJSON != "" {
+		app, err = firebase.NewApp(ctx, nil, option.WithCredentialsJSON([]byte(serviceAccountJSON)))
 	} else {
 		app, err = firebase.NewApp(ctx, nil)
 	}

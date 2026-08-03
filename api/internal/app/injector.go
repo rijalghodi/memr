@@ -33,11 +33,8 @@ func InjectHTTPHandlers(ctx context.Context, app *fiber.App, db *gorm.DB) {
 	authUsecase := usecase.NewAuthUsecase(userRepo, tokenUsecase)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 
-	// Firebase is used to verify ID tokens for email/password and magic-link
-	// (email link) sign-in. It's optional at boot: if no service account is
-	// configured yet, we log a warning and disable the /v1/auth/firebase-login
-	// route instead of crashing the whole server.
-	firebaseUsecase, err := firebasepkg.NewFirebaseUsecase(ctx, config.Env.Firebase.ServiceAccountKeyPath)
+	// Firebase
+	firebaseUsecase, err := firebasepkg.NewFirebaseUsecase(ctx, config.Env.Firebase.ServiceAccount)
 	if err != nil {
 		logger.Log.Warnf("Firebase not configured, email/magic-link login disabled: %v", err)
 		firebaseUsecase = nil
