@@ -1,16 +1,9 @@
-import { useState } from "react";
-
-import { LoginForm } from "@/components/auth/login-form";
 import { LoginWithMagicLink } from "@/components/auth/login-w-magic-link";
 import { Button } from "@/components/ui/button";
 import { IconGoogle } from "@/components/ui/icon-google";
 import { BRAND } from "@/lib/brand";
 
-type EmailMode = "closed" | "password" | "magic-link";
-
 export function LoginPage() {
-  const [emailMode, setEmailMode] = useState<EmailMode>("closed");
-
   return (
     <div className="min-h-screen flex flex-col">
       {/* Logo in top left corner */}
@@ -29,13 +22,13 @@ export function LoginPage() {
             </h1>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             <p className="text-base">Log in to your Memr account</p>
             {/* Google Login Button */}
             <Button
-              variant="outline-primary"
+              variant="outline"
               size="lg"
-              className="px-10! rounded-full"
+              className="w-full justify-center h-12 rounded-full"
               type="button"
               onClick={loginWithGoogle}
             >
@@ -43,50 +36,18 @@ export function LoginPage() {
               Continue with Google
             </Button>
 
-            {emailMode === "closed" && (
-              <div className="flex flex-col gap-2 items-center">
-                <button
-                  type="button"
-                  className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
-                  onClick={() => setEmailMode("password")}
-                >
-                  Continue with email
-                </button>
-                <button
-                  type="button"
-                  className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
-                  onClick={() => setEmailMode("magic-link")}
-                >
-                  Email me a login link
-                </button>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border"></div>
               </div>
-            )}
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-background px-4 text-muted-foreground">or</span>
+              </div>
+            </div>
 
-            {emailMode === "password" && (
-              <div className="space-y-2">
-                <LoginForm />
-                <button
-                  type="button"
-                  className="w-full text-center text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
-                  onClick={() => setEmailMode("closed")}
-                >
-                  Back
-                </button>
-              </div>
-            )}
-
-            {emailMode === "magic-link" && (
-              <div className="space-y-2">
-                <LoginWithMagicLink />
-                <button
-                  type="button"
-                  className="w-full text-center text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
-                  onClick={() => setEmailMode("closed")}
-                >
-                  Back
-                </button>
-              </div>
-            )}
+            <div className="text-left">
+              <LoginWithMagicLink />
+            </div>
           </div>
         </div>
       </div>

@@ -5,6 +5,8 @@ import { Button, Input } from "@/components/ui";
 import { auth } from "@/lib/firebase";
 import { ROUTES } from "@/lib/routes";
 
+import { Label } from "../ui/label";
+
 // Firebase remembers the email locally so the completion page (opened from
 // the emailed link, possibly in a different tab/session) doesn't have to
 // ask the user to retype it.
@@ -47,19 +49,20 @@ export function LoginWithMagicLink({}: Props) {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto p-6">
+    <div className="w-full">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="magic-link-email" className="block text-sm font-medium mb-1">
+          <Label htmlFor="magic-link-email" className="mb-2">
             Email
-          </label>
+          </Label>
           <Input
             id="magic-link-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            placeholder="you@example.com"
+            className="w-full h-12 bg-background border-border rounded-full"
+            placeholder="Your email"
           />
         </div>
 
@@ -69,8 +72,14 @@ export function LoginWithMagicLink({}: Props) {
           </div>
         )}
 
-        <Button type="submit" disabled={loading} className="w-full" variant="outline-primary" size="lg">
-          {loading ? "Sending link..." : "Email me a login link"}
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full h-12 rounded-full text-base font-semibold"
+          variant="default"
+          size="lg"
+        >
+          {loading ? "Sending link..." : "Send Login Link"}
         </Button>
       </form>
     </div>
