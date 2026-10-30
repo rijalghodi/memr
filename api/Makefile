@@ -22,8 +22,8 @@ migrate-up:
 migrate-down:
 	@go run main.go migrate down $(word 2,$(MAKECMDGOALS))
 docker:
-	@docker-compose up --build
+	@docker compose -f ../docker-compose.yml up --build
 docker-down:
-	@docker-compose down --rmi all --volumes --remove-orphans
+	@docker compose -f ../docker-compose.yml down --rmi all --volumes --remove-orphans
 docker-cache:
 	@docker builder prune -f

@@ -1,0 +1,91 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: memr-db
+    restart: unless-stopped
+    env_file:
+      - ./api/.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DBNAME:-postgres}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DBNAME:-postgres}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - memr-network
+
+  adminer:
+    image: adminer
+    container_name: memr-adminer
+    restart: unless-stopped
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - memr-network
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    image: memr-api
+    container_name: memr-api
+    restart: unless-stopped
+    env_file:
+      - ./api/.env
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      POSTGRES_HOST: ${DOCKER_POSTGRES_HOST:-db}
+      POSTGRES_PORT: 5432
+    ports:
+      - "${API_EXTERNAL_PORT:-8085}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8000/hello"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - memr-network
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    image: memr-web
+    container_name: memr-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_EXTERNAL_PORT:-3080}:80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - memr-network
+
+volumes:
+  dbdata:
+
+networks:
+  memr-network:
+    driver: bridge

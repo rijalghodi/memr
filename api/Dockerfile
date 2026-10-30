@@ -31,8 +31,9 @@ WORKDIR /app
 # Copy binary
 COPY --from=build /app/main .
 
-# Copy assets folder
+# Copy assets and database migrations
 COPY --from=build /app/assets ./assets
+COPY --from=build /app/internal/database/migrations ./internal/database/migrations
 
 EXPOSE 8000
 

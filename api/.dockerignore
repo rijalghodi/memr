@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vscode
+tmp
+_debug
+__debug_bin*
+main
+lint.txt
+README.md
+
