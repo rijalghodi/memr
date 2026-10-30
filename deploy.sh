@@ -21,11 +21,14 @@ usage() {
 Usage: ./deploy.sh [TARGETS...] [OPTIONS...]
 
 Targets (combine one or more):
-  -a, --all               Deploy all services (db, adminer, api, web)
+  -a, --all               Deploy all services (api + web, plus db & adminer unless --external-db)
   -f, --frontend, --web   Deploy frontend web service (web)
   -b, --backend, --api    Deploy backend API service (api)
-  -d, --db                Deploy PostgreSQL + pgvector service (db)
+  -d, --db                Deploy PostgreSQL + pgvector container (db)
       --adminer           Deploy Adminer DB UI service (adminer)
+
+Database Mode Options:
+      --external-db       Use existing Postgres on VPS/host (do not start 'db' container)
 
 Actions & Options:
   -m, --migrate           Run database migrations (up to latest)
@@ -35,16 +38,20 @@ Actions & Options:
       --status, --ps      Show running status of services
       --no-build          Do not build images before starting
       --no-cache          Force rebuild images without Docker cache
-      --no-deps           Do not start linked dependent services (e.g. skip db when starting api)
   -h, --help              Show this help message
 
 Examples:
-  ./deploy.sh --all                    # Build and start db, adminer, api, and web
-  ./deploy.sh --all --migrate          # Deploy everything and run DB migrations
-  ./deploy.sh --frontend               # Rebuild and redeploy only the frontend
-  ./deploy.sh --backend --migrate      # Rebuild and redeploy backend + run migrations
-  ./deploy.sh --db --adminer           # Start only database and Adminer
-  ./deploy.sh --backend --down         # Stop and remove only the backend container
+  # Using existing Postgres on VPS:
+  ./deploy.sh --all --external-db --migrate
+  ./deploy.sh --backend --frontend
+
+  # Creating & using the Docker Postgres container:
+  ./deploy.sh --all --migrate
+  ./deploy.sh --db --backend --migrate
+
+  # Single service updates:
+  ./deploy.sh --frontend               # Rebuild and redeploy only frontend
+  ./deploy.sh --backend                # Rebuild and redeploy only backend
   ./deploy.sh --down                   # Stop and remove the entire stack
 EOF
 }
@@ -59,10 +66,12 @@ else
 fi
 
 SERVICES=()
+ALL_REQUESTED=false
+EXTERNAL_DB=false
+USE_DOCKER_DB=false
 ACTION="up"
 BUILD=true
 NO_CACHE=false
-NO_DEPS=false
 RUN_MIGRATE=false
 
 add_service() {
@@ -82,10 +91,7 @@ fi
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -a|--all)
-      add_service "db"
-      add_service "adminer"
-      add_service "api"
-      add_service "web"
+      ALL_REQUESTED=true
       shift
       ;;
     -f|--frontend|--web)
@@ -97,11 +103,16 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     -d|--db)
+      USE_DOCKER_DB=true
       add_service "db"
       shift
       ;;
     --adminer)
       add_service "adminer"
+      shift
+      ;;
+    --external-db)
+      EXTERNAL_DB=true
       shift
       ;;
     -m|--migrate)
@@ -132,10 +143,6 @@ while [[ $# -gt 0 ]]; do
       NO_CACHE=true
       shift
       ;;
-    --no-deps)
-      NO_DEPS=true
-      shift
-      ;;
     -h|--help)
       usage
       exit 0
@@ -146,19 +153,48 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Ensure env files exist before running
-ensure_env_files() {
-  if [[ ! -f "$ROOT_DIR/api/.env" && -f "$ROOT_DIR/api/.env.example" ]]; then
-    warn "api/.env not found. Copying from api/.env.example..."
-    cp "$ROOT_DIR/api/.env.example" "$ROOT_DIR/api/.env"
+if [[ "$ALL_REQUESTED" == true ]]; then
+  if [[ "$EXTERNAL_DB" == false ]]; then
+    USE_DOCKER_DB=true
+    add_service "db"
+    add_service "adminer"
   fi
-  if [[ ! -f "$ROOT_DIR/web/.env" && -f "$ROOT_DIR/web/.env.example" ]]; then
-    warn "web/.env not found. Copying from web/.env.example..."
-    cp "$ROOT_DIR/web/.env.example" "$ROOT_DIR/web/.env"
-  fi
-}
+  add_service "api"
+  add_service "web"
+fi
 
-ensure_env_files
+# Ensure env files exist before running
+if [[ ! -f "$ROOT_DIR/api/.env" && -f "$ROOT_DIR/api/.env.example" ]]; then
+  warn "api/.env not found. Copying from api/.env.example..."
+  cp "$ROOT_DIR/api/.env.example" "$ROOT_DIR/api/.env"
+fi
+if [[ ! -f "$ROOT_DIR/web/.env" && -f "$ROOT_DIR/web/.env.example" ]]; then
+  warn "web/.env not found. Copying from web/.env.example..."
+  cp "$ROOT_DIR/web/.env.example" "$ROOT_DIR/web/.env"
+fi
+
+# Configure DB host resolution for the api container
+if [[ "$USE_DOCKER_DB" == true ]]; then
+  export DOCKER_POSTGRES_HOST="db"
+  export DOCKER_POSTGRES_PORT="5432"
+else
+  # Check if memr-db container is already running and --external-db wasn't forced
+  if [[ "$EXTERNAL_DB" == false ]] && docker ps --format '{{.Names}}' 2>/dev/null | grep -qx 'memr-db'; then
+    export DOCKER_POSTGRES_HOST="db"
+    export DOCKER_POSTGRES_PORT="5432"
+  else
+    # Using existing Postgres on VPS/host: read POSTGRES_HOST from api/.env
+    ENV_PG_HOST=$(grep -E '^POSTGRES_HOST=' "$ROOT_DIR/api/.env" 2>/dev/null | tail -n1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" || true)
+    if [[ -z "$ENV_PG_HOST" || "$ENV_PG_HOST" == "127.0.0.1" || "$ENV_PG_HOST" == "localhost" ]]; then
+      export DOCKER_POSTGRES_HOST="host.docker.internal"
+    else
+      export DOCKER_POSTGRES_HOST="$ENV_PG_HOST"
+    fi
+  fi
+fi
+
+# Enable profiles so docker compose can manage db/adminer when requested
+COMPOSE_CMD+=(--profile db --profile adminer)
 
 # Pass api/.env for variable interpolation in docker-compose.yml
 if [[ -f "$ROOT_DIR/api/.env" ]]; then
@@ -172,8 +208,8 @@ run_migrations() {
     warn "No migration files found in api/internal/database/migrations/"
     return 0
   fi
-  info "Running database migrations up to version ${latest_version}..."
-  "${COMPOSE_CMD[@]}" run --rm api ./main migrate up "$latest_version"
+  info "Running database migrations up to version ${latest_version} (DB host: ${DOCKER_POSTGRES_HOST})..."
+  "${COMPOSE_CMD[@]}" run --rm --no-deps api ./main migrate up "$latest_version"
   ok "Database migrations completed."
 }
 
@@ -186,7 +222,7 @@ case "$ACTION" in
     ;;
   restart)
     if [[ ${#SERVICES[@]} -eq 0 ]]; then
-      info "Restarting all services..."
+      info "Restarting running services..."
       "${COMPOSE_CMD[@]}" restart
     else
       info "Restarting services: ${SERVICES[*]}..."
@@ -195,7 +231,7 @@ case "$ACTION" in
     ok "Restart complete."
     ;;
   down)
-    if [[ ${#SERVICES[@]} -eq 0 ]] || [[ ${#SERVICES[@]} -eq 4 ]]; then
+    if [[ ${#SERVICES[@]} -eq 0 ]] || [[ "$ALL_REQUESTED" == true ]]; then
       info "Stopping and removing all containers..."
       "${COMPOSE_CMD[@]}" down --remove-orphans
     else
@@ -214,7 +250,7 @@ case "$ACTION" in
       error "No target specified. Choose --all, --frontend, --backend, --db, or --migrate (see ./deploy.sh --help)."
     fi
 
-    info "Deploying services: ${SERVICES[*]}"
+    info "Deploying services: ${SERVICES[*]} (DB host: ${DOCKER_POSTGRES_HOST})"
 
     if [[ "$NO_CACHE" == true ]]; then
       info "Building images without cache..."
@@ -224,9 +260,6 @@ case "$ACTION" in
     UP_ARGS=(-d)
     if [[ "$BUILD" == true && "$NO_CACHE" == false ]]; then
       UP_ARGS+=(--build)
-    fi
-    if [[ "$NO_DEPS" == true ]]; then
-      UP_ARGS+=(--no-deps)
     fi
 
     "${COMPOSE_CMD[@]}" up "${UP_ARGS[@]}" "${SERVICES[@]}"
@@ -239,4 +272,3 @@ case "$ACTION" in
     "${COMPOSE_CMD[@]}" ps "${SERVICES[@]}"
     ;;
 esac
-
